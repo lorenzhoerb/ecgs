@@ -1,6 +1,15 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Column;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.JoinTable;
+import javax.persistence.CascadeType;
+
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -11,26 +20,26 @@ public class Competition {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length=4095)
+    @Column(nullable = false, length = 4095)
     private String name;
 
     @Column(nullable = false)
     private LocalDateTime begin;
 
     @Column(nullable = false)
-    private LocalDateTime end_of_registration;
+    private LocalDateTime endOfRegistration;
 
     @Column(nullable = false)
     private LocalDateTime end;
 
-    @Column(nullable = false, columnDefinition="TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false, length=4095)
-    private String picture_path;
+    @Column(nullable = false, length = 4095)
+    private String picturePath;
 
     @Column(nullable = false)
-    private Boolean is_public;
+    private Boolean isPublic;
 
     @Column(nullable = false)
     private Boolean draft;
@@ -43,9 +52,9 @@ public class Competition {
 
     @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(
-        name="competition_gradingGroup",
-        joinColumns={@JoinColumn(referencedColumnName = "id")},
-        inverseJoinColumns={@JoinColumn(referencedColumnName = "id")}
+        name = "competition_gradingGroup",
+        joinColumns = {@JoinColumn(referencedColumnName = "id")},
+        inverseJoinColumns = {@JoinColumn(referencedColumnName = "id")}
     )
     private Set<Competition> competition;
 

@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -44,6 +45,9 @@ public class CustomUserDetailService implements UserService {
             ApplicationUser applicationUser = findApplicationUserByEmail(email);
 
             List<GrantedAuthority> grantedAuthorities;
+            // @TODO: fix with new user
+            grantedAuthorities = AuthorityUtils.createAuthorityList("ROLE_USER");
+            /*
             if (applicationUser.getAdmin()) {
                 grantedAuthorities = AuthorityUtils.createAuthorityList("ROLE_ADMIN", "ROLE_USER");
             } else {
@@ -51,6 +55,8 @@ public class CustomUserDetailService implements UserService {
             }
 
             return new User(applicationUser.getEmail(), applicationUser.getPassword(), grantedAuthorities);
+            */
+            throw new NotFoundException("Not Implemented");
         } catch (NotFoundException e) {
             throw new UsernameNotFoundException(e.getMessage(), e);
         }

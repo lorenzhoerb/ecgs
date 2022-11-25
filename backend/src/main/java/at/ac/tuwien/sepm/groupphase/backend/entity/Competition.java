@@ -6,8 +6,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.CascadeType;
 
 import java.time.LocalDateTime;
@@ -23,14 +24,16 @@ public class Competition {
     @Column(nullable = false, length = 4095)
     private String name;
 
+    // @TODO: change name in the ER-Diagram to match end
     @Column(nullable = false)
-    private LocalDateTime begin;
+    private LocalDateTime beginOfRegistration;
 
     @Column(nullable = false)
     private LocalDateTime endOfRegistration;
 
+    // @TODO: change name in the ER-Diagram as end is a keyword in h2
     @Column(nullable = false)
-    private LocalDateTime end;
+    private LocalDateTime endOfCompetition;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
@@ -56,7 +59,17 @@ public class Competition {
         joinColumns = {@JoinColumn(referencedColumnName = "id")},
         inverseJoinColumns = {@JoinColumn(referencedColumnName = "id")}
     )
-    private Set<Competition> competition;
+    private Set<GradingGroup> competition;
+
+    // @TODO: adjust ER-Diagram relation unneeded
+    /*
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "id")
+    private ApplicationUser participant;
+    */
+
+    @OneToMany(mappedBy = "competition")
+    private Set<Judge> judges;
 
     public Competition() {}
 }

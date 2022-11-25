@@ -4,22 +4,26 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Column;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.ManyToOne;
+import java.util.Set;
 
 @Entity
-public class Grade {
+public class Judge {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // @TODO: change name in the ER-Diagram as value is a keyword in h2
-    @Column(nullable = false)
-    private String grading;
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "id")
+    private ApplicationUser participant;
 
     @ManyToOne
     @JoinColumn(referencedColumnName = "id")
-    private Judge judging;
+    private Competition competition;
+
+    @OneToMany(mappedBy = "judging")
+    private Set<Grade> grades;
 }

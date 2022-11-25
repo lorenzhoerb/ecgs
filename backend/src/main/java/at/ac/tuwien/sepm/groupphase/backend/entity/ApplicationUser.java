@@ -7,9 +7,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.CascadeType;
 
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 public class ApplicationUser {
@@ -32,7 +34,7 @@ public class ApplicationUser {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(referencedColumnName = "id")
-    private User user;
+    private SecurityUser user;
 
     @Column(nullable = false)
     private Role type;
@@ -51,6 +53,24 @@ public class ApplicationUser {
 
     @Column(nullable = false, length = 4095)
     private String picturePath;
+
+    @OneToMany(mappedBy = "manager")
+    private Set<ManagedBy> members;
+
+    @OneToMany(mappedBy = "member")
+    private Set<ManagedBy> managers;
+
+    // @TODO: adjust ER-Diagram relation unneeded
+    /*
+    @OneToMany(mappedBy = "participant")
+    private Set<Competition> competitions;
+     */
+
+    @OneToMany(mappedBy = "participant")
+    private Set<Judge> judges;
+
+    @OneToMany(mappedBy = "participant")
+    private Set<RegisterTo> registrations;
 
     public ApplicationUser() {
     }

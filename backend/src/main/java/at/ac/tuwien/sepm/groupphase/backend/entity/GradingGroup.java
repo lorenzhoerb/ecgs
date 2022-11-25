@@ -29,4 +29,7 @@ public class GradingGroup {
 
     @ManyToMany(mappedBy = "competition")
     private Set<Competition> competitions;
+
+    @OneToMany(mappedBy = "gradingGroup")
+    private Set<RegisterTo> registrations;
 }

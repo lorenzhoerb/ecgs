@@ -28,7 +28,7 @@ public class GradingSystem {
     private String formula;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(referencedColumnName = "id")
     private GradingGroup gradingGroup;
 
     public GradingSystem() {}

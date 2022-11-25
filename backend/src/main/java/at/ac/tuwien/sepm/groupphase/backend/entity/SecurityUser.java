@@ -7,8 +7,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Column;
 import javax.persistence.OneToOne;
 
+// @TODO: rename in ER-Diagram user is a keyword in h2
 @Entity
-public class User {
+public class SecurityUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,28 +23,5 @@ public class User {
     @OneToOne(mappedBy = "user")
     private ApplicationUser user;
 
-    public User() {
-
-    }
-
-    public User(String email, String password) {
-        this.email = email;
-        this.password = password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public SecurityUser() {}
 }

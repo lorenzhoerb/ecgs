@@ -60,7 +60,7 @@ public class ApplicationUser {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "member")
     private Set<ManagedBy> managers;
 
-    @OneToMany(mappedBy = "creator")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator")
     private Set<Competition> competitions;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "participant")

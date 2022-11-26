@@ -28,4 +28,43 @@ public class Flags {
         inverseJoinColumns = {@JoinColumn(referencedColumnName = "id")}
     )
     private Set<ManagedBy> clubs;
+
+    public Flags() {}
+
+    public Flags(String name) {
+        this.name = name;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Set<ManagedBy> getClubs() {
+        return clubs;
+    }
+
+    public void setClubs(Set<ManagedBy> clubs) {
+        this.clubs = clubs;
+    }
+
+    @Override
+    public String toString() {
+        return "Flags{"
+            + "id=" + id
+            + ", name='" + name + '\''
+            + ", clubs=" + clubs
+            + '}';
+    }
 }

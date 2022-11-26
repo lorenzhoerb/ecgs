@@ -24,4 +24,54 @@ public class Report {
     @OneToOne
     @JoinColumn(referencedColumnName = "id")
     private GradingGroup gradingGroup;
+
+    public Report() {}
+
+    public Report(String created, String results, GradingGroup gradingGroup) {
+        this.created = created;
+        this.results = results;
+        this.gradingGroup = gradingGroup;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getCreated() {
+        return created;
+    }
+
+    public void setCreated(String created) {
+        this.created = created;
+    }
+
+    public String getResults() {
+        return results;
+    }
+
+    public void setResults(String results) {
+        this.results = results;
+    }
+
+    public GradingGroup getGradingGroup() {
+        return gradingGroup;
+    }
+
+    public void setGradingGroup(GradingGroup gradingGroup) {
+        this.gradingGroup = gradingGroup;
+    }
+
+    @Override
+    public String toString() {
+        return "Report{"
+            + "id=" + id
+            + ", created='" + created + '\''
+            + ", results='" + results + '\''
+            + ", gradingGroup=" + gradingGroup
+            + '}';
+    }
 }

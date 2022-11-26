@@ -22,4 +22,44 @@ public class Grade {
     @ManyToOne
     @JoinColumn(referencedColumnName = "id")
     private Judge judging;
+
+    public Grade() {}
+
+    public Grade(String grading, Judge judging) {
+        this.grading = grading;
+        this.judging = judging;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getGrading() {
+        return grading;
+    }
+
+    public void setGrading(String grading) {
+        this.grading = grading;
+    }
+
+    public Judge getJudging() {
+        return judging;
+    }
+
+    public void setJudging(Judge judging) {
+        this.judging = judging;
+    }
+
+    @Override
+    public String toString() {
+        return "Grade{"
+            + "id=" + id
+            + ", grading='" + grading + '\''
+            + ", judging=" + judging
+            + '}';
+    }
 }

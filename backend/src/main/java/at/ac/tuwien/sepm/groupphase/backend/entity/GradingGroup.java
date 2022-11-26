@@ -32,4 +32,70 @@ public class GradingGroup {
 
     @OneToMany(mappedBy = "gradingGroup")
     private Set<RegisterTo> registrations;
+
+    public GradingGroup() {}
+
+    public GradingGroup(String title) {
+        this.title = title;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Report getReport() {
+        return report;
+    }
+
+    public void setReport(Report report) {
+        this.report = report;
+    }
+
+    public Set<GradingSystem> getGradingSystems() {
+        return gradingSystems;
+    }
+
+    public void setGradingSystems(Set<GradingSystem> gradingSystems) {
+        this.gradingSystems = gradingSystems;
+    }
+
+    public Set<Competition> getCompetitions() {
+        return competitions;
+    }
+
+    public void setCompetitions(Set<Competition> competitions) {
+        this.competitions = competitions;
+    }
+
+    public Set<RegisterTo> getRegistrations() {
+        return registrations;
+    }
+
+    public void setRegistrations(Set<RegisterTo> registrations) {
+        this.registrations = registrations;
+    }
+
+    @Override
+    public String toString() {
+        return "GradingGroup{"
+            + "id=" + id
+            + ", title='" + title + '\''
+            + ", report=" + report
+            + ", gradingSystems=" + gradingSystems
+            + ", competitions=" + competitions
+            + ", registrations=" + registrations
+            + '}';
+    }
 }

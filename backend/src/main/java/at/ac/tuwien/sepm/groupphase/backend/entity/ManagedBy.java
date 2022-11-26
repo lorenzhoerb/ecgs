@@ -34,4 +34,60 @@ public class ManagedBy {
 
     public ManagedBy() {}
 
+    public ManagedBy(ApplicationUser manager, ApplicationUser member, String teamName) {
+        this.manager = manager;
+        this.member = member;
+        this.teamName = teamName;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public ApplicationUser getManager() {
+        return manager;
+    }
+
+    public void setManager(ApplicationUser manager) {
+        this.manager = manager;
+    }
+
+    public ApplicationUser getMember() {
+        return member;
+    }
+
+    public void setMember(ApplicationUser member) {
+        this.member = member;
+    }
+
+    public Set<Flags> getFlags() {
+        return flags;
+    }
+
+    public void setFlags(Set<Flags> flags) {
+        this.flags = flags;
+    }
+
+    public String getTeamName() {
+        return teamName;
+    }
+
+    public void setTeamName(String teamName) {
+        this.teamName = teamName;
+    }
+
+    @Override
+    public String toString() {
+        return "ManagedBy{"
+            + "id=" + id
+            + ", manager=" + manager
+            + ", member=" + member
+            + ", flags=" + flags
+            + ", teamName='" + teamName + '\''
+            + '}';
+    }
 }

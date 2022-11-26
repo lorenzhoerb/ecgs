@@ -182,6 +182,14 @@ public class Competition {
         this.competition = competition;
     }
 
+    public ApplicationUser getCreator() {
+        return creator;
+    }
+
+    public void setCreator(ApplicationUser creator) {
+        this.creator = creator;
+    }
+
     public Set<Judge> getJudges() {
         return judges;
     }

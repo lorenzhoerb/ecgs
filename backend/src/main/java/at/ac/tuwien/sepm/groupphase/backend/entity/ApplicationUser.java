@@ -155,6 +155,14 @@ public class ApplicationUser {
         this.members = members;
     }
 
+    public Set<Competition> getCompetitions() {
+        return competitions;
+    }
+
+    public void setCompetitions(Set<Competition> competitions) {
+        this.competitions = competitions;
+    }
+
     public Set<ManagedBy> getManagers() {
         return managers;
     }

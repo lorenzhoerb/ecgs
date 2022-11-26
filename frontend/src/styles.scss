@@ -1,4 +1,366 @@
-/* You can add global styles to this file, and also import other style files */
+/* Checkout variables.scss for default colors, margins and more */
+@import './variables.scss';
+
 body {
-  background-color: whitesmoke;
+  background-color: $ming;
+  color: $font-color;
+  margin: 0;
+  padding: 0;
+}
+
+////////////////////////////////////
+/// Layouts
+////////////////////////////////////
+
+////////// Container
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+}
+
+.turnier-information {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  gap: 16px;
+}
+
+main {
+  font-size: 20px;
+  margin: 1rem 2rem;
+}
+
+.field {
+  display: flex;
+  grid-template-columns: auto auto;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+///////// Spacers and other Helpers
+
+.vertical-seperator {
+  border-right: 2px solid #719c8c/*#f7f6f7*/;
+}
+
+.horizontal-line {
+  height: 0;
+  width: 100%;
+  border-bottom: 2px rgba(32,31,32, 0.4) solid;
+  margin: 0.5rem 0;
+}
+
+.spacer {
+  height: 0;
+  width: 0;
+  margin: 1rem 0 0 0;
+}
+.spacer-2 {
+  height: 0;
+  width: 0;
+  margin: 2rem 0 0 0;
+}
+.spacer-3 {
+  height: 0;
+  width: 0;
+  margin: 3rem 0 0 0;
+}
+.spacer-4 {
+  height: 0;
+  width: 0;
+  margin: 4rem 0 0 0;
+}
+
+
+////////////////////////////////////
+/// Components
+////////////////////////////////////
+
+/////////// Header
+
+.header {
+  width: 100vw;
+  height: 4rem;
+  background-color: var(--ming);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  padding: 0;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: auto;
+}
+
+.heading {
+  height: 4rem;
+  display: flex;
+  align-items: center;
+}
+.heading h1 {
+  margin-left: 1em;
+  margin-right: 1em;
+  color: white;
+  font-size: 32px;
+}
+
+////////// Buttons
+
+button {
+  border: none;
+  border-radius: 8px;
+  font-size: 20px;
+  font-weight: 750;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.primary-btn {
+  background-color: $space-cadet;
+  color: white;
+}
+
+.secondary-btn {
+  background-color: $fancy-red;
+  color: white;
+}
+
+//Add Button
+.add-btn {
+  border: none;
+  cursor: pointer;
+  background-color: rgba(0,0,0,0);
+  font-size: 8px;
+}
+
+.add-btn::before {
+  content: "+";
+  font-size: 12px;
+  margin-right: 4px;
+  cursor: pointer;
+  background-color: white;
+  border-radius: 50%;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 0.5px solid rgba(0,0,0,0.2);
+  color: rgba(32,31,32, 0.6);
+}
+
+//Large Add Button with Space Cadet Background Color
+.add-btn.large.space {
+  font-size: 32px;
+}
+
+.add-btn.large.space::before {
+  font-size: 32px;
+  margin-right: 8px;
+  height: 48px;
+  width: 48px;
+  border-color: var(--space-cadet);
+  border-width: 2px;
+  border-style: dotted;
+  color: var(--space-cadet);
+}
+
+////////// Inputs
+
+input[type=text] {
+  background-color: rgba(0,0,0,0);
+  color: var(--font-color);
+  border: 1px turquoise solid;
+}
+
+textarea {
+  width: 100%;
+  max-width: 100%;
+  resize: vertical;
+  height: 200px;
+}
+
+input.h4 {
+  color: white;
+  font-size: 20px;
+}
+
+////////// Headings
+
+h4 {
+  margin: 1rem -1rem 0.5rem -1rem;
+  border-top: 4px solid var(--ming);
+  padding: 4px 12px;
+  font-size: 24px;
+}
+
+///////// Table (unfinished TODO: create consistent Table style)
+
+table {
+  width: 100%;
+  text-align: center;
+}
+
+//////// Pill Flags (tags)
+
+.flag {
+  background-color: var(--ming);
+  color: white;
+  border-radius: 4px;
+  padding: 0px 4px;
+  margin-left: 4px;
+}
+
+///////// User
+.user {
+  display: flex;
+  height: 4em;
+  justify-content: space-evenly;
+  align-items: center;
+  margin-right: 1em;
+}
+
+.user img {
+  width: 42px;
+  border-radius: 50%;
+  margin-right: 1em;
+}
+
+
+///////// Tournament Header
+
+.turnier-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 5rem;
+  background-color: var(--space-cadet);
+  margin: 0 2rem 0 2rem;
+  border-radius: 8px;
+  transform: translateY(-1rem);
+  transition: linear 0.3s;
+  z-index: auto;
+  position: sticky;
+  top: 1rem;
+  /*conic-gradient(from 75deg at bottom right, blue, cyan); */
+}
+
+.turnier-header.stuck {
+margin: 0;
+border-radius: 0;
+height: 3em;
+box-shadow: var(--shadow);
+transition: linear 0.3s;
+}
+
+.turnier-header * {
+  margin: 0 2rem;
+}
+
+.turnier-header input.h1 {
+  font-size: 48px;
+  color: white;
+  border: 1px turquoise solid;
+  max-width: 60vw;
+}
+
+.turnier-header h1 {
+  /*color: #f5f5f5;*/
+  font-size: 48px;
+  background-color: var(--space-cadet);
+  color: white;
+}
+
+.turnier-header.stuck h1 {
+  font-size: 42px;
+}
+
+////////////////////////////////////
+/// Adjusters
+////////////////////////////////////
+
+.large {
+  font-size: 42px;
+  margin-left: 12px;
+  margin-right: 12px;
+  margin-top: -12px;
+  margin-bottom: -8px;
+}
+
+.bold {
+  font-weight: 750;
+}
+
+.center {
+  text-align: center;
+}
+
+.opaque {
+  opacity: 60%;
+}
+
+/////// Font (Foreground) Colors
+
+.c-space {
+  color: $space-cadet;
+}
+
+.c-ming {
+  color: $ming;
+}
+
+.c-white {
+  color: snow;
+}
+
+.c-black {
+  background: $font-color;
+}
+
+.c-fancy-red {
+  color: $fancy-red;
+}
+
+.c-light-cyan {
+  color: $light-cyan;
+}
+
+.c-cardinal {
+  color: $cardinal;
+}
+
+.c-sizzling-red {
+  color: $sizzling-red;
+}
+
+/////// Background Colors
+
+.bc-space {
+  background-color: $space-cadet;
+}
+
+.bc-ming {
+  background-color: $space-cadet;
+}
+
+.bc-white {
+  background: $background-color;
+}
+
+.bc-white-2 {
+  background: $secondary-color;
+}
+
+.bc-fancy-red {
+  background-color: $fancy-red;
+}
+
+.bc-light-cyan {
+  background-color: $light-cyan;
+}
+
+.bc-cardinal {
+  background-color: $cardinal;
+}
+
+.bc-sizzling-red {
+  background-color: $sizzling-red;
 }

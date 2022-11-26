@@ -9,3 +9,5 @@
 If the database is not clean, the test data won't be inserted
 
 `mvn spring-boot:run -Dspring-boot.run.profiles=generateData`
+
+

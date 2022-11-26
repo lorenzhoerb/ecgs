@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.CascadeType;
 
 @Entity
 public class Report {
@@ -21,7 +22,7 @@ public class Report {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String results;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(referencedColumnName = "id")
     private GradingGroup gradingGroup;
 

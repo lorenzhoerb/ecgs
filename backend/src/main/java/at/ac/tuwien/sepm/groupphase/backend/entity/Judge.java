@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.CascadeType;
 import java.util.Set;
 
 @Entity
@@ -16,15 +17,15 @@ public class Judge {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(referencedColumnName = "id")
     private ApplicationUser participant;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(referencedColumnName = "id")
     private Competition competition;
 
-    @OneToMany(mappedBy = "judging")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "judging")
     private Set<Grade> grades;
 
     public Judge() {}

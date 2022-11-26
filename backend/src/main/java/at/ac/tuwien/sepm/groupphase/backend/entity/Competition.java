@@ -53,7 +53,7 @@ public class Competition {
     @Column(nullable = true, length = 255)
     private String phone;
 
-    @ManyToMany(cascade = {CascadeType.ALL})
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
         name = "competition_gradingGroup",
         joinColumns = {@JoinColumn(referencedColumnName = "id")},
@@ -68,7 +68,7 @@ public class Competition {
     private ApplicationUser participant;
     */
 
-    @OneToMany(mappedBy = "competition")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "competition")
     private Set<Judge> judges;
 
     public Competition() {}

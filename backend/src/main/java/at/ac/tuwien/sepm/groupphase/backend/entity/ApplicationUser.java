@@ -54,10 +54,10 @@ public class ApplicationUser {
     @Column(nullable = false, length = 4095)
     private String picturePath;
 
-    @OneToMany(mappedBy = "manager")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "manager")
     private Set<ManagedBy> members;
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "member")
     private Set<ManagedBy> managers;
 
     // @TODO: adjust ER-Diagram relation unneeded
@@ -66,10 +66,10 @@ public class ApplicationUser {
     private Set<Competition> competitions;
      */
 
-    @OneToMany(mappedBy = "participant")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "participant")
     private Set<Judge> judges;
 
-    @OneToMany(mappedBy = "participant")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "participant")
     private Set<RegisterTo> registrations;
 
     public ApplicationUser() {

@@ -5,18 +5,19 @@ import javax.persistence.Id;
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.CascadeType;
 import java.io.Serializable;
 
 @Entity
 public class RegisterTo implements Serializable {
 
     @Id
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(referencedColumnName = "id")
     private ApplicationUser participant;
 
     @Id
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(referencedColumnName = "id")
     private GradingGroup gradingGroup;
 

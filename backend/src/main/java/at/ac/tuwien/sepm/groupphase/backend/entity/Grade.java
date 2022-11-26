@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.CascadeType;
 
 @Entity
 public class Grade {
@@ -19,7 +20,7 @@ public class Grade {
     @Column(nullable = false)
     private String grading;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(referencedColumnName = "id")
     private Judge judging;
 

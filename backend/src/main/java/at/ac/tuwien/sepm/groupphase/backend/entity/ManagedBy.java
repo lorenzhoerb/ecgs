@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.CascadeType;
 
 import java.util.Set;
 
@@ -18,15 +19,15 @@ public class ManagedBy {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(referencedColumnName = "id")
     private ApplicationUser manager;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(referencedColumnName = "id")
     private ApplicationUser member;
 
-    @ManyToMany(mappedBy = "clubs")
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "clubs")
     private Set<Flags> flags;
 
     @Column(nullable = false, length = 4095)

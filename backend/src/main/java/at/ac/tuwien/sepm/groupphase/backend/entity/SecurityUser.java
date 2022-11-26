@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Column;
 import javax.persistence.OneToOne;
+import javax.persistence.CascadeType;
 
 // @TODO: rename in ER-Diagram user is a keyword in h2
 @Entity
@@ -20,7 +21,7 @@ public class SecurityUser {
     @Column(nullable = false, length = 255)
     private String password;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
     private ApplicationUser user;
 
     public SecurityUser() {}

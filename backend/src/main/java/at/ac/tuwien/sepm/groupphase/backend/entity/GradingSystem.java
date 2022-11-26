@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.CascadeType;
 
 @Entity
 public class GradingSystem {
@@ -27,7 +28,7 @@ public class GradingSystem {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String formula;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(referencedColumnName = "id")
     private GradingGroup gradingGroup;
 

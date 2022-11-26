@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.ManyToMany;
+import javax.persistence.CascadeType;
 
 import java.util.Set;
 
@@ -21,16 +22,16 @@ public class GradingGroup {
     @Column(nullable = false, length = 4095)
     private String title;
 
-    @OneToOne(mappedBy = "gradingGroup")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "gradingGroup")
     private Report report;
 
-    @OneToMany(mappedBy = "gradingGroup")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "gradingGroup")
     private Set<GradingSystem> gradingSystems;
 
-    @ManyToMany(mappedBy = "competition")
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "competition")
     private Set<Competition> competitions;
 
-    @OneToMany(mappedBy = "gradingGroup")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "gradingGroup")
     private Set<RegisterTo> registrations;
 
     public GradingGroup() {}

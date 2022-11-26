@@ -60,11 +60,8 @@ public class ApplicationUser {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "member")
     private Set<ManagedBy> managers;
 
-    // @TODO: adjust ER-Diagram relation unneeded
-    /*
-    @OneToMany(mappedBy = "participant")
+    @OneToMany(mappedBy = "creator")
     private Set<Competition> competitions;
-     */
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "participant")
     private Set<Judge> judges;

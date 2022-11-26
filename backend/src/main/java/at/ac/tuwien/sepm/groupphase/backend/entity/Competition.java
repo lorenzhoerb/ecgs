@@ -9,6 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.CascadeType;
 
 import java.time.LocalDateTime;
@@ -61,12 +62,9 @@ public class Competition {
     )
     private Set<GradingGroup> competition;
 
-    // @TODO: adjust ER-Diagram relation unneeded
-    /*
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(referencedColumnName = "id")
-    private ApplicationUser participant;
-    */
+    private ApplicationUser creator;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "competition")
     private Set<Judge> judges;

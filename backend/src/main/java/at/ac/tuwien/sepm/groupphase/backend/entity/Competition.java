@@ -36,6 +36,9 @@ public class Competition {
     @Column(nullable = false)
     private LocalDateTime endOfCompetition;
 
+    @Column(nullable = false)
+    private LocalDateTime beginOfCompetition;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
@@ -72,12 +75,13 @@ public class Competition {
     public Competition() {}
 
     public Competition(String name, LocalDateTime beginOfRegistration, LocalDateTime endOfRegistration,
-                       LocalDateTime endOfCompetition, String description, String picturePath, Boolean isPublic,
-                       Boolean draft, String email, String phone) {
+                       LocalDateTime beginOfCompetition, LocalDateTime endOfCompetition, String description, String picturePath,
+                       Boolean isPublic, Boolean draft, String email, String phone) {
         this.name = name;
         this.beginOfRegistration = beginOfRegistration;
         this.endOfRegistration = endOfRegistration;
         this.endOfCompetition = endOfCompetition;
+        this.beginOfCompetition = beginOfCompetition;
         this.description = description;
         this.picturePath = picturePath;
         this.isPublic = isPublic;
@@ -120,6 +124,14 @@ public class Competition {
 
     public LocalDateTime getEndOfCompetition() {
         return endOfCompetition;
+    }
+
+    public LocalDateTime getBeginOfCompetition() {
+        return beginOfCompetition;
+    }
+
+    public void setBeginOfCompetition(LocalDateTime beginOfCompetition) {
+        this.beginOfCompetition = beginOfCompetition;
     }
 
     public void setEndOfCompetition(LocalDateTime endOfCompetition) {

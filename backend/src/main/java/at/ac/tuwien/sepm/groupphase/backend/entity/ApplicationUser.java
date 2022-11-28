@@ -9,6 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.CascadeType;
+import javax.persistence.FetchType;
 
 import java.util.Date;
 import java.util.Set;
@@ -32,7 +33,7 @@ public class ApplicationUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(referencedColumnName = "id")
     private SecurityUser user;
 
@@ -72,9 +73,8 @@ public class ApplicationUser {
     public ApplicationUser() {
     }
 
-    public ApplicationUser(SecurityUser user, Role type, String firstName, String lastName, Gender gender,
+    public ApplicationUser(Role type, String firstName, String lastName, Gender gender,
                            Date dateOfBirth, String picturePath) {
-        this.user = user;
         this.type = type;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -89,10 +89,6 @@ public class ApplicationUser {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public SecurityUser getUser() {
-        return user;
     }
 
     public void setUser(SecurityUser user) {

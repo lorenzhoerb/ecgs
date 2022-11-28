@@ -26,10 +26,9 @@ public class SecurityUser {
 
     public SecurityUser() {}
 
-    public SecurityUser(String email, String password, ApplicationUser user) {
+    public SecurityUser(String email, String password) {
         this.email = email;
         this.password = password;
-        this.user = user;
     }
 
     public Long getId() {

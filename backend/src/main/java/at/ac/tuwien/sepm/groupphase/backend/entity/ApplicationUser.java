@@ -187,7 +187,6 @@ public class ApplicationUser {
     public String toString() {
         return "ApplicationUser{"
             + "id=" + id
-            + ", user=" + user
             + ", type=" + type
             + ", firstName='" + firstName + '\''
             + ", lastName='" + lastName + '\''

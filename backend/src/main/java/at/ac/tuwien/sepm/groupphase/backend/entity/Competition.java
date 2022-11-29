@@ -39,10 +39,10 @@ public class Competition {
     @Column(nullable = false)
     private LocalDateTime beginOfCompetition;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false, length = 4095)
+    @Column(length = 4095)
     private String picturePath;
 
     @Column(nullable = false)

@@ -52,6 +52,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             .stream()
             .map(err -> err.getField() + " " + err.getDefaultMessage())
             .collect(Collectors.toList());
+
+        // add custom constraint errors
+        List<String> constraintErrors = ex.getBindingResult().getGlobalErrors().stream().map(err -> err.getDefaultMessage()).toList();
+        errors.addAll(constraintErrors);
+
         body.put("Validation errors", errors);
 
         return new ResponseEntity<>(body.toString(), headers, status);

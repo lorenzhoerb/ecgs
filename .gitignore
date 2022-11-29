@@ -1,3 +1,5 @@
 .idea
 log
 database
+**/.DS_Store
+backend.iml

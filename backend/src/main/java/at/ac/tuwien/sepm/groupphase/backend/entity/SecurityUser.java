@@ -7,6 +7,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Column;
 import javax.persistence.OneToOne;
 import javax.persistence.CascadeType;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 // @TODO: rename in ER-Diagram user is a keyword in h2
 @Entity
@@ -15,10 +17,13 @@ public class SecurityUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 255)
+    @Size(min = 4, max = 64, message = "email must be between 4 and 64 characters long")
+    @Pattern(regexp = "^[a-zA-Z0-9_.@\\-]+$", message = "email can only include letters, numbers and .-_@")
+    @Column(nullable = false, length = 64, unique = true)
     private String email;
 
-    @Column(nullable = false, length = 255)
+    @Size(min = 8, max = 64, message = "password must be between 8 and 64 characters long")
+    @Column(nullable = false, length = 64)
     private String password;
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")

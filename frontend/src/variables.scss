@@ -1,0 +1,40 @@
+//scss definition
+$font-color: #313331;
+$shadow: 0 2px 1px -1px rgba(78,79,78,0.5);
+$lightgrey1: #fbfafb;
+$lightgrey2: #f7f6f7;
+$darkgrey1: #262726;
+
+$gradient: conic-gradient(from 75deg at bottom right, blue, cyan);
+$secondary-color: conic-gradient(at 0% 0%, snow, white);
+$background-color: conic-gradient(from 175deg at top right, #efeaea, white);;
+$primary-color: var(--space-cadet);
+$space-cadet: rgba(59, 53, 97, 1);
+
+$ming: rgba(56, 119, 128, 1);
+$fancy-red: #DB162F; // if in doubt use this red
+$cardinal: rgba(196, 30, 61, 1);
+$sizzling-red: rgba(255, 44, 85, 1);
+$light-cyan: rgba(201, 249, 255, 1);
+
+//css definition
+:root {
+    --font-color: #313331;
+    --shadow: 0 2px 1px -1px rgba(78,79,78,0.5);
+    --lightgrey1: #fbfafb;
+    --lightgrey2: #f7f6f7;
+    --darkgrey1: #262726;
+    --gradient: conic-gradient(from 75deg at bottom right, blue, cyan);
+    --secondary-color: conic-gradient(at 0% 0%, snow, white);
+    --background-color: conic-gradient(from 175deg at top right, #efeaea, white);
+
+    
+    --primary-color: var(--space-cadet);
+    
+    --space-cadet: rgba(59, 53, 97, 1);
+    --ming: rgba(56, 119, 128, 1);
+    --fancy-red: #DB162F; // if in doubt use this red
+    --cardinal: rgba(196, 30, 61, 1);
+    --sizzling-red: rgba(255, 44, 85, 1);
+    --light-cyan: rgba(201, 249, 255, 1);
+}

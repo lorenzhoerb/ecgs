@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {AuthRequest} from '../dtos/auth-request';
+import {AuthRequest, RegisterRequest} from '../dtos/auth-request';
 import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {tap} from 'rxjs/operators';
@@ -13,8 +13,10 @@ import {Globals} from '../global/globals';
 export class AuthService {
 
   private authBaseUri: string = this.globals.backendUri + '/authentication';
+  private registerUri: string = this.globals.backendUri + '/registration';
 
   constructor(private httpClient: HttpClient, private globals: Globals) {
+
   }
 
   /**
@@ -23,17 +25,23 @@ export class AuthService {
    * @param authRequest User data
    */
   loginUser(authRequest: AuthRequest): Observable<string> {
-    return this.httpClient.post(this.authBaseUri, authRequest, {responseType: 'text'})
+    return this.httpClient.post(this.authBaseUri, authRequest, {
+      responseType: 'text'
+    })
       .pipe(
         tap((authResponse: string) => this.setToken(authResponse))
       );
   }
 
+  registerUser(registerRequest: RegisterRequest): Observable<string> {
+    return this.httpClient.post(this.registerUri, registerRequest, { responseType: 'text'})
+      .pipe();
+  }
 
   /**
    * Check if a valid JWT token is saved in the localStorage
    */
-  isLoggedIn() {
+   isLoggedIn() {
     return !!this.getToken() && (this.getTokenExpirationDate(this.getToken()).valueOf() > new Date().valueOf());
   }
 

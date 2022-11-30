@@ -82,5 +82,11 @@ public class UserLoginDto {
             userLoginDto.setPassword(password);
             return userLoginDto;
         }
+
+
+        //TODO CREATE USERREGISTRATIONDTO
+        //TODO CREATE MAPPER FUNCTION
+        //TODO SERVICE ACCOUNT CREATE
+        //TODO EMAIL UNIQUE TRUE
     }
 }

@@ -10,6 +10,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import java.util.Date;
 import java.util.Set;
@@ -17,13 +19,13 @@ import java.util.Set;
 @Entity
 public class ApplicationUser {
 
-    enum Gender {
+    public enum Gender {
         MALE,
         FEMALE,
         OTHER
     }
 
-    enum Role {
+    public enum Role {
         Participant,
         ClubManager,
         TournamentManager
@@ -40,10 +42,14 @@ public class ApplicationUser {
     @Column(nullable = false)
     private Role type;
 
-    @Column(nullable = false, length = 255)
+    @Size(min = 2, max = 32, message = "first name must be between 2 and 32 characters long")
+    @Pattern(regexp = "^[a-zA-Z_.\\-]+$", message = "first name can only include letters and .-_")
+    @Column(nullable = false, length = 32, unique = false)
     private String firstName;
 
-    @Column(nullable = false, length = 255)
+    @Size(min = 2, max = 32, message = "last name must be between 2 and 32 characters long")
+    @Pattern(regexp = "^[a-zA-Z_.\\-]+$", message = "last name can only include letters and .-_")
+    @Column(nullable = false, length = 32, unique = false)
     private String lastName;
 
     @Column(nullable = false)
@@ -52,7 +58,7 @@ public class ApplicationUser {
     @Column(nullable = false)
     private Date dateOfBirth;
 
-    @Column(nullable = false, length = 4095)
+    @Column(length = 4095)
     private String picturePath;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "manager")
@@ -89,6 +95,10 @@ public class ApplicationUser {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public SecurityUser getUser() {
+        return user;
     }
 
     public void setUser(SecurityUser user) {

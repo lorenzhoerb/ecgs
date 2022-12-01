@@ -3,17 +3,21 @@
     box-shadow: var(--shadow);
     padding: 16px;
     border-radius: 8px;
+    height: 100%;
 }
 
 .content-card-heading {
     box-shadow: var(--shadow);
     display: flex;
     justify-content: space-between;
-    background-color: var(--space-cadet);
     color: white;
     margin: -16px -16px 0.5rem -16px;
     padding: 0 8px 0 8px;
     border-radius: 8px 8px 0 0;
+}
+
+.content-card-heading.bc-light-cyan h3 {
+    color: var(--font-color);
 }
 
 .content-card h3,

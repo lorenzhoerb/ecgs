@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.security.PermitAll;
-import javax.validation.Valid;
 import java.lang.invoke.MethodHandles;
 
 @RestController
@@ -33,10 +32,8 @@ public class CompetitionEndpoint {
     @PostMapping
     @Operation(summary = "Create a competition")
     @ResponseStatus(code = HttpStatus.CREATED)
-    public CompetitionDetailDto create(@Valid @RequestBody CompetitionDetailDto competitionDetailDto) {
+    public CompetitionDetailDto create(@RequestBody CompetitionDetailDto competitionDetailDto) {
         LOGGER.info("POST {}", BASE_PATH);
-        System.out.println(competitionDetailDto);
-        LOGGER.info("request body\n{}", competitionDetailDto);
         return competitionService.create(competitionDetailDto);
     }
 }

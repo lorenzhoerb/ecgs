@@ -1,7 +1,10 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.exceptionhandler;
 
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ErrorListRestDto;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -10,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -54,10 +59,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             .map(err -> err.getField() + " " + err.getDefaultMessage())
             .collect(Collectors.toList());
 
-        // add custom constraint errors
-        List<String> constraintErrors = ex.getBindingResult().getGlobalErrors().stream().map(err -> err.getDefaultMessage()).toList();
-        errors.addAll(constraintErrors);
-
         body.put("Validation errors", errors);
 
         return new ResponseEntity<>(body.toString(), headers, status);
@@ -82,4 +83,32 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
     }
 
+
+    /**
+     * Handles the custom ValidationListException to send a custom Http response.
+     *
+     * @param e ValidationListException e
+     * @return ErrorListRestDto
+     */
+    @ExceptionHandler(value = {ValidationListException.class})
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ResponseBody
+    public ErrorListRestDto handleValidationException(ValidationListException e) {
+        LOGGER.warn("Terminating request processing with status 422 due to {}: {}", e.getClass().getSimpleName(), e.getMessage());
+        return new ErrorListRestDto(e.summary(), e.errors());
+    }
+
+    /**
+     * Handles the custom ConflictException to send a custom Http response.
+     *
+     * @param e ValidationListException e
+     * @return ErrorListRestDto
+     */
+    @ExceptionHandler(value = {ConflictException.class})
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    public ErrorListRestDto handleConflictException(ConflictException e) {
+        LOGGER.warn("Terminating request processing with status 409 due to {}: {}", e.getClass().getSimpleName(), e.getMessage());
+        return new ErrorListRestDto(e.summary(), e.errors());
+    }
 }

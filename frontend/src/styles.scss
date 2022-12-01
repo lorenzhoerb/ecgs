@@ -1,7 +1,26 @@
 /* Checkout variables.scss for default colors, margins and more */
+// TODO: maybe remove Bootstrap for f*cking with my styles
+@import '../node_modules/bootstrap/scss/bootstrap';
 @import './variables.scss';
 
+h6,
+.h6,
+h5,
+.h5,
+h4,
+.h4,
+h3,
+.h3,
+h2,
+.h2,
+h1,
+.h1 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 body {
+  font-family: 'Noto Sans';
   background-color: $ming;
   color: $font-color;
   margin: 0;
@@ -27,7 +46,11 @@ body {
 
 main {
   font-size: 20px;
-  margin: 1rem 2rem;
+}
+
+main>* {
+  padding-left: 2rem;
+  padding-right: 2rem;
 }
 
 .field {
@@ -37,16 +60,57 @@ main {
   justify-content: space-between;
 }
 
+.hold-image {
+  height: 320px;
+  display: flex;
+  justify-content: center;
+}
+
+.turnier-image {
+  height: 320px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background: var(--secondary-color);
+  position: fixed;
+  /*box-shadow: var(--shadow);
+  margin: 1rem 2rem;
+  border-radius: 8px; */
+}
+
+.scrollabove {
+  z-index: 4;
+  background-color: var(--ming);
+}
+
+.turnier-image img {
+  height: 320px;
+}
+
+.scrollabove {
+  position: relative;
+  z-index: 3;
+  padding-bottom: 2rem;
+}
+
+.second-scrollabove {
+  background: $secondary-color;
+  margin: 0 -2rem -2rem;
+  padding: 4rem 2rem;
+}
+
 ///////// Spacers and other Helpers
 
 .vertical-seperator {
-  border-right: 2px solid #719c8c/*#f7f6f7*/;
+  border-right: 2px solid #719c8c
+    /*#f7f6f7*/
+  ;
 }
 
 .horizontal-line {
   height: 0;
   width: 100%;
-  border-bottom: 2px rgba(32,31,32, 0.4) solid;
+  border-bottom: 2px rgba(32, 31, 32, 0.4) solid;
   margin: 0.5rem 0;
 }
 
@@ -55,16 +119,19 @@ main {
   width: 0;
   margin: 1rem 0 0 0;
 }
+
 .spacer-2 {
   height: 0;
   width: 0;
   margin: 2rem 0 0 0;
 }
+
 .spacer-3 {
   height: 0;
   width: 0;
   margin: 3rem 0 0 0;
 }
+
 .spacer-4 {
   height: 0;
   width: 0;
@@ -97,6 +164,7 @@ main {
   display: flex;
   align-items: center;
 }
+
 .heading h1 {
   margin-left: 1em;
   margin-right: 1em;
@@ -129,7 +197,7 @@ button {
 .add-btn {
   border: none;
   cursor: pointer;
-  background-color: rgba(0,0,0,0);
+  background-color: rgba(0, 0, 0, 0);
   font-size: 8px;
 }
 
@@ -143,8 +211,8 @@ button {
   display: inline-block;
   width: 16px;
   height: 16px;
-  border: 0.5px solid rgba(0,0,0,0.2);
-  color: rgba(32,31,32, 0.6);
+  border: 0.5px solid rgba(0, 0, 0, 0.2);
+  color: rgba(32, 31, 32, 0.6);
 }
 
 //Large Add Button with Space Cadet Background Color
@@ -166,7 +234,7 @@ button {
 ////////// Inputs
 
 input[type=text] {
-  background-color: rgba(0,0,0,0);
+  background-color: rgba(0, 0, 0, 0);
   color: var(--font-color);
   border: 1px turquoise solid;
 }
@@ -190,6 +258,19 @@ h4 {
   border-top: 4px solid var(--ming);
   padding: 4px 12px;
   font-size: 24px;
+}
+
+h3 {
+  font-size: 1.2rem;
+}
+
+.sticky-heading {
+  position: sticky;
+  background-color: var(--ming);
+  width: 100vw;
+  margin: 0 -2rem -2rem -2rem;
+  top: 0;
+  height: 5rem;
 }
 
 ///////// Table (unfinished TODO: create consistent Table style)
@@ -231,7 +312,7 @@ table {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 5rem;
+  min-height: 5rem;
   background-color: var(--space-cadet);
   margin: 0 2rem 0 2rem;
   border-radius: 8px;
@@ -244,11 +325,11 @@ table {
 }
 
 .turnier-header.stuck {
-margin: 0;
-border-radius: 0;
-height: 3em;
-box-shadow: var(--shadow);
-transition: linear 0.3s;
+  margin: 0 -2rem;
+  border-radius: 0;
+  height: 3em;
+  box-shadow: var(--shadow);
+  transition: linear 0.3s;
 }
 
 .turnier-header * {
@@ -267,6 +348,7 @@ transition: linear 0.3s;
   font-size: 48px;
   background-color: var(--space-cadet);
   color: white;
+  text-overflow: ellipsis;
 }
 
 .turnier-header.stuck h1 {
@@ -338,7 +420,7 @@ transition: linear 0.3s;
 }
 
 .bc-ming {
-  background-color: $space-cadet;
+  background-color: $ming;
 }
 
 .bc-white {

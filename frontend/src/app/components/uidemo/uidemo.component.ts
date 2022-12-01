@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ContentCardComponent } from '../content-card/content-card.component';
+import { SupportedLanguages } from 'src/app/services/localization/language';
+import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service' ;
 
 @Component({
   selector: 'app-uidemo',
@@ -8,9 +9,26 @@ import { ContentCardComponent } from '../content-card/content-card.component';
 })
 export class UidemoComponent implements OnInit {
 
-  constructor() { }
+  currentLanguage = SupportedLanguages.English;
+
+  constructor() {
+    this.localize.changeLanguage(this.currentLanguage);
+  }
+
+  public get localize(): LocalizeService {
+    return LocalizationService;
+  }
 
   ngOnInit(): void {
+  }
+
+  toggleLanguage() {
+    if(this.currentLanguage === SupportedLanguages.English) {
+      this.currentLanguage = SupportedLanguages.German;
+    } else {
+      this.currentLanguage = SupportedLanguages.English;
+    }
+    this.localize.changeLanguage(this.currentLanguage);
   }
 
 }

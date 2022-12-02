@@ -5,7 +5,6 @@ import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
@@ -35,7 +34,7 @@ public class Validator {
         if (type == null) {
             throw new ValidationException("Role must not be null!");
         }
-        if (!(type == ApplicationUser.Role.Participant || type == ApplicationUser.Role.ClubManager || type == ApplicationUser.Role.TournamentManager)) {
+        if (!(type == ApplicationUser.Role.PARTICIPANT || type == ApplicationUser.Role.CLUB_MANAGER || type == ApplicationUser.Role.TOURNAMENT_MANAGER)) {
             throw new ValidationException("Role can only be Participant,ClubManager or TournamentManager.");
         }
     }

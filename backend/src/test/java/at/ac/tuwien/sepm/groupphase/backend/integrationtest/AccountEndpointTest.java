@@ -4,7 +4,6 @@ import at.ac.tuwien.sepm.groupphase.backend.config.properties.SecurityProperties
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
@@ -28,7 +27,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import javax.transaction.Transactional;
 import java.lang.invoke.MethodHandles;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Objects;
 import java.util.Optional;
@@ -36,7 +34,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
@@ -81,7 +78,7 @@ public class AccountEndpointTest implements TestData {
         UserRegisterDto userRegisterDto =
             new UserRegisterDto.UserRegisterDtoBuilder().setFirstName("Hans").setLastName("Meyer").setEmail("hans.meyer@gmail.com").setPassword("password187")
                 .setGender(
-                    ApplicationUser.Gender.MALE).setType(ApplicationUser.Role.ClubManager)
+                    ApplicationUser.Gender.MALE).setType(ApplicationUser.Role.CLUB_MANAGER)
                 .setDateOfBirth(new GregorianCalendar(1998, Calendar.FEBRUARY, 11).getTime()).createUserRegisterDto();
 
         String body = objectMapper.writeValueAsString(userRegisterDto);
@@ -113,7 +110,7 @@ public class AccountEndpointTest implements TestData {
         UserRegisterDto userRegisterDto =
             new UserRegisterDto.UserRegisterDtoBuilder().setLastName("Mey$$er").setEmail("hans.meyer@gmail.com").setPassword("password187")
                 .setGender(
-                    ApplicationUser.Gender.MALE).setType(ApplicationUser.Role.ClubManager)
+                    ApplicationUser.Gender.MALE).setType(ApplicationUser.Role.CLUB_MANAGER)
                 .setDateOfBirth(new GregorianCalendar(1998, Calendar.FEBRUARY, 11).getTime()).createUserRegisterDto();
 
         String body = objectMapper.writeValueAsString(userRegisterDto);
@@ -134,7 +131,7 @@ public class AccountEndpointTest implements TestData {
         UserRegisterDto userRegisterDto =
             new UserRegisterDto.UserRegisterDtoBuilder().setFirstName("Test Hab").setLastName("Meyer").setEmail("hans.meyer@gmail.com").setPassword("1234")
                 .setGender(
-                    ApplicationUser.Gender.MALE).setType(ApplicationUser.Role.ClubManager)
+                    ApplicationUser.Gender.MALE).setType(ApplicationUser.Role.CLUB_MANAGER)
                 .setDateOfBirth(new GregorianCalendar(1998, Calendar.FEBRUARY, 11).getTime()).createUserRegisterDto();
 
         String body = objectMapper.writeValueAsString(userRegisterDto);

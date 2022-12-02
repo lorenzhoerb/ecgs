@@ -2,6 +2,7 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint.exceptionhandler;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ErrorListRestDto;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
@@ -85,30 +86,32 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 
     /**
-     * Handles the custom ValidationListException to send a custom Http response.
-     *
-     * @param e ValidationListException e
-     * @return ErrorListRestDto
+     * Handles Validation Exception.
      */
     @ExceptionHandler(value = {ValidationListException.class})
-    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    @ResponseBody
-    public ErrorListRestDto handleValidationException(ValidationListException e) {
+    public ResponseEntity<Object> handleValidationException(ValidationListException e, WebRequest request) {
         LOGGER.warn("Terminating request processing with status 422 due to {}: {}", e.getClass().getSimpleName(), e.getMessage());
-        return new ErrorListRestDto(e.summary(), e.errors());
+        ErrorListRestDto errorDto = new ErrorListRestDto(e.summary(), e.errors());
+        return handleExceptionInternal(e, errorDto, new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY, request);
     }
 
     /**
-     * Handles the custom ConflictException to send a custom Http response.
-     *
-     * @param e ValidationListException e
-     * @return ErrorListRestDto
+     * Handles Conflict Exception.
      */
     @ExceptionHandler(value = {ConflictException.class})
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ResponseBody
-    public ErrorListRestDto handleConflictException(ConflictException e) {
+    public ResponseEntity<Object> handleConflictException(ConflictException e, WebRequest request) {
         LOGGER.warn("Terminating request processing with status 409 due to {}: {}", e.getClass().getSimpleName(), e.getMessage());
-        return new ErrorListRestDto(e.summary(), e.errors());
+        ErrorListRestDto errorDto = new ErrorListRestDto(e.summary(), e.errors());
+        return handleExceptionInternal(e, errorDto, new HttpHeaders(), HttpStatus.CONFLICT, request);
+    }
+
+    /**
+     * Handles Forbidden Exception.
+     */
+    @ExceptionHandler(value = {ForbiddenException.class})
+    public ResponseEntity<Object> handleForbiddenException(ForbiddenException e, WebRequest request) {
+        LOGGER.info("Terminating request processing with status 403 due to {}: {}", e.getClass().getSimpleName(), e.getMessage());
+        return handleExceptionInternal(e, new ErrorListRestDto("Forbidden",
+            List.of(e.getMessage())), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
     }
 }

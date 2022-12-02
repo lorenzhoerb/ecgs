@@ -65,7 +65,7 @@ public class Competition {
     )
     private Set<GradingGroup> competition;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(referencedColumnName = "id")
     private ApplicationUser creator;
 

@@ -2,12 +2,15 @@ package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.CompetitionMapper;
+import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
 import at.ac.tuwien.sepm.groupphase.backend.validation.CompetitionValidator;
+import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -37,9 +40,13 @@ public class CompetitionServiceImpl implements CompetitionService {
             throw new ForbiddenException("No Permission to create a competition");
         }
         competitionValidator.validate(competitionDetailDto);
+
         Competition competition = competitionMapper
             .competitionDetailDtoToCompetition(competitionDetailDto);
-        competition.setCreator(sessionUtils.getSessionUser());
+
+        ApplicationUser sessionUser = sessionUtils.getSessionUser();
+
+        competition.setCreator(sessionUser);
         return competitionMapper
             .competitionToCompetitionDetailDto(competitionRepository.save(competition));
     }

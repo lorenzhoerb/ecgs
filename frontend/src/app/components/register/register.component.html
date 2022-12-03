@@ -1,0 +1,120 @@
+<div *ngIf="error" class="alert alert-warning alert-dismissible fade show" role="alert">
+  <strong>Authentication problems!</strong> {{ errorMessage }}
+  <button type="button" (click)="vanishError()" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="pt-5">
+  <div class="row">
+    <div class="col-md-6 mx-auto">
+      <span class="anchor" id="formLogin"></span>
+
+      <div class="card rounded-0">
+        <div class="card-header">
+          <h3 class="mb-0">Registration</h3>
+        </div>
+
+        <div class="card-body">
+          <form class="form" [formGroup]="registerForm" (ngSubmit)="registerUser()">
+
+            <div class="form-group">
+              <label for="inputEmail">Email</label>
+              <input type="text" name="email" formControlName="email" class="form-control" id="inputEmail"
+                     aria-describedby="emailHelp" placeholder="Enter email">
+              <div *ngIf="submitted && registerForm.controls.email.errors" class="error">
+                <small class="form-text text-warning" *ngIf="registerForm.controls.email.errors.required">Your email is
+                  required!
+                </small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" name="password" formControlName="password" class="form-control" id="password"
+                     placeholder="Password">
+              <div *ngIf="submitted && registerForm.controls.password.errors" class="error">
+                <small class="form-text text-warning" *ngIf="registerForm.controls.password.errors.required">Your password
+                  is
+                  required!
+                </small>
+                <small class="form-text text-warning" *ngIf="registerForm.controls.password.errors.minlength">Your password
+                  must be at least 8 characters long!
+                </small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="inputFirstname">Firstname</label>
+              <input type="text" name="firstName" formControlName="firstName" class="form-control" id="inputFirstname"
+                     aria-describedby="firstnameHelp" placeholder="Enter firstname">
+              <div *ngIf="submitted && registerForm.controls.firstName.errors" class="error">
+                <small class="form-text text-warning" *ngIf="registerForm.controls.firstName.errors.required">Your firstname is
+                  required!
+                </small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="inputLastname">Lastname</label>
+              <input type="text" name="lastName" formControlName="lastName" class="form-control" id="inputLastname"
+                     aria-describedby="lastnameHelp" placeholder="Enter lastname">
+              <div *ngIf="submitted && registerForm.controls.lastName.errors" class="error">
+                <small class="form-text text-warning" *ngIf="registerForm.controls.lastName.errors.required">Your Lastname is
+                  required!
+                </small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="inputBirthdate">Birthdate</label>
+              <input type="date" name="dateOfBirth" formControlName="dateOfBirth" class="form-control" id="inputBirthdate"
+                     aria-describedby="birthDateHelp" placeholder="Enter birthdate">
+              <div *ngIf="submitted && registerForm.controls.dateOfBirth.errors" class="error">
+                <small class="form-text text-warning" *ngIf="registerForm.controls.dateOfBirth.errors.required">Your Birthdate is
+                  required!
+                </small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="inputGender">Gender</label>
+              <select name="gender" formControlName="gender" class="form-select form-control" id="inputGender"
+                     aria-describedby="genderHelp">
+                <option value="FEMALE" selected>Female</option>
+                <option value="MALE">Male</option>
+                <option value="OTHER">Other</option>
+              </select>
+              <div *ngIf="submitted && registerForm.controls.gender.errors" class="error">
+                <small class="form-text text-warning" *ngIf="registerForm.controls.gender.errors.required">Your Gender is
+                  required!
+                </small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="inputType">Type</label>
+              <select name="type" formControlName="type" class="form-select form-control" id="inputType"
+                     aria-describedby="roleHelp">
+                <option value="PARTICIPANT" selected>Participant</option>
+                <option value="CLUB_MANAGER">ClubManager</option>
+                <option value="TOURNAMENT_MANAGER">TournamentManager</option>
+              </select>
+              <div *ngIf="submitted && registerForm.controls.type.errors" class="error">
+                <small class="form-text text-warning" *ngIf="registerForm.controls.type.errors.required">Your Type is
+                  required!
+                </small>
+              </div>
+            </div>
+
+
+            <button type="button" (click)="registerUser()" class="btn btn-success float-right">Register</button>
+
+          </form>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>

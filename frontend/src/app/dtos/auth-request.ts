@@ -6,9 +6,9 @@ export class AuthRequest {
 }
 
 export enum Role {
-  participant = 'Participant',
-  clubManager = 'ClubManager',
-  tournamentManager = 'TournamentManager'
+  participant = 'PARTICIPANT',
+  clubManager = 'CLUB_MANAGER',
+  tournamentManager = 'TOURNAMENT_MANAGER'
 }
 
 

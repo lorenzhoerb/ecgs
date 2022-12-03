@@ -96,9 +96,9 @@
               <label for="inputType">Type</label>
               <select name="type" formControlName="type" class="form-select form-control" id="inputType"
                      aria-describedby="roleHelp">
-                <option value="Participant" selected>Participant</option>
-                <option value="ClubManager">ClubManager</option>
-                <option value="TournamentManager">TournamentManager</option>
+                <option value="PARTICIPANT" selected>Participant</option>
+                <option value="CLUB_MANAGER">ClubManager</option>
+                <option value="TOURNAMENT_MANAGER">TournamentManager</option>
               </select>
               <div *ngIf="submitted && registerForm.controls.type.errors" class="error">
                 <small class="form-text text-warning" *ngIf="registerForm.controls.type.errors.required">Your Type is

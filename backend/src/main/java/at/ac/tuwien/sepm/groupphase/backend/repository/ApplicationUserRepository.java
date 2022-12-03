@@ -12,4 +12,6 @@ public interface ApplicationUserRepository extends JpaRepository<ApplicationUser
 
     Optional<ApplicationUser> findApplicationUserByUserEmail(String email);
 
+    void deleteAll();
+
 }

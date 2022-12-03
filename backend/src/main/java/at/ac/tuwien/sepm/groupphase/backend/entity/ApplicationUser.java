@@ -26,16 +26,16 @@ public class ApplicationUser {
     }
 
     public enum Role {
-        Participant,
-        ClubManager,
-        TournamentManager
+        PARTICIPANT,
+        CLUB_MANAGER,
+        TOURNAMENT_MANAGER
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(referencedColumnName = "id")
     private SecurityUser user;
 

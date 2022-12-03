@@ -1,7 +1,113 @@
-<p>uidemo works!</p>
-
-<app-content-card [title]="'Card'">
-    <div>
-        Put your content here
+<main>
+    <div class="hold-image">
+        <div class="turnier-image">
+            <img src="../../../assets/turnier.jpg" alt="turnier bild">
+        </div>
     </div>
-</app-content-card>
+    <div class="scrollabove">
+        <!--TODO: Header Transform Animation-->
+        <!-- <div id="header" class="turnier-header">
+            <h1>12. Wiener TURNier</h1>
+            <button class="secondary-btn">{{localize.register}}</button>
+        </div> -->
+
+        <app-tournament-header [title]="'This is the Tournament Header'"></app-tournament-header>
+
+        <div class="spacer-2"></div>
+
+        <app-golden-ratio-container>
+            <app-content-card [title]="'Card'">
+                <div>
+                    Cards can hold customizable Content.
+                    <h3>Basically Everything is possible</h3>
+                    <div class="horizontal-line"></div>
+                    <h2>But it's prefered to keep a cards content simple</h2>
+                    <div class="horizontal-line"></div>
+                    PS: Horizontal Lines and spacers can help you with structuring.
+                    The same is true for containers like the <b>golden-ratio-container</b>.
+                </div>
+            </app-content-card>
+
+            <app-content-card [title]="'Card In Sizzling Red'" [color]="'bc-sizzling-red'">
+                <div>
+                    To change the color of a cards heading just pass the respective
+                    background color style to the card.
+
+                    The predefined options are:
+                    <ul>
+                        <li class="c-space">bc-space</li>
+                        <li class="c-ming">bc-ming</li>
+                        <li class="c-sizzling-red">bc-sizzling-red</li>
+                        <li class="c-fancy-red">bc-fancy-red</li>
+                        <li class="c-cardinal">bc-cardinal</li>
+                    </ul>
+                    But feel free to extend the available styles in styles.css
+                </div>
+            </app-content-card>
+
+        </app-golden-ratio-container>
+
+        <div class="spacer-2"></div>
+
+        <app-content-card [title]="'Card In Light Cyan'" [color]="'bc-light-cyan'">
+            <div>
+                Put your content here
+            </div>
+        </app-content-card>
+
+        <div class="spacer-2"></div>
+        <div class="sticky-heading heading">
+            <h1>This is a Sticky Heading</h1>
+        </div>
+
+        <div class="second-scrollabove">
+            <app-content-card [title]="'Card In Ming: Localization / i18n / l10n'" [color]="'bc-ming'">
+                <div>
+                    <h2>TLDR:</h2>
+                    One Important Part of a well made Frontend is Localization for the most important Keywords.
+                    Therefore I added an LocalizationService class to help with that matter.
+    
+                    <div class="spacer"></div>
+    
+                    <h2>How to use it</h2>
+                    The correct Usage is demonstrated on this UIDemo Page. The LocalizationService
+                    takes advantage of Typescripts typing system and is fully typed itself. To localize
+                    a key just call <span class="bold"> localize.WhatYouWantToLoacalize</span>. If a key
+                    does not yet exist you need to add it in `language.ts` to the `LocalizationKeys`class.
+                    Afterwards you have to add a valid translation to each language file we support or the
+                    frontend won't compile. Keys come in two forms:
+                    <ul>
+                        <li>Simple keys that just represent constants like <span class="bold">"{{localize.Hello}}"</span>
+                        </li>
+                        <li>Complex keys that evaluate functions like <span
+                                class="bold">"{{localize.HelloFunction(1)}}"</span> which can also create: <span
+                                class="bold">"{{localize.HelloFunction(3)}}"</span></li>
+                    </ul>
+    
+                    <div class="spacer"></div>
+    
+                    <h2>Try it out: Live Language Switching</h2>
+                    <div class="spacer"></div>
+                    <button class="primary-btn" (click)="toggleLanguage()">{{localize.SwitchLanguage}}</button>
+                </div>
+            </app-content-card>
+    
+            <div class="spacer-2"></div>
+    
+            <app-content-card [title]="'Card In Cardinal'" [color]="'bc-cardinal'">
+                <div>
+                    Put your content here
+                </div>
+            </app-content-card>
+    
+            <div class="spacer-2"></div>
+    
+            <app-content-card [title]="'Card In Fancy Red'" [color]="'bc-fancy-red'">
+                <div>
+                    Put your content here
+                </div>
+            </app-content-card>
+            <div class="spacer-2"></div>
+        </div>
+    </div>
+</main>

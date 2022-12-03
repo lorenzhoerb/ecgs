@@ -12,8 +12,12 @@ import {LoginComponent} from './components/login/login.component';
 import {MessageComponent} from './components/message/message.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {httpInterceptorProviders} from './interceptors';
+import { RegisterComponent } from './components/register/register.component';
 import { UidemoComponent } from './components/uidemo/uidemo.component';
 import { ContentCardComponent } from './components/content-card/content-card.component';
+import { UserComponent } from './components/user/user.component';
+import { GoldenRatioContainerComponent } from './components/containers/golden-ratio-container/golden-ratio-container.component';
+import { TournamentHeaderComponent } from './components/tournament-header/tournament-header.component';
 
 @NgModule({
   declarations: [
@@ -23,8 +27,12 @@ import { ContentCardComponent } from './components/content-card/content-card.com
     HomeComponent,
     LoginComponent,
     MessageComponent,
+    RegisterComponent,
     UidemoComponent,
     ContentCardComponent,
+    UserComponent,
+    GoldenRatioContainerComponent,
+    TournamentHeaderComponent,
   ],
   imports: [
     BrowserModule,

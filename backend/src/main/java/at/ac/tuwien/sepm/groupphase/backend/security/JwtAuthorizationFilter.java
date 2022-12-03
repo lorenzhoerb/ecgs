@@ -4,6 +4,7 @@ import at.ac.tuwien.sepm.groupphase.backend.config.properties.SecurityProperties
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
@@ -11,6 +12,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;

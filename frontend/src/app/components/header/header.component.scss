@@ -1,0 +1,27 @@
+@import '../../../variables.scss';
+
+.header {
+    width: 100vw;
+    height: 4rem;
+    background-color: $ming;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    padding: 0;
+    box-shadow: $shadow;
+    position: sticky;
+    top: 0;
+    z-index: auto;
+}
+
+.heading {
+    height: 4rem;
+    display: flex;
+    align-items: center;
+}
+.heading h1 {
+    margin-left: 1em;
+    margin-right: 1em;
+    color: white;
+    font-size: 32px;
+}

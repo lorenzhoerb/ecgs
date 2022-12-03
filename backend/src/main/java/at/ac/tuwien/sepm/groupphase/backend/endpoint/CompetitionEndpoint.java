@@ -3,9 +3,11 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,10 +29,9 @@ public class CompetitionEndpoint {
         this.competitionService = competitionService;
     }
 
-    //    @Secured("ROLE_COMP_MANAGER") //ToDo: change to role
-    @PermitAll
+    @Secured("ROLE_TOURNAMENT_MANAGER")
     @PostMapping
-    @Operation(summary = "Create a competition")
+    @Operation(summary = "Create a competition", security = @SecurityRequirement(name = "apiKey"))
     @ResponseStatus(code = HttpStatus.CREATED)
     public CompetitionDetailDto create(@RequestBody CompetitionDetailDto competitionDetailDto) {
         LOGGER.info("POST {}", BASE_PATH);

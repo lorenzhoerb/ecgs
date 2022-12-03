@@ -51,7 +51,6 @@ public class CustomUserDetailService implements UserService {
         LOGGER.debug("Load all user by email");
         try {
             ApplicationUser applicationUser = findApplicationUserByEmail(email);
-
             List<GrantedAuthority> grantedAuthorities = AuthorityUtils.createAuthorityList("ROLE_" + applicationUser.getType().toString());
             return new User(applicationUser.getUser().getEmail(), applicationUser.getUser().getPassword(), grantedAuthorities);
         } catch (NotFoundException e) {

@@ -21,8 +21,8 @@ public abstract class TestDataProvider {
     private CustomUserDetailService customUserDetailService;
 
     protected static final String BASE_URI = "/api/v1";
-
     protected static final String COMPETITION_URI = "/competitions";
+    protected static final String COMPETITION_BASE_URI = BASE_URI + COMPETITION_URI;
 
     protected static final String TEST_USER_BASIC_EMAIL = "basic@email.com";
     protected static final String TEST_USER_COMPETITION_MANAGER_EMAIL = "comp.manager@email.com";

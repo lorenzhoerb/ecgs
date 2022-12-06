@@ -1,6 +1,5 @@
-package at.ac.tuwien.sepm.groupphase.backend.service.validator;
+package at.ac.tuwien.sepm.groupphase.backend.validation.annotation;
 
-import at.ac.tuwien.sepm.groupphase.backend.service.validator.annotation.DateBeforeOrEquals;
 import org.springframework.beans.BeanWrapperImpl;
 
 import javax.validation.ConstraintValidator;

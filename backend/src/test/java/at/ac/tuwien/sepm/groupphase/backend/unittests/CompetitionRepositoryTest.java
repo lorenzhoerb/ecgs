@@ -1,6 +1,5 @@
 package at.ac.tuwien.sepm.groupphase.backend.unittests;
 
-import at.ac.tuwien.sepm.groupphase.backend.basetest.TestData;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 // the entire application context
 @DataJpaTest
 @ActiveProfiles("test")
-public class CompetitionRepositoryTest implements TestData {
+public class CompetitionRepositoryTest {
 
     @Autowired
     private CompetitionRepository competitionRepository;

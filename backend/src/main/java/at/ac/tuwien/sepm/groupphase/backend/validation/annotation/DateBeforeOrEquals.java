@@ -1,6 +1,4 @@
-package at.ac.tuwien.sepm.groupphase.backend.service.validator.annotation;
-
-import at.ac.tuwien.sepm.groupphase.backend.service.validator.DateBeforeOrEqualsValidator;
+package at.ac.tuwien.sepm.groupphase.backend.validation.annotation;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

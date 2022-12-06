@@ -1,6 +1,6 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 
-import at.ac.tuwien.sepm.groupphase.backend.service.validator.annotation.DateBeforeOrEquals;
+import at.ac.tuwien.sepm.groupphase.backend.validation.annotation.DateBeforeOrEquals;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Email;
@@ -24,31 +24,32 @@ public class CompetitionDetailDto {
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @FutureOrPresent(message = "Begin of registration must be in the future or now")
-    @NotNull
+    @NotNull(message = "Begin of registration must be given")
     private LocalDateTime beginOfRegistration;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    @NotNull
+    @NotNull(message = "End of registration must be given")
     private LocalDateTime endOfRegistration;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    @NotNull
+    @FutureOrPresent(message = "Begin of competition must be in the future or now")
+    @NotNull(message = "Begin of competition must be given")
     private LocalDateTime beginOfCompetition;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    @NotNull
+    @NotNull(message = "End of competition must be given")
     private LocalDateTime endOfCompetition;
 
-    @NotNull
+    @NotNull(message = "isPublic must be given")
     private boolean isPublic;
 
-    @NotNull
+    @NotNull(message = "draft must be given")
     private boolean draft;
 
-    @Email
+    @Email(message = "Invalid email")
     private String email;
 
-    @Pattern(regexp = "^[\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6}$")
+    @Pattern(regexp = "^[\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6}$", message = "Invalid phone number")
     private String phone;
 
     public String getName() {

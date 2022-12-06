@@ -15,6 +15,7 @@ import {httpInterceptorProviders} from './interceptors';
 import { RegisterComponent } from './components/register/register.component';
 import { UidemoComponent } from './components/uidemo/uidemo.component';
 import { ContentCardComponent } from './components/content-card/content-card.component';
+import { CreateCompetitionComponent } from './components/competition/create-competition/create-competition.component';
 import { UserComponent } from './components/user/user.component';
 import { GoldenRatioContainerComponent } from './components/containers/golden-ratio-container/golden-ratio-container.component';
 import { TournamentHeaderComponent } from './components/tournament-header/tournament-header.component';
@@ -30,6 +31,7 @@ import { TournamentHeaderComponent } from './components/tournament-header/tourna
     RegisterComponent,
     UidemoComponent,
     ContentCardComponent,
+    CreateCompetitionComponent,
     UserComponent,
     GoldenRatioContainerComponent,
     TournamentHeaderComponent,

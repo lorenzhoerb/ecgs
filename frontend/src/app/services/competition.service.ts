@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Globals} from '../global/globals';
-import {Observable} from 'rxjs';
+import {Competition} from '../dtos/competition';
 import {CompetitionDetail} from '../dtos/competition-detail';
+import {Observable, map} from 'rxjs';
+import {Globals} from '../global/globals';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +16,25 @@ export class CompetitionService {
   }
 
   /**
+   * Loads specific competition from the backend
+   *
+   * @param id of competition to load
+   */
+  getCompetitionById(id: number): Observable<Competition> {
+    console.log('Load competition details for ' + id);
+    return this.httpClient.get<Competition>(this.competitionBaseUri + '/' + id)
+      .pipe(
+        map((data: Competition) => {
+          data.beginOfRegistration = new Date(data.beginOfRegistration);
+          data.endOfRegistration = new Date(data.endOfRegistration);
+          data.endOfCompetition = new Date(data.endOfCompetition);
+          data.beginOfCompetition = new Date(data.beginOfCompetition);
+          return data;
+        })
+      );
+  }
+
+  /*
    * Create a competition.
    *
    * @param competition competition to create
@@ -23,5 +43,4 @@ export class CompetitionService {
     return this.httpClient
       .post<CompetitionDetail>(this.competitionBaseUri, competition);
   }
-
 }

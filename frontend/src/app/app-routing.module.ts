@@ -4,6 +4,7 @@ import {HomeComponent} from './components/home/home.component';
 import {LoginComponent} from './components/login/login.component';
 import {AuthGuard} from './guards/auth.guard';
 import {MessageComponent} from './components/message/message.component';
+import {CompetitionComponent} from './components/competition/competition.component';
 import { UidemoComponent } from './components/uidemo/uidemo.component';
 import { environment } from 'src/environments/environment';
 import {RegisterComponent} from './components/register/register.component';
@@ -17,7 +18,10 @@ const routbuilding: Routes = [
   {path: 'message', canActivate: [AuthGuard], component: MessageComponent},
   {
     path: 'competition', children:
-      [{path: 'create', canActivate: [AuthGuard], component: CreateCompetitionComponent}]
+      [
+        {path: 'create', canActivate: [AuthGuard], component: CreateCompetitionComponent},
+        {path: ':id', component: CompetitionComponent}
+      ]
   },
   {path: '**', redirectTo: ''},
 ];

@@ -10,12 +10,12 @@ import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
 import at.ac.tuwien.sepm.groupphase.backend.validation.CompetitionValidator;
-import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 
 @Service
 public class CompetitionServiceImpl implements CompetitionService {
@@ -49,5 +49,17 @@ public class CompetitionServiceImpl implements CompetitionService {
         competition.setCreator(sessionUser);
         return competitionMapper
             .competitionToCompetitionDetailDto(competitionRepository.save(competition));
+    }
+
+    @Override
+    public Competition findOne(Long id) {
+        LOGGER.debug("Find message with id {}", id);
+        Optional<Competition> competition = competitionRepository.findById(id);
+
+        if (competition.isPresent()) {
+            return competition.get();
+        }
+
+        throw new NotFoundException(String.format("Could not find competition with id %s", id));
     }
 }

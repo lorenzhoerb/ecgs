@@ -1,0 +1,35 @@
+<main>
+  <div class="hold-image">
+    <div class="turnier-image">
+      <img *ngIf="pictureEmpty()" src="../../../assets/turnier.jpg" alt="turnier bild">
+      <img *ngIf="!pictureEmpty()" [src]="competition.picturePath" alt="turnier bild">
+    </div>
+  </div>
+  <div class="scrollabove">
+    <app-tournament-header [title]="competition.name"></app-tournament-header>
+
+    <div class="spacer-2"></div>
+
+    <app-golden-ratio-container>
+      <app-content-card [title]="'Daten und Kontakt'">
+        <div>
+          Anmeldung:<br> <span class="c-ming">        {{formatDate(competition.beginOfRegistration)}}</span>
+          bis       <br> <span class="c-sizzling-red">{{formatDate(competition.endOfRegistration)}}</span> <br><br>
+          Wettkampf:<br> <span class="c-ming">        {{formatDate(competition.beginOfCompetition)}}</span>
+          bis       <br> <span class="c-sizzling-red">{{formatDate(competition.endOfCompetition)}}</span> <br><br>
+
+          Kontakt:  <br> <span>{{competition.email}}</span>
+                    <br> <span>{{competition.phone}}</span> <br><br>
+        </div>
+      </app-content-card>
+
+      <app-content-card [title]="'Beschreibung'" >
+        <div>
+          {{competition.description}}
+        </div>
+      </app-content-card>
+
+    </app-golden-ratio-container>
+
+  </div>
+</main>

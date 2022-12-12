@@ -29,7 +29,8 @@ public class SecurityUser {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
     private ApplicationUser user;
 
-    public SecurityUser() {}
+    public SecurityUser() {
+    }
 
     public SecurityUser(String email, String password) {
         this.email = email;

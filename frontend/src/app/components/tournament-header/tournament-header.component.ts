@@ -10,6 +10,8 @@ export class TournamentHeaderComponent implements OnInit, AfterViewInit {
 
   @Input() title = '...';
 
+  @Input() isEdit = false;
+
   @ViewChild('header', { read: ElementRef })
   header: ElementRef;
   @ViewChild('ob', { read: ElementRef })

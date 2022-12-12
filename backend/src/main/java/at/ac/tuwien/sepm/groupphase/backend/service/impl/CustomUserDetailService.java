@@ -38,7 +38,8 @@ public class CustomUserDetailService implements UserService {
     private final UserMapper userMapper;
 
     @Autowired
-    public CustomUserDetailService(ApplicationUserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer, Validator validator, UserMapper userMapper) {
+    public CustomUserDetailService(ApplicationUserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer, Validator validator,
+                                   UserMapper userMapper) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;

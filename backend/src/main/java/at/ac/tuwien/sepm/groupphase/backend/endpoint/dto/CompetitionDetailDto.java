@@ -1,8 +1,10 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 
 import at.ac.tuwien.sepm.groupphase.backend.validation.annotation.DateBeforeOrEquals;
+import at.ac.tuwien.sepm.groupphase.backend.validation.annotation.HasOnlyUniqueProperty;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
 
 @DateBeforeOrEquals(first = "beginOfRegistration", second = "endOfRegistration", message = "End of registration date must be after begin of registration")
 @DateBeforeOrEquals(first = "beginOfCompetition", second = "endOfCompetition", message = "End of competition date must be after begin of competition")
+@DateBeforeOrEquals(first = "endOfRegistration", second = "beginOfCompetition", message = "Begin of competition date must be after end of registration")
 public class CompetitionDetailDto {
 
     private Long id;
@@ -51,6 +54,10 @@ public class CompetitionDetailDto {
 
     @Pattern(regexp = "^[\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6}$", message = "Invalid phone number")
     private String phone;
+
+    @Valid
+    @HasOnlyUniqueProperty(property = "title", message = "Grading groups must have unique names")
+    private GradingGroupDto[] gradingGroups;
 
     public String getName() {
         return name;
@@ -142,6 +149,15 @@ public class CompetitionDetailDto {
         return this;
     }
 
+    public GradingGroupDto[] getGradingGroups() {
+        return gradingGroups;
+    }
+
+    public CompetitionDetailDto setGradingGroups(GradingGroupDto[] gradingGroups) {
+        this.gradingGroups = gradingGroups;
+        return this;
+    }
+
     public String getPhone() {
         return phone;
     }
@@ -153,7 +169,9 @@ public class CompetitionDetailDto {
 
     @Override
     public String toString() {
-        return "name='" + "CompetitionDetailDto{" + name + '\'' + ", description='" + description + '\'' + ", beginOfRegistration=" + beginOfRegistration + ", endOfRegistration=" + endOfRegistration + ", beginOfCompetition="
-            + beginOfCompetition + ", endOfCompetition=" + endOfCompetition + ", isPublic=" + isPublic + ", draft=" + draft + ", email='" + email + '\'' + ", phone='" + phone + '\'' + '}';
+        return "name='" + "CompetitionDetailDto{" + name + '\'' + ", description='" + description + '\'' + ", beginOfRegistration=" + beginOfRegistration
+            + ", endOfRegistration=" + endOfRegistration + ", beginOfCompetition="
+            + beginOfCompetition + ", endOfCompetition=" + endOfCompetition + ", isPublic=" + isPublic + ", draft=" + draft + ", email='" + email + '\''
+            + ", phone='" + phone + '\'' + '}';
     }
 }

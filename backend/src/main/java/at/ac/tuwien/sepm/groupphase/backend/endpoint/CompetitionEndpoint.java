@@ -62,6 +62,7 @@ public class CompetitionEndpoint {
     @ResponseStatus(code = HttpStatus.CREATED)
     public CompetitionDetailDto create(@RequestBody CompetitionDetailDto competitionDetailDto) {
         LOGGER.info("POST {}", BASE_PATH);
+        LOGGER.trace("POST {}, value: {}", BASE_PATH, competitionDetailDto);
         return competitionService.create(competitionDetailDto);
     }
 

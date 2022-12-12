@@ -1,5 +1,9 @@
 <div #ob></div>
-<div #header id="header" class="turnier-header">
+<div #header id="header" class="turnier-header" *ngIf="!isEdit">
     <h1>{{title}}</h1>
     <button class="secondary-btn">{{localize.register}}</button>
+</div>
+
+<div #header id="header" class="turnier-header" *ngIf="isEdit">
+    <h1><ng-content></ng-content></h1>
 </div>

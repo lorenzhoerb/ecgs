@@ -9,6 +9,7 @@ export class Englisch implements ILanguage {
         HelloFunction: (count: number) => count === 1 ? `Hello, you are alone.` : `Hello, you are ${count} people`,
         login: 'Login',
         register: 'Register',
-        SwitchLanguage: 'Switch Language'
+        SwitchLanguage: 'Switch Language',
+        MyTournaments: 'My Tournaments'
     };
 }

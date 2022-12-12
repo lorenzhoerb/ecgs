@@ -24,7 +24,8 @@ public class Grade {
     @JoinColumn(referencedColumnName = "id")
     private Judge judging;
 
-    public Grade() {}
+    public Grade() {
+    }
 
     public Grade(String grading, Judge judging) {
         this.grading = grading;

@@ -10,7 +10,6 @@
     box-shadow: var(--shadow);
     display: flex;
     justify-content: space-between;
-    background-color: var(--space-cadet);
     color: white;
     margin: -16px -16px 0.5rem -16px;
     padding: 0 8px 0 8px;
@@ -30,4 +29,28 @@
 
 .content-card.group-creator {
     box-shadow: 0.5px 1px 1px 1px rgba(0,0,0,0.3);
+}
+
+h3 input[type="text"] {
+    color: snow;
+    width: 100%;
+    border-radius: 6px;
+}
+
+h3 input[type="text"]:focus {
+    background-color: inherit;
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.action-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 8px;
+}
+
+.action-container mat-icon {
+    cursor: pointer;
 }

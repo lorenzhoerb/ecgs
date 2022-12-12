@@ -3,7 +3,6 @@
 </div>
 
 <div class="user" *ngIf="loggedIn">
-    <!-- TODO: Map with user login/authentication -->
     <img src="../../../assets/user_image.jpg" alt="User image">
-    <h3>Beate Benutzerin</h3>
+    <h3>{{user?.firstName + " " + user?.lastName}}</h3>
 </div>

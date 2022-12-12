@@ -25,3 +25,14 @@
     color: white;
     font-size: 32px;
 }
+
+.flex {
+    display: flex;
+    align-items: center;
+}
+
+.flex a {
+    margin-right: 1.5rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+}

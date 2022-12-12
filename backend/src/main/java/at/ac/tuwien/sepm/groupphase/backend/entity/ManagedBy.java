@@ -33,7 +33,8 @@ public class ManagedBy {
     @Column(nullable = false, length = 4095)
     private String teamName;
 
-    public ManagedBy() {}
+    public ManagedBy() {
+    }
 
     public ManagedBy(ApplicationUser manager, ApplicationUser member, String teamName) {
         this.manager = manager;

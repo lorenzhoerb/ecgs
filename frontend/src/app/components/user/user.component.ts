@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { UserInfoDto } from 'src/app/dtos/userInfoDto';
+import { AuthService } from 'src/app/services/auth.service';
 import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service' ;
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-user',
@@ -7,16 +10,30 @@ import LocalizationService, { LocalizeService } from 'src/app/services/localizat
   styleUrls: ['./user.component.scss']
 })
 export class UserComponent implements OnInit {
-
   public loggedIn = false;
+  public user?: UserInfoDto;
 
-  constructor() { }
+  constructor(public authService: AuthService, public userService: UserService) { }
 
   public get localize(): LocalizeService {
     return LocalizationService;
   }
 
   ngOnInit(): void {
+    this.loggedIn = this.authService.isLoggedIn();
+    if(this.loggedIn) {
+      this.userService.getUserInfo().subscribe({
+        next: data => {
+          this.user = data;
+          console.log(data);
+        },
+        error: error => {
+          console.error('Error fetching competition information', error);
+          this.loggedIn = false;
+          // @TODO: route to home or throw exception
+        }
+      });
+    }
   }
 
 }

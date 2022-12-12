@@ -3,6 +3,7 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionViewDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.CompetitionMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.security.PermitAll;
 import java.lang.invoke.MethodHandles;
+import java.util.Set;
 
 @RestController
 @RequestMapping(value = CompetitionEndpoint.BASE_PATH)
@@ -62,4 +64,13 @@ public class CompetitionEndpoint {
         LOGGER.info("POST {}", BASE_PATH);
         return competitionService.create(competitionDetailDto);
     }
+
+    @Secured({"ROLE_PARTICIPANT", "ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER"})
+    @GetMapping(value = "/{id}/participants")
+    @Operation(summary = "Get participants of competition", security = @SecurityRequirement(name = "apiKey"))
+    public Set<UserDetailDto> getParticipants(@PathVariable Long id) {
+        LOGGER.info("GET {}", BASE_PATH);
+        return competitionService.getParticipants(id);
+    }
+
 }

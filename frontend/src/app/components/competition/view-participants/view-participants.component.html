@@ -1,0 +1,22 @@
+<app-content-card title="Teilnehmer">
+  <app-error
+    title="error fetching participants"
+    [error]="error"
+  ></app-error>
+  <table>
+    <thead>
+      <th>Vorname</th>
+      <th>Nachname</th>
+      <th>Geschlecht</th>
+      <th>Geburtsdatum</th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of this.participants;">
+        <td>{{p.firstName}}</td>
+        <td>{{p.lastName}}</td>
+        <td>{{formatGender(p.gender)}}</td>
+        <td>{{formatDate(p.dateOfBirth)}}</td>
+      </tr>
+    </tbody>
+  </table>
+</app-content-card>

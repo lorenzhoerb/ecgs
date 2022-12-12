@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
+import {UserDetail} from '../dtos/user-detail';
 import {Competition} from '../dtos/competition';
 import {CompetitionDetail} from '../dtos/competition-detail';
 import {Observable, map} from 'rxjs';
@@ -43,4 +44,25 @@ export class CompetitionService {
     return this.httpClient
       .post<CompetitionDetail>(this.competitionBaseUri, competition);
   }
+
+  /**
+   * Get aprticipants of competition.
+   *
+   * @param id id of competition to get participants for
+   */
+  getParticipants(id: number): Observable<Array<UserDetail>> {
+    return this.httpClient
+      .get<Array<UserDetail>>(this.competitionBaseUri + '/' + id + '/participants')
+        .pipe(
+          map((data: Array<UserDetail>) => {
+            console.log(data.length);
+            for(const d of data) {
+              d.dateOfBirth = new Date(d.dateOfBirth);
+              console.log(d.dateOfBirth);
+            }
+            return data;
+          })
+        );
+  }
+
 }

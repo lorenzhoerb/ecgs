@@ -11,6 +11,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.CascadeType;
+import javax.transaction.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -57,13 +58,13 @@ public class Competition {
     @Column(nullable = true, length = 255)
     private String phone;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(
         name = "competition_gradingGroup",
         joinColumns = {@JoinColumn(referencedColumnName = "id")},
         inverseJoinColumns = {@JoinColumn(referencedColumnName = "id")}
     )
-    private Set<GradingGroup> competition;
+    private Set<GradingGroup> gradingGroups;
 
     //ToDO: cascadeType: delete
     @ManyToOne(cascade = CascadeType.MERGE)
@@ -187,12 +188,12 @@ public class Competition {
         this.phone = phone;
     }
 
-    public Set<GradingGroup> getCompetition() {
-        return competition;
+    public Set<GradingGroup> getGradingGroups() {
+        return gradingGroups;
     }
 
-    public void setCompetition(Set<GradingGroup> competition) {
-        this.competition = competition;
+    public void setGradingGroups(Set<GradingGroup> gradingGroups) {
+        this.gradingGroups = gradingGroups;
     }
 
     public ApplicationUser getCreator() {
@@ -225,7 +226,7 @@ public class Competition {
             + ", draft=" + draft
             + ", email='" + email + '\''
             + ", phone='" + phone + '\''
-            + ", competition=" + competition
+            + ", gradingGroups=" + gradingGroups
             + ", judges=" + judges
             + '}';
     }

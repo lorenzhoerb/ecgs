@@ -1,4 +1,5 @@
-<main>
+<app-error title="Wettkampffehler" [error]="error"></app-error>
+<main *ngIf="competition !== null">
   <div class="hold-image">
     <div class="turnier-image">
       <img *ngIf="pictureEmpty()" src="../../../assets/turnier.jpg" alt="turnier bild">
@@ -6,6 +7,8 @@
     </div>
   </div>
   <div class="scrollabove">
+    <app-error [error]="error"></app-error>
+
     <app-tournament-header [title]="competition.name"></app-tournament-header>
 
     <div class="spacer-2"></div>
@@ -29,7 +32,12 @@
         </div>
       </app-content-card>
 
+      <div class="spacer-2"></div>
+
     </app-golden-ratio-container>
 
+    <div class="spacer-2"></div>
+
+    <app-view-participants [id]="this.id"></app-view-participants>
   </div>
 </main>

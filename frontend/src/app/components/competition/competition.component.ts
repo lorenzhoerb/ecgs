@@ -12,31 +12,14 @@ import LocalizationService, {LocalizeService} from '../../services/localization/
   styleUrls: ['./competition.component.scss']
 })
 export class CompetitionComponent implements OnInit {
-  competition: Competition = {
-    name: 'Competition',
-    beginOfRegistration: new Date(),
-    beginOfCompetition: new Date(),
-    endOfRegistration: new Date(),
-    endOfCompetition: new Date(),
-    description: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut ' +
-      'labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.' +
-      ' Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, ' +
-      'consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed ' +
-      'diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata ' +
-      'sanctus est Lorem ipsum dolor sit amet.',
-    picturePath: '',
-    draft: false,
-    isPublic: true,
-    email: 'test@mail.com',
-    phone: '+436606060666'
-  };
-  // Error flag
-  error = false;
-  errorMessage = '';
+  id: number;
+  competition: Competition = null;
+  error: Error = null;
   currentLanguage = SupportedLanguages.English;
 
   constructor(private service: CompetitionService,
               private route: ActivatedRoute) {
+    console.log('init');
     this.localize.changeLanguage(this.currentLanguage);
   }
 
@@ -47,18 +30,18 @@ export class CompetitionComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       if(params.id) {
-        const id: number = parseInt(params.id, 10);
+        this.id = parseInt(params.id, 10);
 
-        this.service.getCompetitionById(id).subscribe({
+        this.service.getCompetitionById(this.id).subscribe({
           next: data => {
             this.competition = data;
+            this.error = null;
             console.log(data);
           },
           error: error => {
             console.error('Error fetching competition information', error);
-            this.errorMessage = 'Error fetching competition information: \n' + error.error.message;
-            error = true;
-            // @TODO: route to home or throw exception
+            this.error = error;
+            this.competition = null;
           }
         });
       }

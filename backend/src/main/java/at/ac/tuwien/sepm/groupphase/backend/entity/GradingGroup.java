@@ -9,6 +9,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.ManyToMany;
 import javax.persistence.CascadeType;
+import javax.transaction.Transactional;
 
 import java.util.Set;
 
@@ -28,7 +29,7 @@ public class GradingGroup {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "gradingGroup")
     private Set<GradingSystem> gradingSystems;
 
-    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "competition")
+    @ManyToMany(cascade = CascadeType.MERGE, mappedBy = "gradingGroups")
     private Set<Competition> competitions;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "gradingGroup")

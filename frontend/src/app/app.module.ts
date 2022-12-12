@@ -19,6 +19,8 @@ import { CreateCompetitionComponent } from './components/competition/create-comp
 import { UserComponent } from './components/user/user.component';
 import { GoldenRatioContainerComponent } from './components/containers/golden-ratio-container/golden-ratio-container.component';
 import { TournamentHeaderComponent } from './components/tournament-header/tournament-header.component';
+import {ToastrModule} from 'ngx-toastr';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -39,11 +41,13 @@ import { TournamentHeaderComponent } from './components/tournament-header/tourna
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     ReactiveFormsModule,
     HttpClientModule,
     NgbModule,
     FormsModule,
+    ToastrModule.forRoot()
   ],
   providers: [httpInterceptorProviders],
   bootstrap: [AppComponent]

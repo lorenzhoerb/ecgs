@@ -1,6 +1,7 @@
 /* Checkout variables.scss for default colors, margins and more */
 // TODO: maybe remove Bootstrap for f*cking with my styles
 @import '../node_modules/bootstrap/scss/bootstrap';
+@import 'ngx-toastr/toastr';
 @import './variables.scss';
 
 h6,

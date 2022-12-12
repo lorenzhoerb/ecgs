@@ -1,8 +1,10 @@
 package at.ac.tuwien.sepm.groupphase.backend.config;
 
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtAuthorizationFilter;
+
 import java.util.Collections;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;

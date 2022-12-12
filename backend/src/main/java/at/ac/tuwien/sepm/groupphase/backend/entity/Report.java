@@ -26,7 +26,8 @@ public class Report {
     @JoinColumn(referencedColumnName = "id")
     private GradingGroup gradingGroup;
 
-    public Report() {}
+    public Report() {
+    }
 
     public Report(String created, String results, GradingGroup gradingGroup) {
         this.created = created;

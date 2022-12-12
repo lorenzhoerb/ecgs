@@ -4,6 +4,7 @@ import {Router} from '@angular/router';
 import {CompetitionService} from '../../../services/competition.service';
 import {CompetitionDetail} from '../../../dtos/competition-detail';
 import {ListError} from '../../../dtos/list-error';
+import { GradingGroupDetail } from 'src/app/dtos/gradingGroupDetail';
 
 @Component({
   selector: 'app-create-competition',
@@ -11,6 +12,8 @@ import {ListError} from '../../../dtos/list-error';
   styleUrls: ['./create-competition.component.scss']
 })
 export class CreateCompetitionComponent implements OnInit {
+
+  gradingGroups: GradingGroupDetail[] = [];
 
   competitionForm: UntypedFormGroup;
   dateNow = new Date();
@@ -60,6 +63,8 @@ export class CreateCompetitionComponent implements OnInit {
       competition.description = null;
     }
 
+    competition.gradingGroups = this.gradingGroups;
+
     this.competitionService.createCompetition(competition)
       .subscribe({
         next: value => {
@@ -77,6 +82,18 @@ export class CreateCompetitionComponent implements OnInit {
 
   public vanishError() {
     this.error = false;
+  }
+
+  addGroup() {
+    this.gradingGroups.push({title: `Gruppe ${this.gradingGroups.length + 1}`});
+  }
+
+  duplicateGroup(group,id) {
+    this.gradingGroups.splice(id, 0, Object.assign({}, group));
+  }
+
+  deleteGroup(id) {
+    this.gradingGroups.splice(id, 1);
   }
 
   public dynamicCssClassesForInput(input: AbstractControl): any {

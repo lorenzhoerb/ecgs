@@ -2,6 +2,7 @@ package at.ac.tuwien.sepm.groupphase.backend.unittests;
 
 import at.ac.tuwien.sepm.groupphase.backend.basetest.TestDataProvider;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
@@ -32,9 +33,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
@@ -124,9 +125,9 @@ public class CompetitionServiceTest extends TestDataProvider {
 
     @Test
     public void givenNotLoggedInUser_whenCreatingCompetition_thenForbiddenException() {
-       assertThrows(ForbiddenException.class, () -> {
-           competitionService.create(getValidCompetitionDetailDto());
-       });
+        assertThrows(ForbiddenException.class, () -> {
+            competitionService.create(getValidCompetitionDetailDto());
+        });
     }
 
     @Test
@@ -231,6 +232,41 @@ public class CompetitionServiceTest extends TestDataProvider {
     public void throwNotFound_searchingForNonExistingUser() {
         assertThrows(NotFoundException.class, () -> {
             competitionService.findOne(-1L);
+        });
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void givenValidCompetitionWithGradingGroups_createValidCompetitionAndGradingGroups() {
+        CompetitionDetailDto comp = getValidCompetitionDetailDto();
+        comp.setGradingGroups(getValidGradingGroupDtos());
+
+        CompetitionDetailDto result = competitionService.create(comp);
+
+        assertNotNull(result);
+        assertNotNull(result.getId());
+        //why not containing groups?
+        GradingGroupDto[] groups = result.getGradingGroups();
+        assertNotNull(groups);
+        assertEquals(3, groups.length);
+        assertNotNull(groups[0].getId());
+        assertNotNull(groups[1].getId());
+        assertNotNull(groups[2].getId());
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void givenValidCompetitionWithInvalidGradingGroups_thenValidationException() {
+        CompetitionDetailDto comp = getValidCompetitionDetailDto();
+
+        assertThrows(ValidationListException.class, () -> {
+            comp.setGradingGroups(getGradingGroupDtosWithNameDuplicates());
+            competitionService.create(comp);
+        });
+
+        assertThrows(ValidationListException.class, () -> {
+            comp.setGradingGroups(getGradingGroupDtosWithEmptyNames());
+            competitionService.create(comp);
         });
     }
 }

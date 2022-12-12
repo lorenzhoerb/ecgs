@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.basetest;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.*;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -58,8 +60,32 @@ public abstract class TestDataProvider {
             .setDraft(true);
     }
 
+    protected GradingGroupDto[] getValidGradingGroupDtos() {
+        return new GradingGroupDto[] {
+            new GradingGroupDto().withTitle("Group 1"),
+            new GradingGroupDto().withTitle("Group 2"),
+            new GradingGroupDto().withTitle("Group 3"),
+        };
+    }
+
+    protected GradingGroupDto[] getGradingGroupDtosWithNameDuplicates() {
+        return new GradingGroupDto[] {
+            new GradingGroupDto().withTitle("Group 1"),
+            new GradingGroupDto().withTitle("Group 1"),
+            new GradingGroupDto().withTitle("Group 2"),
+        };
+    }
+
+    protected GradingGroupDto[] getGradingGroupDtosWithEmptyNames() {
+        return new GradingGroupDto[] {
+            new GradingGroupDto().withTitle("Group 1"),
+            new GradingGroupDto().withTitle(""),
+            new GradingGroupDto().withTitle("Group 2"),
+        };
+    }
+
     protected void setUpCompetitionUser() {
-       customUserDetailService.registerUser(getValidRegistrationDtoForCompetitionManager());
+        customUserDetailService.registerUser(getValidRegistrationDtoForCompetitionManager());
     }
 
     protected Competition createCompetitionEntity(
@@ -93,7 +119,15 @@ public abstract class TestDataProvider {
             ""
         );
 
+        applicationUserRepository.save(user);
+
         GradingGroup group = new GradingGroup("group 1");
+
+        competition.setGradingGroups(Set.of(group));
+        group.setCompetitions(competition);
+
+        competitionRepository.save(competition);
+        gradingGroupRepository.save(group);
 
         RegisterTo registerTo = new RegisterTo();
         registerTo.setParticipant(user);
@@ -103,12 +137,7 @@ public abstract class TestDataProvider {
         group.setRegistrations(Set.of(registerTo));
         user.setRegistrations(Set.of(registerTo));
 
-        competition.setGradingGroups(Set.of(group));
-
-        applicationUserRepository.save(user);
         registerToRepository.save(registerTo);
-        gradingGroupRepository.save(group);
-        competitionRepository.save(competition);
 
         return competition;
     }

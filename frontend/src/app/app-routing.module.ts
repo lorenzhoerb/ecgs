@@ -24,8 +24,7 @@ const routbuilding: Routes = [
         {path: ':id', component: CompetitionComponent},
         //{path: ':id/participants', canActivate: [AuthGuard], component: ViewParticipantsComponent},
       ]
-  },
-  {path: '**', redirectTo: ''},
+  }
 ];
 
 // These Routes will be visible in Dev mode, but not when
@@ -33,6 +32,8 @@ const routbuilding: Routes = [
 if(!environment.production) {
   routbuilding.push({path: 'ui-demo', component: UidemoComponent});
 }
+
+routbuilding.push({path: '**', redirectTo: ''});
 
 const routes: Routes = routbuilding;
 

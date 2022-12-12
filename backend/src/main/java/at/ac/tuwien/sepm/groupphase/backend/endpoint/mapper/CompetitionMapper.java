@@ -5,6 +5,7 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import org.mapstruct.Mapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import org.mapstruct.Mapping;
+import org.springframework.context.annotation.Bean;
 
 @Mapper
 public interface CompetitionMapper {

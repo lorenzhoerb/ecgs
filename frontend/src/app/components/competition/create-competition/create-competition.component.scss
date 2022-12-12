@@ -1,0 +1,46 @@
+app-tournament-header .form-group {
+    display: flex;
+    gap: 8px;
+}
+
+.form-group {
+    width: 100%;
+}
+
+app-tournament-header input[type="text"] {
+    color: snow;
+    width: 100%;
+    border-radius: 6px;
+    font-size: 1.8rem;
+}
+
+app-tournament-header input[type="text"]:focus {
+    background-color: inherit;
+}
+
+.sticky-heading.heading {
+    display: flex;
+    justify-content: space-between;
+}
+.sticky-heading.heading button {
+    margin-right: 2rem;
+}
+
+.flex-center {
+    gap: 16px;
+    align-items: center;
+}
+
+.add-group {
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.add-group:hover {
+    color: rgba(13, 110, 253, 0.55);
+}
+
+mat-icon {
+    line-height: 0.7;
+}

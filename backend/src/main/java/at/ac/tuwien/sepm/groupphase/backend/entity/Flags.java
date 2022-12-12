@@ -29,7 +29,8 @@ public class Flags {
     )
     private Set<ManagedBy> clubs;
 
-    public Flags() {}
+    public Flags() {
+    }
 
     public Flags(String name) {
         this.name = name;

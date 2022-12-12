@@ -1,14 +1,13 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.CascadeType;
 import javax.transaction.Transactional;
@@ -58,23 +57,19 @@ public class Competition {
     @Column(nullable = true, length = 255)
     private String phone;
 
-    @ManyToMany(cascade = CascadeType.MERGE)
-    @JoinTable(
-        name = "competition_gradingGroup",
-        joinColumns = {@JoinColumn(referencedColumnName = "id")},
-        inverseJoinColumns = {@JoinColumn(referencedColumnName = "id")}
-    )
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "competition", fetch = FetchType.EAGER)
     private Set<GradingGroup> gradingGroups;
 
     //ToDO: cascadeType: delete
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne()
     @JoinColumn(referencedColumnName = "id")
     private ApplicationUser creator;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "competition")
     private Set<Judge> judges;
 
-    public Competition() {}
+    public Competition() {
+    }
 
     public Competition(String name, LocalDateTime beginOfRegistration, LocalDateTime endOfRegistration,
                        LocalDateTime beginOfCompetition, LocalDateTime endOfCompetition, String description, String picturePath,
@@ -192,8 +187,8 @@ public class Competition {
         return gradingGroups;
     }
 
-    public void setGradingGroups(Set<GradingGroup> gradingGroups) {
-        this.gradingGroups = gradingGroups;
+    public void setGradingGroups(Set<GradingGroup> competition) {
+        this.gradingGroups = competition;
     }
 
     public ApplicationUser getCreator() {
@@ -226,7 +221,7 @@ public class Competition {
             + ", draft=" + draft
             + ", email='" + email + '\''
             + ", phone='" + phone + '\''
-            + ", gradingGroups=" + gradingGroups
+            + ", competition=" + gradingGroups
             + ", judges=" + judges
             + '}';
     }

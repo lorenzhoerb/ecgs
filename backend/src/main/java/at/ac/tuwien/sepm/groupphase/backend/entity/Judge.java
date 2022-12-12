@@ -28,7 +28,8 @@ public class Judge {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "judging")
     private Set<Grade> grades;
 
-    public Judge() {}
+    public Judge() {
+    }
 
     public Judge(ApplicationUser participant, Competition competition) {
         this.participant = participant;

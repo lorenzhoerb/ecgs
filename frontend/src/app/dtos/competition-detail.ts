@@ -1,3 +1,5 @@
+import { GradingGroupDetail } from './gradingGroupDetail';
+
 export class CompetitionDetail {
   id: number;
   name: string;
@@ -10,4 +12,5 @@ export class CompetitionDetail {
   draft: boolean;
   email: string;
   phone: string;
+  gradingGroups: GradingGroupDetail[];
 }

@@ -5,6 +5,8 @@ import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Column;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.ManyToMany;
@@ -26,16 +28,18 @@ public class GradingGroup {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "gradingGroup")
     private Report report;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "gradingGroup")
-    private Set<GradingSystem> gradingSystems;
+    @ManyToOne(cascade = CascadeType.ALL)
+    private GradingSystem gradingSystem;
 
-    @ManyToMany(cascade = CascadeType.MERGE, mappedBy = "gradingGroups")
-    private Set<Competition> competitions;
+    @ManyToOne()
+    @JoinColumn(name = "competition_id")
+    private Competition competition;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "gradingGroup")
     private Set<RegisterTo> registrations;
 
-    public GradingGroup() {}
+    public GradingGroup() {
+    }
 
     public GradingGroup(String title) {
         this.title = title;
@@ -65,20 +69,20 @@ public class GradingGroup {
         this.report = report;
     }
 
-    public Set<GradingSystem> getGradingSystems() {
-        return gradingSystems;
+    public GradingSystem getGradingSystems() {
+        return gradingSystem;
     }
 
-    public void setGradingSystems(Set<GradingSystem> gradingSystems) {
-        this.gradingSystems = gradingSystems;
+    public void setGradingSystems(GradingSystem gradingSystems) {
+        this.gradingSystem = gradingSystem;
     }
 
-    public Set<Competition> getCompetitions() {
-        return competitions;
+    public Competition getCompetitions() {
+        return competition;
     }
 
-    public void setCompetitions(Set<Competition> competitions) {
-        this.competitions = competitions;
+    public void setCompetitions(Competition competition) {
+        this.competition = competition;
     }
 
     public Set<RegisterTo> getRegistrations() {
@@ -95,8 +99,8 @@ public class GradingGroup {
             + "id=" + id
             + ", title='" + title + '\''
             + ", report=" + report
-            + ", gradingSystems=" + gradingSystems
-            + ", competitions=" + competitions
+            + ", gradingSystems=" + gradingSystem
+            + ", competitions=" + competition
             + ", registrations=" + registrations
             + '}';
     }

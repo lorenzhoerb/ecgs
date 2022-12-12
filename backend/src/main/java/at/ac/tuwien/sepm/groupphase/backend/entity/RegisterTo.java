@@ -18,11 +18,11 @@ public class RegisterTo implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(referencedColumnName = "id")
     private ApplicationUser participant;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(referencedColumnName = "id")
     private GradingGroup gradingGroup;
 
@@ -32,7 +32,8 @@ public class RegisterTo implements Serializable {
     @Column(nullable = false)
     private Boolean accepted;
 
-    public RegisterTo() {}
+    public RegisterTo() {
+    }
 
     public RegisterTo(ApplicationUser participant, GradingGroup gradingGroup, Boolean accepted) {
         this.participant = participant;

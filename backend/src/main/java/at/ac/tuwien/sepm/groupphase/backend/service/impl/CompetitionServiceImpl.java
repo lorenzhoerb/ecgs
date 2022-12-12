@@ -1,16 +1,20 @@
 package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.CompetitionMapper;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.GradingGroupMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.entity.GradingGroup;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.CompetitionMapper;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.RegisterTo;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
 import at.ac.tuwien.sepm.groupphase.backend.validation.CompetitionValidator;
@@ -20,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -31,19 +36,24 @@ public class CompetitionServiceImpl implements CompetitionService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final CompetitionRepository competitionRepository;
+    private final GradingGroupRepository gradingGroupRepository;
     private final CompetitionMapper competitionMapper;
+    private final GradingGroupMapper gradingGroupMapper;
     private final UserMapper userMapper;
     private final CompetitionValidator competitionValidator;
     private final SessionUtils sessionUtils;
 
     public CompetitionServiceImpl(CompetitionRepository competitionRepository, CompetitionMapper competitionMapper,
-                                  UserMapper userMapper, CompetitionValidator competitionValidator,
-                                  SessionUtils sessionUtils) {
+                                  CompetitionValidator competitionValidator, UserMapper userMapper,
+                                  SessionUtils sessionUtils, GradingGroupRepository gradingGroupRepository, 
+                                  GradingGroupMapper gradingGroupMapper) {
         this.competitionRepository = competitionRepository;
         this.competitionMapper = competitionMapper;
         this.userMapper = userMapper;
         this.competitionValidator = competitionValidator;
         this.sessionUtils = sessionUtils;
+        this.gradingGroupMapper = gradingGroupMapper;
+        this.gradingGroupRepository = gradingGroupRepository;
     }
 
     @Override
@@ -60,8 +70,33 @@ public class CompetitionServiceImpl implements CompetitionService {
         ApplicationUser sessionUser = sessionUtils.getSessionUser();
 
         competition.setCreator(sessionUser);
+
+        if (competitionDetailDto.getGradingGroups() != null) {
+            Set<GradingGroup> gradingGroups = Arrays.stream(competitionDetailDto.getGradingGroups())
+                .map(g -> gradingGroupMapper.gradingGroupDetailDtoToGradingGroup(g))
+                .collect(Collectors.toSet());
+
+            Competition finalCompetition = competition;
+            gradingGroups.forEach(g -> g.setCompetitions(finalCompetition));
+
+            competition.setGradingGroups(gradingGroups);
+
+            gradingGroupRepository.saveAll(gradingGroups);
+        }
+        competition = competitionRepository.save(competition);
+
+        GradingGroupDto[] gradingGroupDtos = new GradingGroupDto[] {};
+
+        if (competition.getGradingGroups() != null) {
+            gradingGroupDtos = competition.getGradingGroups().stream()
+                .map(g -> gradingGroupMapper.gradingGroupToGradingGroupDetailDto(g))
+                .collect(Collectors.toList())
+                .toArray(gradingGroupDtos);
+        }
+
         return competitionMapper
-            .competitionToCompetitionDetailDto(competitionRepository.save(competition));
+            .competitionToCompetitionDetailDto(competition)
+            .setGradingGroups(gradingGroupDtos);
     }
 
     @Override

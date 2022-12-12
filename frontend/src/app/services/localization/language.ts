@@ -3,8 +3,8 @@
 //Disable the lint because localization keys should not be forced to obey naming conventions
 
 export enum SupportedLanguages {
-    German = 'de',
-    English = 'en'
+    German = 'de-De',
+    English = 'en-US'
 }
 
 export class LocalizationKeys {
@@ -13,6 +13,7 @@ export class LocalizationKeys {
     login: string;
     register: string;
     SwitchLanguage: string;
+    MyTournaments: string;
 }
 
 export interface ILanguage {

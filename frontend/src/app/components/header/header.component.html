@@ -1,6 +1,11 @@
 <div class="header">
   <div class="heading">
-    <a routerLink="/"><h1>Stationary</h1></a>
+    <a routerLink="/">
+      <h1>Stationary</h1>
+    </a>
   </div>
-  <app-user></app-user>
+  <div class="flex">
+    <a routerLink="/competition/create">{{localize.MyTournaments}}</a>
+    <app-user></app-user>
+  </div>
 </div>

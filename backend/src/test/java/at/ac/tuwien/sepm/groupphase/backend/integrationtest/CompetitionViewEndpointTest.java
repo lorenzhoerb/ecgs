@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
@@ -64,7 +64,7 @@ public class CompetitionViewEndpointTest implements TestData {
         competitionRepository.save(competition);
 
         MvcResult mvcResult = this.mockMvc.perform(get(COMPETITION_BASE_URI + "/{id}",
-                                                        competition.getId()))
+                competition.getId()))
             .andDo(print())
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -82,7 +82,7 @@ public class CompetitionViewEndpointTest implements TestData {
         competitionRepository.save(competition);
 
         MvcResult mvcResult = this.mockMvc.perform(get(COMPETITION_BASE_URI + "/{id}",
-                                                       -1))
+                -1))
             .andDo(print())
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -96,7 +96,7 @@ public class CompetitionViewEndpointTest implements TestData {
         competitionRepository.save(competition);
 
         MvcResult mvcResult = this.mockMvc.perform(get(COMPETITION_BASE_URI + "/{id}",
-                                                       competition.getId()))
+                competition.getId()))
             .andDo(print())
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();

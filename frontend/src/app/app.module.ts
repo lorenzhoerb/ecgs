@@ -19,6 +19,8 @@ import { CreateCompetitionComponent } from './components/competition/create-comp
 import { UserComponent } from './components/user/user.component';
 import { GoldenRatioContainerComponent } from './components/containers/golden-ratio-container/golden-ratio-container.component';
 import { TournamentHeaderComponent } from './components/tournament-header/tournament-header.component';
+import { ViewParticipantsComponent } from './components/competition/view-participants/view-participants.component';
+import {ErrorComponent} from './components/error/error.component';
 import {ToastrModule} from 'ngx-toastr';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
@@ -38,6 +40,8 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
     UserComponent,
     GoldenRatioContainerComponent,
     TournamentHeaderComponent,
+    ViewParticipantsComponent,
+    ErrorComponent
   ],
   imports: [
     BrowserModule,

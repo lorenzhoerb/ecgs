@@ -2,16 +2,23 @@ package at.ac.tuwien.sepm.groupphase.backend.basetest;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
-import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepm.groupphase.backend.entity.*;
+import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
+import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepm.groupphase.backend.service.impl.CustomUserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
+import java.util.Set;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -53,5 +60,56 @@ public abstract class TestDataProvider {
 
     protected void setUpCompetitionUser() {
        customUserDetailService.registerUser(getValidRegistrationDtoForCompetitionManager());
+    }
+
+    protected Competition createCompetitionEntity(
+        ApplicationUserRepository applicationUserRepository,
+        RegisterToRepository registerToRepository,
+        GradingGroupRepository gradingGroupRepository,
+        CompetitionRepository competitionRepository,
+        boolean accepted,
+        boolean draft
+    ) {
+        Competition competition = new Competition(
+            "Test Competition",
+            LocalDateTime.of(2022, 11, 9, 8, 0),
+            LocalDateTime.of(2022, 11, 10, 23, 55),
+            LocalDateTime.of(2022, 11, 11, 14, 0),
+            LocalDateTime.of(2022, 11, 11, 8, 0),
+            "This is a test competition",
+            "",
+            true,
+            draft,
+            "test@mail.com",
+            "+436666660666"
+
+        );
+
+        ApplicationUser user = new ApplicationUser(
+            ApplicationUser.Role.PARTICIPANT,
+            "first", "last",
+            ApplicationUser.Gender.MALE,
+            new Date(2000,10,10),
+            ""
+        );
+
+        GradingGroup group = new GradingGroup("group 1");
+
+        RegisterTo registerTo = new RegisterTo();
+        registerTo.setParticipant(user);
+        registerTo.setGradingGroup(group);
+        registerTo.setAccepted(accepted);
+
+        group.setRegistrations(Set.of(registerTo));
+        user.setRegistrations(Set.of(registerTo));
+
+        competition.setGradingGroups(Set.of(group));
+
+        applicationUserRepository.save(user);
+        registerToRepository.save(registerTo);
+        gradingGroupRepository.save(group);
+        competitionRepository.save(competition);
+
+        return competition;
     }
 }

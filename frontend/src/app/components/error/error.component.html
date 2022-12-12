@@ -1,0 +1,10 @@
+<div *ngIf="error !== null" class="alert alert-warning alert-dismissible fade show error" role="alert">
+  <strong>{{title}}</strong>
+  <ul>
+    <li *ngIf="this.errMsg.message !== null">{{this.errMsg.message}}</li>
+    <li *ngFor="let err of errMsg.errors">{{err}}</li>
+  </ul>
+  <button type="button" (click)="vanishError()" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>

@@ -9,6 +9,7 @@ import { UidemoComponent } from './components/uidemo/uidemo.component';
 import { environment } from 'src/environments/environment';
 import {RegisterComponent} from './components/register/register.component';
 import {CreateCompetitionComponent} from './components/competition/create-competition/create-competition.component';
+import {ViewParticipantsComponent} from './components/competition/view-participants/view-participants.component';
 
 
 const routbuilding: Routes = [
@@ -20,7 +21,8 @@ const routbuilding: Routes = [
     path: 'competition', children:
       [
         {path: 'create', canActivate: [AuthGuard], component: CreateCompetitionComponent},
-        {path: ':id', component: CompetitionComponent}
+        {path: ':id', component: CompetitionComponent},
+        //{path: ':id/participants', canActivate: [AuthGuard], component: ViewParticipantsComponent},
       ]
   },
   {path: '**', redirectTo: ''},

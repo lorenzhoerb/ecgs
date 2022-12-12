@@ -3,13 +3,12 @@ package at.ac.tuwien.sepm.groupphase.backend.entity;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Column;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.GenerationType;
 import javax.persistence.CascadeType;
-import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.Column;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 

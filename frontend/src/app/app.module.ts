@@ -1,4 +1,5 @@
 import {BrowserModule} from '@angular/platform-browser';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
@@ -24,6 +25,7 @@ import { ViewParticipantsComponent } from './components/competition/view-partici
 import {ErrorComponent} from './components/error/error.component';
 import {ToastrModule} from 'ngx-toastr';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { FormularEditorComponent } from './components/competition/formular-editor/formular-editor.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +44,8 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
     GoldenRatioContainerComponent,
     TournamentHeaderComponent,
     ViewParticipantsComponent,
-    ErrorComponent
+    ErrorComponent,
+    FormularEditorComponent
   ],
   imports: [
     BrowserModule,
@@ -53,7 +56,8 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
     NgbModule,
     FormsModule,
     MatIconModule,
-    ToastrModule.forRoot()
+    ToastrModule.forRoot(),
+    DragDropModule
   ],
   providers: [httpInterceptorProviders],
   bootstrap: [AppComponent]

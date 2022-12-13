@@ -145,17 +145,63 @@
       </div>
 
       <div class="second-scrollabove">
-        <div class="group-container" *ngFor="let group of gradingGroups;index as id;">
-          <app-content-card [(title)]="group.title" [isEdit]="true" [actions]="['duplicate','delete','collapse']" (delete)="deleteGroup(id)" (duplicate)="duplicateGroup(group,id)" [color]="'bc-ming'"></app-content-card>
-          <div class="spacer-2"></div>
+        <div class="group-container" *ngFor="let group of gradingGroups; index as id;">
+          <app-content-card [(title)]="group.title" [isEdit]="true" [actions]="['duplicate','delete','collapse']"
+            (delete)="deleteGroup(id)" (duplicate)="duplicateGroup(group,id)" (collapsed)="group.collapsed = $event"
+            [color]="'bc-ming'">
+
+            <div class="minimize" *ngIf="group.collapsed">
+              <app-content-card [(title)]="station.title" [color]="'bc-space'" *ngFor="let station of group.stations">
+              </app-content-card>
+            </div>
+
+            <div *ngIf="!group.collapsed">
+              <div class="spacer"></div>
+
+              <div class="station-container" *ngFor="let station of group.stations; index as stationId;">
+                <app-content-card [(title)]="station.title" [isEdit]="true"
+                  [actions]="['duplicate','delete','collapse']" (delete)="deleteStation(id, stationId)"
+                  (duplicate)="duplicateStation(id, station, stationId)" [color]="'bc-space'">
+
+                  <div class="station-content-head">
+                    Variablen:
+                  </div>
+                  <div class="station-variables">
+                    <div *ngFor="let variable of station.variables">
+                      <input type="text" class="variable" [(ngModel)]="variable.name" (change)="change(station)"
+                        [ngModelOptions]="{standalone: true}">
+                    </div>
+
+                    <div class="add-note flex-center" (click)="addStationVariable(station)">
+                      <mat-icon>add_circle_outline</mat-icon> Note
+                    </div>
+                  </div>
+                  <div class="horizontal-line"></div>
+                  <div class="station-result">
+                    <app-formular-editor [vars]="station.variables" [(formula)]="station.formula"></app-formular-editor>
+                  </div>
+
+                </app-content-card>
+              </div>
+
+              <div class="spacer-2"></div>
+
+              <div class="add-group flex-center" (click)="addStation(id)">
+                <mat-icon class="large">add_circle_outline</mat-icon> Station
+              </div>
+            </div>
+
+            <div class="spacer-2"></div>
+          </app-content-card>
         </div>
+
+
         <div class="flex-center">
           <div class="add-group flex-center" (click)="addGroup()">
             <mat-icon class="large">add_circle_outline</mat-icon> Bewertungsgruppe
           </div>
         </div>
       </div>
-
     </div>
   </main>
 </form>

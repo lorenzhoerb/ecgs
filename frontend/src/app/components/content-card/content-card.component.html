@@ -5,8 +5,8 @@
         <div class="action-container">
             <mat-icon *ngIf="actions.includes('delete')" (click)="deleteClicked()">delete</mat-icon>
             <mat-icon *ngIf="actions.includes('duplicate')" (click)="duplicateClicked()">content_copy</mat-icon>
-            <mat-icon *ngIf="actions.includes('collapse') && !collapsed" (click)="collapsed = !collapsed">expand_less</mat-icon>
-            <mat-icon *ngIf="actions.includes('collapse') && collapsed" (click)="collapsed = !collapsed">expand_more</mat-icon>
+            <mat-icon *ngIf="actions.includes('collapse') && !_collapsed" (click)="collapse()">expand_less</mat-icon>
+            <mat-icon *ngIf="actions.includes('collapse') && _collapsed" (click)="collapse()">expand_more</mat-icon>
         </div>
     </div>
     <div class="content-card-content">

@@ -16,9 +16,10 @@ export class ContentCardComponent implements OnInit {
 
   @Output() duplicate = new EventEmitter();
   @Output() delete = new EventEmitter();
+  @Output() collapsed = new EventEmitter<boolean>();
 
 
-  collapsed = false;
+  _collapsed = false;
 
 
 
@@ -37,6 +38,10 @@ export class ContentCardComponent implements OnInit {
 
   duplicateClicked() {
     this.duplicate.emit();
+  }
+  collapse() {
+    this._collapsed = !this._collapsed;
+    this.collapsed.emit(this._collapsed);
   }
 
 }

@@ -5,6 +5,7 @@ import {CompetitionService} from '../../../services/competition.service';
 import {CompetitionDetail} from '../../../dtos/competition-detail';
 import {ListError} from '../../../dtos/list-error';
 import { GradingGroupDetail } from 'src/app/dtos/gradingGroupDetail';
+import { cloneDeep } from 'lodash';
 
 @Component({
   selector: 'app-create-competition',
@@ -13,7 +14,7 @@ import { GradingGroupDetail } from 'src/app/dtos/gradingGroupDetail';
 })
 export class CreateCompetitionComponent implements OnInit {
 
-  gradingGroups: GradingGroupDetail[] = [];
+  gradingGroups: any[] = [];
 
   competitionForm: UntypedFormGroup;
   dateNow = new Date();
@@ -85,15 +86,37 @@ export class CreateCompetitionComponent implements OnInit {
   }
 
   addGroup() {
-    this.gradingGroups.push({title: `Gruppe ${this.gradingGroups.length + 1}`});
+    this.gradingGroups.push({title: `Gruppe ${this.gradingGroups.length + 1}`, stations: []});
+  }
+
+  addStation(id) {
+    this.gradingGroups[id].stations.push({title: `Station ${this.gradingGroups[id].stations.length + 1}`,
+      variables: [], formula: {valid: false, data: {} }});
+  }
+
+  addStationVariable(station) {
+    station.variables.push({name: '', value: station.variables.length, type: 'variable', spaces: 0, priority: 0});
+    station.variables = cloneDeep(station.variables);
+  }
+
+  change(station) {
+    station.variables = cloneDeep(station.variables.filter(x => x.name !== ''));
   }
 
   duplicateGroup(group,id) {
-    this.gradingGroups.splice(id, 0, Object.assign({}, group));
+    this.gradingGroups.splice(id+1, 0, cloneDeep(Object.assign({}, group, {title: group.title + ' Kopie'})));
+  }
+
+  duplicateStation(groupId, station, stationId) {
+    this.gradingGroups[groupId].stations.splice(stationId+1, 0, cloneDeep(Object.assign({}, station, {title: station.title + ' Kopie'})));
   }
 
   deleteGroup(id) {
     this.gradingGroups.splice(id, 1);
+  }
+
+  deleteStation(groupId, stationId) {
+    this.gradingGroups[groupId].stations.splice(stationId, 1);
   }
 
   public dynamicCssClassesForInput(input: AbstractControl): any {

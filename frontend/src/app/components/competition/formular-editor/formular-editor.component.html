@@ -1,0 +1,44 @@
+<div class="formular-creator">
+    <div class="station-content-head">
+        Funktionen:
+    </div>
+    <div cdkDropListGroup class="drop-group">
+        <div class="functions-and-variables">
+            <div class="variables copy" cdkDropList [cdkDropListData]="variables" cdkDropListSortingDisabled
+                (cdkDropListDropped)="drop($event)" (cdkDropListExited)="exitedVars($event)"
+                (cdkDropListEntered)="entered()" [cdkDropListEnterPredicate]="noEnterPredicate">
+                <div class="variable" *ngFor="let item of variables;" cdkDrag [cdkDragData]="item">
+                    {{item.name}}
+                </div>
+            </div>
+            <div class="functions copy" cdkDropList [cdkDropListData]="functions" cdkDropListSortingDisabled
+                (cdkDropListDropped)="drop($event)" (cdkDropListExited)="exitedFuns($event)"
+                (cdkDropListEntered)="entered()" [cdkDropListEnterPredicate]="noEnterPredicate">
+                <div class="function" *ngFor="let item of functions;" cdkDrag [cdkDragData]="item">
+                    {{item.name}}
+                </div>
+            </div>
+        </div>
+
+        <div class="horizontal-line"></div>
+
+        <div class="formular">
+            Stations Ergebnis = <div class="calculation">
+                <div *ngFor="let list of calculation; index as i;">
+                    <div [class]="getFormulaClass(i)" cdkDropList [cdkDropListData]="list" cdkDropListSortingDisabled
+                        (cdkDropListDropped)="drop($event, i)"
+                        (cdkDropListEntered)="entered()" [cdkDropListEnterPredicate]="onlyOnePredicate">
+                        <div [class]="[item.type, 'symbol']" *ngFor="let item of list;" cdkDrag [cdkDragData]="item">
+                            <mat-icon class="remove-btn" (click)="removeFrom(i)">close</mat-icon>
+                            <div>
+                                {{item.name}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>

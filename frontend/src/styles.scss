@@ -277,6 +277,7 @@ h3 {
   margin: 0 -2rem -2rem -2rem;
   top: 0;
   height: 5rem;
+  z-index: 1;
 }
 
 ///////// Table (unfinished TODO: create consistent Table style)
@@ -451,4 +452,9 @@ table {
 
 .bc-sizzling-red {
   background-color: $sizzling-red;
+}
+
+mat-icon.mat-icon {
+  height: auto;
+  width: auto;
 }

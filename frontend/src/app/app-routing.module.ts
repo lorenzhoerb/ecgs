@@ -8,6 +8,9 @@ import {CompetitionComponent} from './components/competition/competition.compone
 import { UidemoComponent } from './components/uidemo/uidemo.component';
 import { environment } from 'src/environments/environment';
 import {RegisterComponent} from './components/register/register.component';
+import {ForgotPasswordComponent} from './components/forgot-password/forgot-password.component';
+import {ResetPasswordComponent} from './components/reset-password/reset-password.component';
+import {ChangePasswordComponent} from './components/change-password/change-password.component';
 import {CreateCompetitionComponent} from './components/competition/create-competition/create-competition.component';
 import {ViewParticipantsComponent} from './components/competition/view-participants/view-participants.component';
 
@@ -17,6 +20,9 @@ const routbuilding: Routes = [
   {path: 'register', component: RegisterComponent},
   {path: 'login', component: LoginComponent},
   {path: 'message', canActivate: [AuthGuard], component: MessageComponent},
+  {path: 'forgot', component: ForgotPasswordComponent},
+  {path: 'reset', component: ResetPasswordComponent},
+  {path: 'changePassword', canActivate: [AuthGuard], component: ChangePasswordComponent},
   {
     path: 'competition', children:
       [

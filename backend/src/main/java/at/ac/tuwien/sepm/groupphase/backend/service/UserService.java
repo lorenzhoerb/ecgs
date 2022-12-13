@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.util.Optional;
+
 public interface UserService extends UserDetailsService {
 
     /**
@@ -48,4 +50,38 @@ public interface UserService extends UserDetailsService {
      * @throws org.springframework.security.authentication.BadCredentialsException if credentials are bad
      */
     String login(UserLoginDto userLoginDto);
+
+
+    /**
+     * Sets the password reset token of the user specified by the email.
+     *
+     * @param email to identify the account whose password needs to be reset
+     * @param token to only grant the person requesting the password reset access to it
+     */
+    void updateResetPasswordToken(String email, String token);
+
+
+    /**
+     * Gets an application user by the reset token set for his securityUser.
+     *
+     * @param token the token to search for the user
+     * @return the ApplicationUser which SecurityUser matches the reset-token
+     */
+    Optional<SecurityUser> getSecurityUserByResetToken(String token);
+
+    /**
+     * Sets a new password for the given ApplicationUser.
+     *
+     * @param toUpdate    the ApplicationUser whose SecurityUsers password needs to be set
+     * @param newPassword the new password to be set for the security user of the application user.
+     */
+    void updateSecurityUserPassword(SecurityUser toUpdate, String newPassword);
+
+    /**
+     * Find an security user based on the email address.
+     *
+     * @param email the email address
+     * @return a security user
+     */
+    Optional<SecurityUser> findSecurityUserByEmail(String email);
 }

@@ -26,6 +26,10 @@ public class SecurityUser {
     @Column(nullable = false, length = 64)
     private String password;
 
+    @Size(min = 32, max = 32, message = "resetToken must be exactly 32 characters long")
+    @Column()
+    private String resetPasswordToken;
+
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
     private ApplicationUser user;
 
@@ -67,6 +71,14 @@ public class SecurityUser {
 
     public void setUser(ApplicationUser user) {
         this.user = user;
+    }
+
+    public String getResetPasswordToken() {
+        return resetPasswordToken;
+    }
+
+    public void setResetPasswordToken(String resetPasswordToken) {
+        this.resetPasswordToken = resetPasswordToken;
     }
 
     @Override

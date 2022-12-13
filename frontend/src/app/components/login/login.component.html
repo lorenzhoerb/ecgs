@@ -23,7 +23,8 @@
               <input type="text" name="username" formControlName="username" class="form-control" id="inputUsername"
                      aria-describedby="usernameHelp" placeholder="Enter username">
               <div *ngIf="submitted && loginForm.controls.username.errors" class="error">
-                <small class="form-text text-warning" *ngIf="loginForm.controls.username.errors.required">Your username is
+                <small class="form-text text-warning" *ngIf="loginForm.controls.username.errors.required">Your username
+                  is
                   required!
                 </small>
               </div>
@@ -51,6 +52,10 @@
         <a class="btn btn-secondary" routerLink="/register" aria-label="Register">
           <i class="bi bi-plus-lg"></i>
           Register
+        </a>
+        <a class="btn btn-secondary" routerLink="/forgot" aria-label="Forgot password">
+          <i class="bi bi-plus-lg"></i>
+          Forgot password
         </a>
       </div>
 

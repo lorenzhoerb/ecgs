@@ -7,6 +7,7 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.SecurityUser;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.SecurityUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepm.groupphase.backend.util.Validator;
@@ -22,15 +23,18 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Optional;
 
+@Transactional
 @Service
 public class CustomUserDetailService implements UserService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final ApplicationUserRepository userRepository;
+    private final SecurityUserRepository securityUserRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenizer jwtTokenizer;
     private final Validator validator;
@@ -38,9 +42,9 @@ public class CustomUserDetailService implements UserService {
     private final UserMapper userMapper;
 
     @Autowired
-    public CustomUserDetailService(ApplicationUserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer, Validator validator,
-                                   UserMapper userMapper) {
+    public CustomUserDetailService(ApplicationUserRepository userRepository, SecurityUserRepository securityUserRepository, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer, Validator validator, UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.securityUserRepository = securityUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
         this.validator = validator;
@@ -73,8 +77,8 @@ public class CustomUserDetailService implements UserService {
     public ApplicationUser registerUser(UserRegisterDto userRegisterDto) {
         LOGGER.debug("Registers user with the given data");
         ApplicationUser applicationUser = userMapper.registerDtoToApplicationUser(userRegisterDto);
-        LOGGER.debug("ApplicatiuonUser " + applicationUser);
-        LOGGER.debug("ApplicatiuonUser " + applicationUser.toString());
+        LOGGER.debug("ApplicationUser " + applicationUser);
+        LOGGER.debug("ApplicationUser " + applicationUser.toString());
         validator.validateRegistration(applicationUser);
         applicationUser.getUser().setPassword(passwordEncoder.encode(applicationUser.getUser().getPassword()));
         ApplicationUser save = userRepository.save(applicationUser);
@@ -83,6 +87,7 @@ public class CustomUserDetailService implements UserService {
 
     @Override
     public String login(UserLoginDto userLoginDto) {
+        LOGGER.debug("Login user with credentials {}", userLoginDto);
         UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
         if (userDetails != null
             && userDetails.isAccountNonExpired()
@@ -97,5 +102,42 @@ public class CustomUserDetailService implements UserService {
             return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles);
         }
         throw new BadCredentialsException("Username or password is incorrect or account is locked");
+    }
+
+    @Override
+    public void updateResetPasswordToken(String email, String token) {
+        LOGGER.debug("updateResetPasswordToken {}{}", email, token);
+        //Optional<ApplicationUser> toUpdateResetPasswordToken = userRepository.findApplicationUserByUserEmail(email);
+        Optional<SecurityUser> toUpdateResetPasswordToken = securityUserRepository.findByEmail(email);
+        Optional<SecurityUser> tmp = securityUserRepository.findById(2L);
+        if (toUpdateResetPasswordToken.isPresent()) {
+            SecurityUser temp = toUpdateResetPasswordToken.get();
+            temp.setResetPasswordToken(token);
+            securityUserRepository.save(temp);
+        } else {
+            throw new NotFoundException("Could not find User with email: " + email);
+        }
+    }
+
+    @Override
+    public Optional<SecurityUser> getSecurityUserByResetToken(String token) {
+        LOGGER.debug("getApplicationUserByResetToken {}", token);
+        return securityUserRepository.findSecurityUserByResetPasswordToken(token);
+    }
+
+    @Override
+    public void updateSecurityUserPassword(SecurityUser toUpdate, String newPassword) {
+        LOGGER.debug("updateSecurityUserPassword {}{}", toUpdate, newPassword);
+        validator.validatePasswordUpdate(newPassword);
+        String passwordEncoded = passwordEncoder.encode(newPassword);
+        toUpdate.setPassword(passwordEncoded);
+        toUpdate.setResetPasswordToken(null);
+        securityUserRepository.save(toUpdate);
+    }
+
+    @Override
+    public Optional<SecurityUser> findSecurityUserByEmail(String email) {
+        LOGGER.debug("Find security user by email");
+        return securityUserRepository.findByEmail(email);
     }
 }

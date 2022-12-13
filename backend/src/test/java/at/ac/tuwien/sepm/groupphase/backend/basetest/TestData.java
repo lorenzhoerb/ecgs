@@ -22,12 +22,14 @@ public interface TestData {
         {
             add("ROLE_ADMIN");
             add("ROLE_USER");
+            add("ROLE_TOURNAMENT_MANAGER");
         }
     };
     String DEFAULT_USER = "admin@email.com";
     List<String> USER_ROLES = new ArrayList<>() {
         {
             add("ROLE_USER");
+            add("ROLE_PARTICIPANT");
         }
     };
 

@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class CompetitionServiceImpl implements CompetitionService {
 
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final CompetitionRepository competitionRepository;
     private final GradingGroupRepository gradingGroupRepository;
@@ -55,6 +56,8 @@ public class CompetitionServiceImpl implements CompetitionService {
         this.gradingGroupMapper = gradingGroupMapper;
         this.gradingGroupRepository = gradingGroupRepository;
     }
+
+
 
     @Override
     public CompetitionDetailDto create(CompetitionDetailDto competitionDetailDto) {
@@ -142,4 +145,18 @@ public class CompetitionServiceImpl implements CompetitionService {
 
         throw new NotFoundException(String.format("Could not find competition with id %s", id));
     }
+
+
+    /*
+    //TO BE FIXXED , not RELEVANT FOR FEATURE 32
+    @Override
+    public List<CompetitionListDto> searchCompetitions(CompetitionSearchDto compoCompetitionSearchDto) {
+
+        List<Competition> allByBeginOfCompetitionAfterAndNameStartingWithAndDescriptionContainingIgnoreCase =
+            competitionRepository.findAllByBeginOfCompetitionAfterAndNameStartingWithAndDescriptionContainingIgnoreCase(compoCompetitionSearchDto.getName(),
+                compoCompetitionSearchDto.getDescription(),
+                compoCompetitionSearchDto.getBeginDate());
+        return competitionMapper.competitionsToCompetitionListDto(allByBeginOfCompetitionAfterAndNameStartingWithAndDescriptionContainingIgnoreCase);
+    }
+    */
 }

@@ -2,6 +2,7 @@ package at.ac.tuwien.sepm.groupphase.backend.util;
 
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
+import org.apache.catalina.core.AprLifecycleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,11 @@ public class Validator {
         validateGender(toValidate.getGender());
         validateDateOfBirth(toValidate.getDateOfBirth());
         validateRole(toValidate.getType());
+    }
+
+    public void validatePasswordUpdate(String toValidate) {
+        LOGGER.trace("validatePasswordUpdate {}", toValidate);
+        validatePassword(toValidate);
     }
 
     private void validateRole(ApplicationUser.Role type) {
@@ -68,9 +74,11 @@ public class Validator {
         if (password.length() < 8) {
             throw new ValidationException("Password needs at least 8 characters.");
         }
+        /*
         if (!password.matches(regEx)) {
             throw new ValidationException("Password needs at least 8 characters with at least one Uppercase,Lowercase,Number and Special Character(@$!%*?&).");
         }
+         */
     }
 
     private void validateEmail(String email) {
@@ -88,7 +96,7 @@ public class Validator {
         LOGGER.trace("validateName {}", name);
         String regEx = "[A-Za-zÄäÖöÜü]+";
         if (name == null) {
-            throw new ValidationException("Email must not be null!");
+            throw new ValidationException("Name must not be null!");
         }
         if (!name.matches(regEx)) {
             throw new ValidationException("Name must only consist of letters.");

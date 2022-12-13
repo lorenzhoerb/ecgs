@@ -51,9 +51,9 @@ export class RegisterComponent implements OnInit {
   }
 
   /**
-   * Send authentication data to the authService. If the authentication was successfully, the user will be forwarded to the message page
+   * Send registration through the auth-service
    *
-   * @param authRequest authentication data from the user login form
+   * @param registerRequest register data from the user register form
    */
   sendUserRegistration(registerRequest: RegisterRequest) {
     console.log('RegisterRequest gets send', registerRequest);

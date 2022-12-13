@@ -6,6 +6,8 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 
 import java.util.Set;
 
+import java.util.List;
+
 public interface CompetitionService {
 
     /**
@@ -24,11 +26,7 @@ public interface CompetitionService {
      */
     CompetitionDetailDto create(CompetitionDetailDto competitionDetailDto);
 
-    /**
-     * Gets participants of competition.
-     *
-     * @param id id of the competition
-     * @return list of registered competitions
-     */
     Set<UserDetailDto> getParticipants(Long id);
+
+    //List<CompetitionListDto> searchCompetitions(CompetitionSearchDto compoCompetitionSearchDto);
 }

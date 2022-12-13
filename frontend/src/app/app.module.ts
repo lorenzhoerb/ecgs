@@ -20,6 +20,9 @@ import { CreateCompetitionComponent } from './components/competition/create-comp
 import { UserComponent } from './components/user/user.component';
 import { GoldenRatioContainerComponent } from './components/containers/golden-ratio-container/golden-ratio-container.component';
 import { TournamentHeaderComponent } from './components/tournament-header/tournament-header.component';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
+import { ChangePasswordComponent } from './components/change-password/change-password.component';
 import { MatIconModule } from '@angular/material/icon';
 import { ViewParticipantsComponent } from './components/competition/view-participants/view-participants.component';
 import {ErrorComponent} from './components/error/error.component';
@@ -43,6 +46,9 @@ import { FormularEditorComponent } from './components/competition/formular-edito
     UserComponent,
     GoldenRatioContainerComponent,
     TournamentHeaderComponent,
+    ForgotPasswordComponent,
+    ResetPasswordComponent,
+    ChangePasswordComponent,
     ViewParticipantsComponent,
     ErrorComponent,
     FormularEditorComponent

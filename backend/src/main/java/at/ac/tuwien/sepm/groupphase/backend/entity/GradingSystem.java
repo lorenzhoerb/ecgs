@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -30,8 +31,7 @@ public class GradingSystem {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String formula;
 
-    @OneToMany(cascade = CascadeType.MERGE)
-    @JoinColumn(referencedColumnName = "id")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "gradingSystem", fetch = FetchType.EAGER)
     private Set<GradingGroup> gradingGroups;
 
     public GradingSystem() {

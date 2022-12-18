@@ -88,10 +88,12 @@ export class AuthService {
     if (this.getToken() != null) {
       const decoded: any = jwt_decode(this.getToken());
       const authInfo: string[] = decoded.rol;
-      if (authInfo.includes('ROLE_ADMIN')) {
-        return 'ADMIN';
-      } else if (authInfo.includes('ROLE_USER')) {
-        return 'USER';
+      if (authInfo.includes('ROLE_TOURNAMENT_MANAGER')) {
+        return 'TOURNAMENT_MANAGER';
+      } else if (authInfo.includes('ROLE_CLUB_MANAGER')) {
+        return 'CLUB_MANAGER';
+      } else if (authInfo.includes('ROLE_PARTICIPANT')) {
+        return 'PARTICIPANT';
       }
     }
     return 'UNDEFINED';

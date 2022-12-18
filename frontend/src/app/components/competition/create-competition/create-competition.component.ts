@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren} from '@angular/core';
 import {AbstractControl, FormControl, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {CompetitionService} from '../../../services/competition.service';
@@ -6,6 +6,7 @@ import {CompetitionDetail} from '../../../dtos/competition-detail';
 import {ListError} from '../../../dtos/list-error';
 import { GradingGroupDetail } from 'src/app/dtos/gradingGroupDetail';
 import { cloneDeep } from 'lodash';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-create-competition',
@@ -14,7 +15,11 @@ import { cloneDeep } from 'lodash';
 })
 export class CreateCompetitionComponent implements OnInit {
 
+  @ViewChildren('inputVariables') inputVariables: QueryList<ElementRef>;
+
   gradingGroups: any[] = [];
+
+  ids: any[] = [];
 
   competitionForm: UntypedFormGroup;
   dateNow = new Date();
@@ -28,6 +33,8 @@ export class CreateCompetitionComponent implements OnInit {
   constructor(
     private formBuilder: UntypedFormBuilder,
     private router: Router,
+    private toastr: ToastrService,
+    private changeDetectorRef: ChangeDetectorRef,
     private competitionService: CompetitionService) {
     this.competitionForm = this.formBuilder.group({
       name: ['', [Validators.required]],
@@ -49,7 +56,52 @@ export class CreateCompetitionComponent implements OnInit {
   createCompetition() {
     this.submitted = true;
     if (!this.competitionForm.valid) {
+      this.toastr.error('Bitte füllen Sie alle benötigten Felder aus', 'Unvollständige Angaben');
       return;
+    }
+
+    if(this.gradingGroups.length !== 0) {
+      const invalidErrors = [];
+
+      for (const group of this.gradingGroups) {
+        if(!group.formula.valid) {
+          invalidErrors.push(group.title);
+        }
+        if(this.gradingGroups.filter(g => g.title.trim() === group.title.trim()).length > 1) {
+          invalidErrors.push(`${group.title} ist kein einzigartiger Name`);
+        }
+
+        if(group.stations.length > 0) {
+          for (const station of group.stations) {
+            if(!station.formula.valid) {
+              invalidErrors.push(`${group.title} -> ${station.title}`);
+            }
+            if(group.stations.filter(s => s.title.trim() === station.title.trim()).length > 1) {
+              invalidErrors.push(`${group.title} -> ${station.title} ist kein einzigartiger Name`);
+            }
+
+            if(station.variables.length > 0) {
+              for(const variable of station.variables) {
+                if(station.variables.filter(v => v.name.trim() === variable.name.trim()).length > 1) {
+                  invalidErrors.push(`${group.title} -> ${station.title} -> ${variable.name} ist kein einzigartiger Name`);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      if(invalidErrors.length !== 0) {
+        this.toastr.error(
+          `Das Turnier kann nicht gespeichert werden da folgende Formeln Probleme aufweisen:
+<ul>          
+${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
+          `Ungültige Formeln`,{
+            enableHtml :  true
+          });
+
+        return;
+      }
     }
 
     const competition = new CompetitionDetail();
@@ -64,19 +116,44 @@ export class CreateCompetitionComponent implements OnInit {
       competition.description = null;
     }
 
+    for(const gradingGroup of this.gradingGroups) {
+      const gradingSystem = {
+        name: 'default',
+        description: 'default',
+        isPublic: false,
+        formula: JSON.stringify({
+          stations: gradingGroup.stations.map((station, stationId) => ({
+            displayName: station.title,
+            id: stationId + 1,
+            variables: station.variables.map(variable => ({
+              displayName: variable.name,
+              id: variable.value
+            })),
+            formula: station.formula.data
+          })),
+          formula: gradingGroup.formula.data
+        })
+      };
+      gradingGroup.gradingSystemDto = gradingSystem;
+    }
+
+
+
     competition.gradingGroups = this.gradingGroups;
 
     this.competitionService.createCompetition(competition)
       .subscribe({
         next: value => {
-          alert('Competition successfully created');
+          this.toastr.success('Turnier erfolgreich erstellt!');
+          this.router.navigate(['/competition',value.id]);
           //ToDO: Integrate with dashboard
         },
         error: err => {
           console.log(err.error.errors);
-          this.error = true;
-          this.errMsg.message = err.error.message;
-          this.errMsg.errors = err.error.errors;
+          this.toastr.error(
+            `<ul>${err.error.errors.map(e => '<li>' + e + '</li>').join('\n')}</ul>`,
+            err.error.message,
+            {enableHtml: true});
         }
       });
   }
@@ -86,29 +163,113 @@ export class CreateCompetitionComponent implements OnInit {
   }
 
   addGroup() {
-    this.gradingGroups.push({title: `Gruppe ${this.gradingGroups.length + 1}`, stations: []});
+    this.gradingGroups.push({
+      title: `Gruppe ${this.gradingGroups.length + 1}`,
+      stations: [],
+      stationVariables: [],
+      formula: {valid: false, data: {} },
+      idCount: 0
+    });
   }
 
   addStation(id) {
-    this.gradingGroups[id].stations.push({title: `Station ${this.gradingGroups[id].stations.length + 1}`,
-      variables: [], formula: {valid: false, data: {} }});
+    this.gradingGroups[id].stations.push({title: `Station ${++this.gradingGroups[id].idCount}`,
+      variables: [], idCount: 0, formula: {valid: false, data: {} }});
+
+    this.gradingGroups[id].stationVariables.push({
+      name: `Station ${this.gradingGroups[id].idCount}`,
+      value: this.gradingGroups[id].idCount,
+      type: 'variable',
+      typeHint: 'variableRef',
+      spaces: 0,
+      priority: 0
+    });
+
+    this.gradingGroups[id].stationVariables = cloneDeep(this.gradingGroups[id].stationVariables);
   }
 
   addStationVariable(station) {
-    station.variables.push({name: '', value: station.variables.length, type: 'variable', spaces: 0, priority: 0});
+    station.variables.push({
+      name: '',
+      value: ++station.idCount,
+      type: 'variable',
+      typeHint: 'variableRef',
+      spaces: 0,
+      priority: 0});
+
     station.variables = cloneDeep(station.variables);
+
+    this.changeDetectorRef.detectChanges();
+    this.inputVariables.last.nativeElement.focus();
   }
 
-  change(station) {
+  updateGroupName(id, newName) {
+    if(this.gradingGroups.map(g => g.title.trim()).includes(newName.trim())) {
+      this.toastr.warning('Gruppen müssen einzigartige Namen haben!', 'Achtung:');
+    }
+    this.gradingGroups[id].title = newName;
+  }
+
+  upadteStationName(groupId, stationId, newName) {
+    if(this.gradingGroups[groupId].stations.map(s => s.title.trim()).includes(newName.trim())) {
+      this.toastr.warning('Stationsnamen müssen innerhalb einer Gruppen einzigartig sein!', 'Achtung:');
+    }
+
+    this.gradingGroups[groupId].stations[stationId].title = newName;
+    this.gradingGroups[groupId].stationVariables[stationId].name = newName;
+
+    this.gradingGroups[groupId].stationVariables = cloneDeep(this.gradingGroups[groupId].stationVariables);
+  }
+
+  change(station, newName) {
     station.variables = cloneDeep(station.variables.filter(x => x.name !== ''));
+
+    if(station.variables.filter(v => v.name.trim() === newName.trim()).length > 1) {
+      this.toastr.warning('Variablennamen müssen innerhalb einer Station einzigartig sein!', 'Achtung:');
+    }
   }
 
   duplicateGroup(group,id) {
+    if(!this.gradingGroups[id].formula.valid) {
+
+      this.toastr.error(
+        `${this.gradingGroups[id].title} kann nicht dupliziert werden da die Formel ungültig ist.`
+        ,'Fehler beim Duplizieren');
+      return;
+    }
+
+    if(this.gradingGroups[id].stations.length > 0
+      && this.gradingGroups[id].stations.filter(s => !s.formula.valid).length > 0) {
+        this.toastr.error(
+          `${this.gradingGroups[id].title} kann nicht dupliziert werden da sie ungültige Formeln enthält.`
+          ,'Fehler beim Duplizieren');
+        return;
+      }
+
     this.gradingGroups.splice(id+1, 0, cloneDeep(Object.assign({}, group, {title: group.title + ' Kopie'})));
+    this.toastr.info(`${this.gradingGroups[id+1].title} erfolgreich erstellt.`);
   }
 
   duplicateStation(groupId, station, stationId) {
-    this.gradingGroups[groupId].stations.splice(stationId+1, 0, cloneDeep(Object.assign({}, station, {title: station.title + ' Kopie'})));
+    if(!this.gradingGroups[groupId].stations[stationId].formula.valid) {
+      this.toastr.error(
+        `${this.gradingGroups[groupId].stations[stationId].title} kann nicht dupliziert werden da die Formel ungültig ist`
+        ,'Fehler beim Duplizieren');
+      return;
+    }
+    this.gradingGroups[groupId].stations.splice(stationId+1, 0, cloneDeep(
+      Object.assign({}, station, {title: station.title + ' Kopie', value: ++this.gradingGroups[groupId].idCount})));
+
+    this.gradingGroups[groupId].stationVariables.push({
+      name: this.gradingGroups[groupId].stations[stationId+1].title,
+      value: this.gradingGroups[groupId].idCount,
+      type: 'variable',
+      typeHint: 'variableRef',
+      spaces: 0,
+      priority: 0
+    });
+    this.gradingGroups[groupId].stationVariables = cloneDeep(this.gradingGroups[groupId].stationVariables);
+    this.toastr.info(`${this.gradingGroups[groupId].stations[stationId+1].title} erfolgreich erstellt.`);
   }
 
   deleteGroup(id) {
@@ -117,6 +278,9 @@ export class CreateCompetitionComponent implements OnInit {
 
   deleteStation(groupId, stationId) {
     this.gradingGroups[groupId].stations.splice(stationId, 1);
+
+    this.gradingGroups[groupId].stationVariables.splice(stationId, 1);
+    this.gradingGroups[groupId].stationVariables = cloneDeep(this.gradingGroups[groupId].stationVariables);
   }
 
   public dynamicCssClassesForInput(input: AbstractControl): any {

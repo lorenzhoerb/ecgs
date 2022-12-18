@@ -93,7 +93,7 @@
       <div class="spacer-2"></div>
 
       <app-content-card [title]="'Einstellungen'">
-        <div class="form-row row">
+        <div class="form-row row f-row">
           <div class="form-group col-6">
             <label for="inputBeginOfRegistration">Registrierung von: </label>
             <input type="datetime-local" name="beginOfRegistration" formControlName="beginOfRegistration"
@@ -146,42 +146,46 @@
 
       <div class="second-scrollabove">
         <div class="group-container" *ngFor="let group of gradingGroups; index as id;">
-          <app-content-card [(title)]="group.title" [isEdit]="true" [actions]="['duplicate','delete','collapse']"
+          <app-content-card [title]="group.title" (titleChange)="updateGroupName(id,$event)" [isEdit]="true" [actions]="['duplicate','delete','collapse']"
             (delete)="deleteGroup(id)" (duplicate)="duplicateGroup(group,id)" (collapsed)="group.collapsed = $event"
             [color]="'bc-ming'">
 
-            <div class="minimize" *ngIf="group.collapsed">
-              <app-content-card [(title)]="station.title" [color]="'bc-space'" *ngFor="let station of group.stations">
-              </app-content-card>
+            <div mini class="minimize" *ngIf="group.collapsed">
+              <app-formular-editor [color]="'bc-space'" [collapsed]="true" [vars]="group.stationVariables" [(formula)]="group.formula"></app-formular-editor>
             </div>
 
-            <div *ngIf="!group.collapsed">
+            <div [hidden]="group.collapsed">
               <div class="spacer"></div>
 
               <div class="station-container" *ngFor="let station of group.stations; index as stationId;">
-                <app-content-card [(title)]="station.title" [isEdit]="true"
+                <app-content-card [title]="station.title" (titleChange)="upadteStationName(id, stationId, $event)" [isEdit]="true"
                   [actions]="['duplicate','delete','collapse']" (delete)="deleteStation(id, stationId)"
-                  (duplicate)="duplicateStation(id, station, stationId)" [color]="'bc-space'">
+                  (duplicate)="duplicateStation(id, station, stationId)" (collapsed)="station.collapsed = $event"
+                  [color]="'bc-space'">
+
+                  <div mini class="minimize" *ngIf="station.collapsed">
+                    <app-formular-editor [collapsed]="true" [vars]="station.variables" [(formula)]="station.formula"></app-formular-editor>
+                  </div>
 
                   <div class="station-content-head">
                     Variablen:
                   </div>
                   <div class="station-variables">
                     <div *ngFor="let variable of station.variables">
-                      <input type="text" class="variable" [(ngModel)]="variable.name" (change)="change(station)"
+                      <input #inputVariables type="text" class="variable" [(ngModel)]="variable.name" (change)="change(station, variable.name)"
                         [ngModelOptions]="{standalone: true}">
                     </div>
 
                     <div class="add-note flex-center" (click)="addStationVariable(station)">
-                      <mat-icon>add_circle_outline</mat-icon> Note
+                      <mat-icon>add_circle_outline</mat-icon> Variable
                     </div>
                   </div>
                   <div class="horizontal-line"></div>
                   <div class="station-result">
                     <app-formular-editor [vars]="station.variables" [(formula)]="station.formula"></app-formular-editor>
                   </div>
-
                 </app-content-card>
+                <div class="spacer"></div>
               </div>
 
               <div class="spacer-2"></div>
@@ -189,10 +193,17 @@
               <div class="add-group flex-center" (click)="addStation(id)">
                 <mat-icon class="large">add_circle_outline</mat-icon> Station
               </div>
+
+              <div class="spacer-2"></div>
+              <div class="horizontal-line"></div>
+
+              <app-formular-editor [color]="'bc-space'" [vars]="group.stationVariables" [(formula)]="group.formula"></app-formular-editor>
+
             </div>
 
             <div class="spacer-2"></div>
           </app-content-card>
+          <div class="spacer-2"></div>
         </div>
 
 

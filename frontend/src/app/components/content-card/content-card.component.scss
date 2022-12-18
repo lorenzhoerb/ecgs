@@ -51,6 +51,11 @@ h3 input[type="text"]:focus {
     margin-right: 8px;
 }
 
+.collapsed-content {
+    display: flex;
+    align-items: center;
+}
+
 .action-container mat-icon {
     cursor: pointer;
 }

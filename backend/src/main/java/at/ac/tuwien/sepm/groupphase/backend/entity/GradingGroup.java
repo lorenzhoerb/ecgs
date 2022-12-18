@@ -9,9 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.ManyToMany;
 import javax.persistence.CascadeType;
-import javax.transaction.Transactional;
 
 import java.util.Set;
 
@@ -28,7 +26,8 @@ public class GradingGroup {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "gradingGroup")
     private Report report;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
+    @JoinColumn(name = "grading_system_id")
     private GradingSystem gradingSystem;
 
     @ManyToOne()
@@ -69,11 +68,11 @@ public class GradingGroup {
         this.report = report;
     }
 
-    public GradingSystem getGradingSystems() {
+    public GradingSystem getGradingSystem() {
         return gradingSystem;
     }
 
-    public void setGradingSystems(GradingSystem gradingSystems) {
+    public void setGradingSystem(GradingSystem gradingSystem) {
         this.gradingSystem = gradingSystem;
     }
 

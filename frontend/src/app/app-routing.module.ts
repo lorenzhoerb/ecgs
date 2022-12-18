@@ -3,7 +3,8 @@ import {RouterModule, Routes} from '@angular/router';
 import {HomeComponent} from './components/home/home.component';
 import {LoginComponent} from './components/login/login.component';
 import {AuthGuard} from './guards/auth.guard';
-import {MessageComponent} from './components/message/message.component';
+import { TournamentManagerGuard } from './guards/tournamentManager.guard';
+import { ClubManagerGuard } from './guards/clubManager.guard';
 import {CompetitionComponent} from './components/competition/competition.component';
 import { UidemoComponent } from './components/uidemo/uidemo.component';
 import { environment } from 'src/environments/environment';
@@ -22,7 +23,6 @@ const routbuilding: Routes = [
   {path: '', component: CompetitionListViewComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'login', component: LoginComponent},
-  {path: 'message', canActivate: [AuthGuard], component: MessageComponent},
   {path: 'forgot', component: ForgotPasswordComponent},
   {path: 'reset', component: ResetPasswordComponent},
   {path: 'changePassword', canActivate: [AuthGuard], component: ChangePasswordComponent},

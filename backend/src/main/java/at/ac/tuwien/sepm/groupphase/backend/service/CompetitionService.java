@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepm.groupphase.backend.service;
 
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingSystemDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
@@ -30,9 +31,13 @@ public interface CompetitionService {
      */
     CompetitionDetailDto create(CompetitionDetailDto competitionDetailDto);
 
+    /**
+     * Get participants for competition.
+     *
+     * @param id id of competition
+     * @return Users registered to competition
+     */
+    Set<UserDetailDto> getParticipants(Long id);
 
     List<CompetitionListDto> searchCompetitions(CompetitionSearchDto compoCompetitionSearchDto);
-
-
-    Set<UserDetailDto> getParticipants(Long id);
 }

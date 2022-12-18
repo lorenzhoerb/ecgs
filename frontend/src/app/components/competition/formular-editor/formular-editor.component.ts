@@ -10,9 +10,9 @@ import { cloneDeep } from 'lodash';
 export class FormularEditorComponent implements OnInit, OnChanges {
 
   @Input() vars: any[] = [
-    { name: 'A', value: 1, type: 'variable', spaces: 0, priority: 0 },
-    { name: 'B', value: 2, type: 'variable', spaces: 0, priority: 0 },
-    { name: 'Abzug', value: 3, type: 'variable', spaces: 0, priority: 0 },
+    { name: 'A', value: 1, typeHint: 'variableRef', type: 'variable', spaces: 0, priority: 0 },
+    { name: 'B', value: 2, typeHint: 'variableRef', type: 'variable', spaces: 0, priority: 0 },
+    { name: 'Abzug', value: 3, typeHint: 'variableRef', type: 'variable', spaces: 0, priority: 0 },
   ];
 
 
@@ -21,16 +21,20 @@ export class FormularEditorComponent implements OnInit, OnChanges {
     data: {}
   };
 
+  @Input() color = 'bc-ming';
+
+  @Input() collapsed = false;
+
   @Output() formulaChange = new EventEmitter<any>();
   @Output() variablesChange = new EventEmitter<any>();
 
   variables = cloneDeep(this.vars);
 
   functions: any[] = [
-    { name: '+', value: 'add', type: 'function', spaces: 2, priority: 2 },
-    { name: '-', value: 'subt', type: 'function', spaces: 2, priority: 2 },
-    { name: '*', value: 'mult', type: 'function', spaces: 2, priority: 3 },
-    { name: '/', value: 'div', type: 'function', spaces: 2, priority: 3 },
+    { name: '+', value: 'add', typeHint: 'add', type: 'function', spaces: 2, priority: 2 },
+    { name: '-', value: 'subt',typeHint: 'subt', type: 'function', spaces: 2, priority: 2 },
+    { name: '*', value: 'mult',typeHint: 'mult', type: 'function', spaces: 2, priority: 3 },
+    { name: '/', value: 'div', typeHint: 'div', type: 'function', spaces: 2, priority: 3 },
     //{ name: "mean", type: "function", spaces: 'n', priority: 4 },
     //{ name: "x", type: "constant", spaces: 1, priority: 0},
   ];
@@ -44,10 +48,25 @@ export class FormularEditorComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     console.log(changes.vars);
     this.variables = cloneDeep(this.vars);
+
+    if(changes.vars.previousValue === undefined) {
+      return;
+    }
+    const t = this.calculation.filter(arr => arr.length === 0
+      || this.variables.map(v => v.value).includes(arr[0].value)
+      || this.functions.map(v => v.value).includes(arr[0].value));
+
+      this.calculation = t.map(arr => arr.length === 0 ||
+        this.functions.map(
+          v => v.value).includes(arr[0].value) ? arr : arr.map(v => this.variables.find(x => x.value === v.value)));
+
+      this.listRebuild();
+      this.buildTree();
+
   }
 
   ngOnInit(): void {
-    if(this.formula.valid) {
+    if(this.formula.data !== null && this.formula.data['type'] !== undefined) {
       this.calculation = [];
       this.calculationsFromTree(this.formula.data);
       this.listRebuild();
@@ -55,7 +74,7 @@ export class FormularEditorComponent implements OnInit, OnChanges {
   }
 
   calculationsFromTree(t) {
-    if(t === null || undefined) {
+    if(t === null || t === undefined) {
       return;
     }
 
@@ -69,6 +88,7 @@ export class FormularEditorComponent implements OnInit, OnChanges {
   }
 
   buildTree() {
+    this.formula.valid = true;
     const values = [];
     const operations = [];
 
@@ -80,14 +100,19 @@ export class FormularEditorComponent implements OnInit, OnChanges {
 
       if(['variable', 'constant'].includes(current.type)) {
         values.push(current);
+
+        if(i > 0 && ['variable', 'constant'].includes(calc[i-1].type)) {
+          this.formula.valid = false;
+        }
+
       } else if(operations.length < 1 || operations[operations.length -1].priority < current.priority) {
         operations.push(current);
       } else if (current.spaces > values.length) {
-        this.formula.data = null;
+        //this.formula.data = null;
         this.formula.valid = false;
-        this.formulaChange.emit(this.formula);
-        console.log('failed because of values');
-        return;
+        //this.formulaChange.emit(this.formula);
+        //console.log('failed because of values');
+        //return;
       } else if(current.spaces === 2) {
         const [right,left] = [values.pop(), values.pop()];
         const op = operations.pop();
@@ -98,26 +123,32 @@ export class FormularEditorComponent implements OnInit, OnChanges {
 
     for(const op of operations.reverse()) {
       if (op.spaces > values.length) {
-        this.formula.data = null;
+        //this.formula.data = null;
         this.formula.valid = false;
-        this.formulaChange.emit(this.formula);
-        console.log('failed at final unwind');
-        return;
+        //this.formulaChange.emit(this.formula);
+        //console.log('failed because of values');
+        //return;
+        const [left,right] = [values.pop(), values.pop()];
+        values.push(Object.assign({}, op, {left, right}));
+      } else {
+        const [right,left] = [values.pop(), values.pop()];
+        values.push(Object.assign({}, op, {left, right}));
       }
-      const [right,left] = [values.pop(), values.pop()];
-      values.push(Object.assign({}, op, {left, right}));
+
     }
 
-    if(values.length > 1) {
-      this.formula.data = null;
+    if(values.length !== 1) {
+      //this.formula.data = null;
       this.formula.valid = false;
-      this.formulaChange.emit(this.formula);
-      console.log('failed at end');
-      return;
+      //this.formulaChange.emit(this.formula);
+      //console.log('failed because of values');
+      //return;
     }
 
     this.formula.data = values.pop();
-    this.formula.valid = true;
+    if(this.formula.data === undefined) {
+      this.formula.data = {};
+    }
 
     console.log(JSON.stringify(this.formula, null, 4));
     console.log(this.formula);
@@ -217,10 +248,17 @@ export class FormularEditorComponent implements OnInit, OnChanges {
           )
         && !inbetween;
 
+    const opempty = this.calculation[i].length === 0 && !inb
+          && (
+            (i > 0 && this.calculation[i-1].length > 0 && this.calculation[i-1][0].type === 'variable')
+            || ( i < this.calculation.length -1 && this.calculation[i+1].length > 0 && this.calculation[i+1][0].type === 'variable'));
+
     return {
       items: true,
       inbetween: inb,
       empty: this.calculation[i].length === 0 && !inb,
+      opempty,
+      borcol: this.color === 'bc-space',
       filled: this.calculation[i].length !== 0
     };
   }

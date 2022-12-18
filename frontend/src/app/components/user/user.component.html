@@ -1,8 +1,8 @@
 <div class="user" *ngIf="!loggedIn">
-    <button class="secondary-btn" routerLink="/login">{{localize.login}}</button>
+    <button class="secondary-btn" [routerLink]="'/login'">{{localize.login}}</button>
 </div>
 
-<div class="user" *ngIf="loggedIn">
+<div class="user" *ngIf="loggedIn" (click)="showMenu.emit()">
     <img src="../../../assets/user_image.jpg" alt="User image">
     <h3>{{user?.firstName + " " + user?.lastName}}</h3>
 </div>

@@ -9,7 +9,6 @@ import {HeaderComponent} from './components/header/header.component';
 import {FooterComponent} from './components/footer/footer.component';
 import {HomeComponent} from './components/home/home.component';
 import {LoginComponent} from './components/login/login.component';
-import {MessageComponent} from './components/message/message.component';
 import {CompetitionComponent} from './components/competition/competition.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {httpInterceptorProviders} from './interceptors';
@@ -23,11 +22,13 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { ChangePasswordComponent } from './components/change-password/change-password.component';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonToggleModule} from '@angular/material/button-toggle';
 import { ViewParticipantsComponent } from './components/competition/view-participants/view-participants.component';
 import {ErrorComponent} from './components/error/error.component';
 import {ToastrModule} from 'ngx-toastr';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { FormularEditorComponent } from './components/competition/formular-editor/formular-editor.component';
+import { HeaderModalComponent } from './components/header-modal/header-modal.component';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { CompetitionListViewComponent } from './components/competition-list-view/competition-list-view.component';
 import { CompetitionListViewEntryComponent }
@@ -45,7 +46,6 @@ import { CompetitionHeaderComponent } from './components/competition-header/comp
     FooterComponent,
     HomeComponent,
     LoginComponent,
-    MessageComponent,
     CompetitionComponent,
     RegisterComponent,
     UidemoComponent,
@@ -65,23 +65,25 @@ import { CompetitionHeaderComponent } from './components/competition-header/comp
     ViewParticipantsComponent,
     ErrorComponent,
     FormularEditorComponent,
+    HeaderModalComponent,
     ClubManagerImportTeamComponent,
     CompetitionCalenderViewComponent,
     CompetitionHeaderComponent
   ],
-    imports: [
-        BrowserModule,
-        BrowserAnimationsModule,
-        AppRoutingModule,
-        ReactiveFormsModule,
-        HttpClientModule,
-        NgbModule,
-        FormsModule,
-        MatIconModule,
-        ToastrModule.forRoot(),
-        DragDropModule,
-        MatFormFieldModule
-    ],
+  imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
+    AppRoutingModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    NgbModule,
+    FormsModule,
+    MatIconModule,
+    MatButtonToggleModule,
+    ToastrModule.forRoot(),
+    DragDropModule,
+    MatFormFieldModule
+  ],
   providers: [httpInterceptorProviders],
   bootstrap: [AppComponent]
 })

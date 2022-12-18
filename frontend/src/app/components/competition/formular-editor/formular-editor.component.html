@@ -1,4 +1,4 @@
-<div class="formular-creator">
+<div class="formular-creator" *ngIf="!collapsed">
     <div class="station-content-head">
         Funktionen:
     </div>
@@ -7,7 +7,7 @@
             <div class="variables copy" cdkDropList [cdkDropListData]="variables" cdkDropListSortingDisabled
                 (cdkDropListDropped)="drop($event)" (cdkDropListExited)="exitedVars($event)"
                 (cdkDropListEntered)="entered()" [cdkDropListEnterPredicate]="noEnterPredicate">
-                <div class="variable" *ngFor="let item of variables;" cdkDrag [cdkDragData]="item">
+                <div class="variable {{color}}" *ngFor="let item of variables;" cdkDrag [cdkDragData]="item">
                     {{item.name}}
                 </div>
             </div>
@@ -26,9 +26,10 @@
             Stations Ergebnis = <div class="calculation">
                 <div *ngFor="let list of calculation; index as i;">
                     <div [class]="getFormulaClass(i)" cdkDropList [cdkDropListData]="list" cdkDropListSortingDisabled
-                        (cdkDropListDropped)="drop($event, i)"
-                        (cdkDropListEntered)="entered()" [cdkDropListEnterPredicate]="onlyOnePredicate">
-                        <div [class]="[item.type, 'symbol']" *ngFor="let item of list;" cdkDrag [cdkDragData]="item">
+                        (cdkDropListDropped)="drop($event, i)" (cdkDropListEntered)="entered()"
+                        [cdkDropListEnterPredicate]="onlyOnePredicate">
+                        <div [class]="[item.type, 'symbol', color]" *ngFor="let item of list;" cdkDrag
+                            [cdkDragData]="item">
                             <mat-icon class="remove-btn" (click)="removeFrom(i)">close</mat-icon>
                             <div>
                                 {{item.name}}
@@ -39,6 +40,22 @@
             </div>
         </div>
     </div>
+</div>
 
-
+<div class="collapsed-formula" *ngIf="collapsed">
+    <div class="larger">=</div>
+    <div class="invalid-formula" *ngIf="!this.formula.valid">
+        Ungültige Formel
+    </div>
+    <div class="flex-me" *ngIf="this.formula.valid">
+        <div *ngFor="let list of calculation; index as i;">
+            <div [class]="getFormulaClass(i)">
+                <div [class]="[item.type, 'symbol', color]" *ngFor="let item of list;">
+                    <div>
+                        {{item.name}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

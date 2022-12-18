@@ -1,3 +1,10 @@
 .jumbotron {
-  background: none
+  background: white;
+  height: calc(100vh - 4rem);
+
+}
+
+main {
+  margin-top: -2.5em;
+  height: 100%;
 }

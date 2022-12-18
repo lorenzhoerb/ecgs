@@ -3,7 +3,7 @@
 //Disable the lint because localization keys should not be forced to obey naming conventions
 
 export enum SupportedLanguages {
-    German = 'de-De',
+    German = 'de-DE',
     English = 'en-US'
 }
 

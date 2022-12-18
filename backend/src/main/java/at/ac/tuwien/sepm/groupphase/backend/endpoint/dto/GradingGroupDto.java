@@ -12,12 +12,12 @@ public class GradingGroupDto {
     @Size(max = 4095)
     private String title;
 
-    private GradingSystemDto gradingSystemDto;
+    private GradingSystemDetailDto gradingSystemDto;
 
     public GradingGroupDto() {
     }
 
-    public GradingGroupDto(Long id, String title, GradingSystemDto gradingSystemDto) {
+    public GradingGroupDto(Long id, String title, GradingSystemDetailDto gradingSystemDto) {
         this.id = id;
         this.title = title;
         this.gradingSystemDto = gradingSystemDto;
@@ -31,7 +31,7 @@ public class GradingGroupDto {
         return this.title;
     }
 
-    public GradingSystemDto getGradingSystemDto() {
+    public GradingSystemDetailDto getGradingSystemDto() {
         return this.gradingSystemDto;
     }
 
@@ -45,7 +45,7 @@ public class GradingGroupDto {
         return this;
     }
 
-    public GradingGroupDto withGradingSystemDto(GradingSystemDto gradingSystemDto) {
+    public GradingGroupDto withGradingSystemDto(GradingSystemDetailDto gradingSystemDto) {
         this.gradingSystemDto = gradingSystemDto;
         return this;
     }
@@ -62,7 +62,7 @@ public class GradingGroupDto {
         this.title = title;
     }
 
-    public void setGradingSystemDto(GradingSystemDto gradingSystemDto) {
+    public void setGradingSystemDto(GradingSystemDetailDto gradingSystemDto) {
         this.gradingSystemDto = gradingSystemDto;
     }
 }

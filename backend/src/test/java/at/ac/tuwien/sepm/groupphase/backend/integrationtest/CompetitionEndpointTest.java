@@ -29,7 +29,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -119,7 +118,7 @@ public class CompetitionEndpointTest extends TestDataProvider {
                 .header(
                     securityProperties.getAuthHeader(),
                     jwtTokenizer.getAuthToken(
-                        TEST_USER_TOURNAMENT_MANAGER_EMAIL,
+                        TEST_USER_COMPETITION_MANAGER_EMAIL,
                         List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
                     ))
                 .content(body))
@@ -149,7 +148,7 @@ public class CompetitionEndpointTest extends TestDataProvider {
                 .header(
                     securityProperties.getAuthHeader(),
                     jwtTokenizer.getAuthToken(
-                        TEST_USER_TOURNAMENT_MANAGER_EMAIL,
+                        TEST_USER_COMPETITION_MANAGER_EMAIL,
                         List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
                     ))
                 .content(body))
@@ -193,7 +192,7 @@ public class CompetitionEndpointTest extends TestDataProvider {
                 .header(
                     securityProperties.getAuthHeader(),
                     jwtTokenizer.getAuthToken(
-                        TEST_USER_TOURNAMENT_MANAGER_EMAIL,
+                        TEST_USER_COMPETITION_MANAGER_EMAIL,
                         List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
                     ))
             )
@@ -233,7 +232,7 @@ public class CompetitionEndpointTest extends TestDataProvider {
                     .header(
                         securityProperties.getAuthHeader(),
                         jwtTokenizer.getAuthToken(
-                            TEST_USER_TOURNAMENT_MANAGER_EMAIL,
+                            TEST_USER_COMPETITION_MANAGER_EMAIL,
                             List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
                         ))
             )

@@ -1,7 +1,8 @@
-<app-header></app-header>
+<app-header (showMenu)="showMenu = !showMenu"></app-header>
+<app-header-modal [(showMenu)]="showMenu"></app-header-modal>
 
 <div class="container-my">
-  <router-outlet></router-outlet>
+  <!-- <router-outlet></router-outlet> -->
 </div>
 
 <router-outlet></router-outlet>

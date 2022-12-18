@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service' ;
 import {AuthService} from '../../services/auth.service';
 
@@ -8,6 +8,8 @@ import {AuthService} from '../../services/auth.service';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent implements OnInit {
+
+  @Output() showMenu = new EventEmitter();
 
   constructor(public authService: AuthService) { }
 

@@ -66,3 +66,12 @@ app-tournament-header input[type="text"]:focus {
     cursor: pointer;
     gap: 8px;
 }
+
+.f-row {
+    display: flex;
+    gap: 16px;
+}
+
+.round-corners {
+    border-radius: 6px;
+}

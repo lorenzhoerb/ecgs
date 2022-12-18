@@ -39,6 +39,10 @@ export class LocalizeService extends LocalizationKeys {
         this.changeLanguageInternal(newLanguage);
     }
 
+    public getLanguage(): string {
+        return this.language;
+    }
+
     private changeLanguageInternal(newLanguage: string) {
         switch (newLanguage) {
             case SupportedLanguages.German:

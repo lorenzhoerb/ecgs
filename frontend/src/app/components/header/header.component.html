@@ -1,11 +1,11 @@
 <div class="header">
   <div class="heading">
     <a routerLink="/">
-      <h1>Stationary</h1>
+      <h1>ECGS</h1>
     </a>
   </div>
   <div class="flex">
     <a routerLink="/competition/create">{{localize.MyTournaments}}</a>
-    <app-user></app-user>
+    <app-user (showMenu)="showMenu.emit()"></app-user>
   </div>
 </div>

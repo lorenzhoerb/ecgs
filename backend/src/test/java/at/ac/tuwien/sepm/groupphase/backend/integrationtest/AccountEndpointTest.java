@@ -154,7 +154,7 @@ public class AccountEndpointTest implements TestData {
     }
 
     @Test
-    public void resetPasswordShouldSuccess() throws Exception{
+    public void resetPasswordShouldSuccess() throws Exception {
         UserRegisterDto userRegisterDto =
             new UserRegisterDto.UserRegisterDtoBuilder().setFirstName("Hans").setLastName("Meyer").setEmail("hans.meyer@gmail.com").setPassword("password187")
                 .setGender(
@@ -184,7 +184,7 @@ public class AccountEndpointTest implements TestData {
             .andReturn();
         response = mvcResult.getResponse();
 
-        assertEquals(HttpStatus.OK.value(),response.getStatus());
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
 
         String token = applicationUserRepository.findApplicationUserByUserEmail("hans.meyer@gmail.com").get().getUser().getResetPasswordToken();
 
@@ -201,12 +201,12 @@ public class AccountEndpointTest implements TestData {
             .andReturn();
         response = mvcResult.getResponse();
 
-        assertEquals(HttpStatus.OK.value(),response.getStatus());
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
     }
 
     @Test
     @Transactional
-    public void changePasswordShouldSuccess() throws Exception{
+    public void changePasswordShouldSuccess() throws Exception {
         UserRegisterDto userRegisterDto =
             new UserRegisterDto.UserRegisterDtoBuilder().setFirstName("Hans").setLastName("Meyer").setEmail("hans.meyer@gmail.com").setPassword("password187")
                 .setGender(
@@ -237,7 +237,7 @@ public class AccountEndpointTest implements TestData {
             .andReturn();
         response = mvcResult.getResponse();
 
-        assertEquals(HttpStatus.OK.value(),response.getStatus());
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
 
         Optional<ApplicationUser> accountOption = applicationUserRepository.findApplicationUserByUserEmail(userCredentialUpdateDto.getEmail());
         assertTrue(accountOption.isPresent());

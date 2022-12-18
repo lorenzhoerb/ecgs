@@ -40,9 +40,13 @@ public abstract class TestDataProvider {
     protected static final String BASE_URI = "/api/v1";
     protected static final String COMPETITION_URI = "/competitions";
     protected static final String COMPETITION_BASE_URI = BASE_URI + COMPETITION_URI;
+    protected static final String USER_URI = "/user";
+    protected static final String USER_BASE_URI = BASE_URI + USER_URI;
+    protected static final String COMPETITION_SELF_REGISTRATION_BASE_URI = USER_BASE_URI + "/competitions/";
 
     protected static final String TEST_USER_BASIC_EMAIL = "basic@email.com";
     protected static final String TEST_USER_COMPETITION_MANAGER_EMAIL = "comp.manager@email.com";
+    protected static final String TEST_USER_PARTICIPANT_EMAIL = "participant@email.com";
 
     protected UserRegisterDto getValidRegistrationDtoForCompetitionManager() {
         return new UserRegisterDto(
@@ -53,6 +57,17 @@ public abstract class TestDataProvider {
             ApplicationUser.Gender.FEMALE,
             new Date(),
             ApplicationUser.Role.TOURNAMENT_MANAGER);
+    }
+
+    protected UserRegisterDto getValidRegistrationDtoForParticipant() {
+        return new UserRegisterDto(
+            TEST_USER_PARTICIPANT_EMAIL,
+            "12345678",
+            "Firsname",
+            "Lastname",
+            ApplicationUser.Gender.MALE,
+            new Date(),
+            ApplicationUser.Role.PARTICIPANT);
     }
 
     protected CompetitionDetailDto getValidCompetitionDetailDto() {
@@ -101,8 +116,14 @@ public abstract class TestDataProvider {
         };
     }
 
+
+
     protected void setUpCompetitionUser() {
         customUserDetailService.registerUser(getValidRegistrationDtoForCompetitionManager());
+    }
+
+    protected void setUpParticipantUser() {
+        customUserDetailService.registerUser(getValidRegistrationDtoForParticipant());
     }
 
     protected Competition createCompetitionEntity(
@@ -132,7 +153,7 @@ public abstract class TestDataProvider {
             ApplicationUser.Role.PARTICIPANT,
             "first", "last",
             ApplicationUser.Gender.MALE,
-            new Date(2000,10,10),
+            new Date(2000, 10, 10),
             ""
         );
 

@@ -9,7 +9,7 @@
   <div class="scrollabove">
     <app-error [error]="error"></app-error>
 
-    <app-competition-header [title]="competition.name"></app-competition-header>
+    <app-competition-header [title]="competition.name" (register)="onRegister()" [isRegistered]="isRegisteredToCompetition" [canRegister]="canRegister"></app-competition-header>
 
     <div class="spacer-2"></div>
 
@@ -38,6 +38,6 @@
 
     <div class="spacer-2"></div>
 
-    <app-view-participants [id]="this.id"></app-view-participants>
+    <app-view-participants [participants]="participants"></app-view-participants>
   </div>
 </main>

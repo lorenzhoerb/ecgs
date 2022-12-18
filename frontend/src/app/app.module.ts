@@ -28,6 +28,7 @@ import {ErrorComponent} from './components/error/error.component';
 import {ToastrModule} from 'ngx-toastr';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { FormularEditorComponent } from './components/competition/formular-editor/formular-editor.component';
+import { RegisterModalComponent } from './components/competition/register-modal/register-modal.component';
 import { HeaderModalComponent } from './components/header-modal/header-modal.component';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { CompetitionListViewComponent } from './components/competition-list-view/competition-list-view.component';
@@ -65,6 +66,7 @@ import { CompetitionHeaderComponent } from './components/competition-header/comp
     ViewParticipantsComponent,
     ErrorComponent,
     FormularEditorComponent,
+    RegisterModalComponent,
     HeaderModalComponent,
     ClubManagerImportTeamComponent,
     CompetitionCalenderViewComponent,

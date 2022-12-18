@@ -100,6 +100,16 @@ public class SessionUtils {
     }
 
     /**
+     * Checks if the session user is authenticated.
+     *
+     * @return true if authenticated else false
+     */
+    public boolean isAuthenticated() {
+        LOGGER.debug("isAuthenticated");
+        return getSessionUser() != null;
+    }
+
+    /**
      * Gets the current session user.
      *
      * @return session user if there is one else null

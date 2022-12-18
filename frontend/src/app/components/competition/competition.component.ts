@@ -1,10 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { ContentCardComponent } from '../content-card/content-card.component';
+import {Component, OnInit} from '@angular/core';
+import {ContentCardComponent} from '../content-card/content-card.component';
 import {CompetitionService} from '../../services/competition.service';
 import {Competition} from '../../dtos/competition';
 import {ActivatedRoute} from '@angular/router';
 import {SupportedLanguages} from '../../services/localization/language';
 import LocalizationService, {LocalizeService} from '../../services/localization/localization.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {RegisterModalComponent} from './register-modal/register-modal.component';
+import {UserService} from '../../services/user.service';
+import {cloneDeep} from 'lodash';
+import {UserDetail} from '../../dtos/user-detail';
 
 @Component({
   selector: 'app-competition-view',
@@ -16,9 +21,14 @@ export class CompetitionComponent implements OnInit {
   competition: Competition = null;
   error: Error = null;
   currentLanguage = SupportedLanguages.English;
+  isRegisteredToCompetition = false;
+  canRegister = false;
+  participants: UserDetail[];
 
   constructor(private service: CompetitionService,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              private modalService: NgbModal,
+              private userService: UserService) {
     console.log('init');
     this.localize.changeLanguage(this.currentLanguage);
   }
@@ -29,14 +39,14 @@ export class CompetitionComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      if(params.id) {
+      if (params.id) {
         this.id = parseInt(params.id, 10);
 
         this.service.getCompetitionById(this.id).subscribe({
           next: data => {
             this.competition = data;
             this.error = null;
-            console.log(data);
+            this.initCanRegister();
           },
           error: error => {
             console.error('Error fetching competition information', error);
@@ -44,8 +54,16 @@ export class CompetitionComponent implements OnInit {
             this.competition = null;
           }
         });
+
+        this.fetchIsRegistered(this.id);
+        this.fetchParticipants();
       }
     });
+  }
+
+  fetchIsRegistered(id) {
+    this.userService.isRegisteredToCompetition(id)
+      .subscribe(value => this.isRegisteredToCompetition = true);
   }
 
   formatDate(date: Date): string {
@@ -53,7 +71,7 @@ export class CompetitionComponent implements OnInit {
   }
 
   toggleLanguage() {
-    if(this.currentLanguage === SupportedLanguages.English) {
+    if (this.currentLanguage === SupportedLanguages.English) {
       this.currentLanguage = SupportedLanguages.German;
     } else {
       this.currentLanguage = SupportedLanguages.English;
@@ -61,7 +79,41 @@ export class CompetitionComponent implements OnInit {
     this.localize.changeLanguage(this.currentLanguage);
   }
 
+  initCanRegister() {
+    const now = new Date();
+    this.canRegister = now >= this.competition.beginOfRegistration && now <= this.competition.endOfRegistration;
+    console.log(this.canRegister);
+  }
+
   pictureEmpty() {
     return this.competition.picturePath === '' || this.competition.picturePath === null;
+  }
+
+  onRegister() {
+    const modalRef = this.modalService.open(RegisterModalComponent);
+    modalRef.componentInstance.competition = this.competition;
+    modalRef.componentInstance.competitionId = this.id;
+    modalRef.closed.subscribe(registered => {
+      if (registered) {
+        this.isRegisteredToCompetition = true;
+        this.fetchParticipants();
+      }
+    });
+  }
+
+
+  fetchParticipants() {
+    this.service.getParticipants(this.id).subscribe({
+      next: data => {
+        this.participants = data;
+        console.log(data);
+        this.error = null;
+      },
+      error: error => {
+        this.participants = [];
+        console.error('Error fetching competition information', error);
+        this.error = error;
+      }
+    });
   }
 }

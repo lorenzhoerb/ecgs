@@ -4,9 +4,11 @@ import at.ac.tuwien.sepm.groupphase.backend.basetest.TestDataProvider;
 import at.ac.tuwien.sepm.groupphase.backend.config.properties.SecurityProperties;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ErrorListRestDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleGradingGroupDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
+import at.ac.tuwien.sepm.groupphase.backend.entity.GradingGroup;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
@@ -187,14 +189,14 @@ public class CompetitionEndpointTest extends TestDataProvider {
         );
 
         MvcResult mvcResult = this.mockMvc.perform(
-            get(COMPETITION_BASE_URI + "/{id}/participants",
-                competition.getId())
-                .header(
-                    securityProperties.getAuthHeader(),
-                    jwtTokenizer.getAuthToken(
-                        TEST_USER_COMPETITION_MANAGER_EMAIL,
-                        List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
-                    ))
+                get(COMPETITION_BASE_URI + "/{id}/participants",
+                    competition.getId())
+                    .header(
+                        securityProperties.getAuthHeader(),
+                        jwtTokenizer.getAuthToken(
+                            TEST_USER_COMPETITION_MANAGER_EMAIL,
+                            List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
+                        ))
             )
             .andDo(print())
             .andReturn();
@@ -266,7 +268,63 @@ public class CompetitionEndpointTest extends TestDataProvider {
     }
 
     @Test
+    public void getGradingGroups_expect200() throws Exception {
+        setUpCompetitionUser();
+        Competition c1 = getValidCompetitionEntity();
+        GradingGroup g1 = new GradingGroup("G1");
+        GradingGroup g2 = new GradingGroup("G2");
+        c1.setGradingGroups(Set.of(g1, g2));
+        g1.setCompetitions(c1);
+        g2.setCompetitions(c1);
+        Competition cc1 = competitionRepository.save(c1);
+        GradingGroup gg1 = gradingGroupRepository.save(g1);
+        GradingGroup gg2 = gradingGroupRepository.save(g2);
+
+        MvcResult mvcResult = this.mockMvc.perform(get(COMPETITION_BASE_URI + "/" + cc1.getId() + "/groups")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(
+                    securityProperties.getAuthHeader(),
+                    jwtTokenizer.getAuthToken(
+                        TEST_USER_COMPETITION_MANAGER_EMAIL,
+                        List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
+                    )))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        List<SimpleGradingGroupDto> simpleGradingGroupDto = objectMapper
+            .readValue(response.getContentAsByteArray(),
+                objectMapper.getTypeFactory().constructCollectionType(List.class, SimpleGradingGroupDto.class));
+
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertEquals(2, simpleGradingGroupDto.size());
+        List<SimpleGradingGroupDto> sG = simpleGradingGroupDto.stream().filter(g -> g.getTitle().equals(g1.getTitle())).toList();
+        assertEquals(1, sG.size());
+        assertEquals("G1", sG.get(0).getTitle());
+        List<SimpleGradingGroupDto> sG2 = simpleGradingGroupDto.stream().filter(g -> g.getTitle().equals(g2.getTitle())).toList();
+        assertEquals(1, sG2.size());
+        assertEquals("G2", sG2.get(0).getTitle());
+    }
+
+    @Test
+    public void getGradingGroups_invalidCompetition_expect404() throws Exception {
+        setUpCompetitionUser();
+        MvcResult mvcResult = this.mockMvc.perform(get(COMPETITION_BASE_URI + "/" + 100 + "/groups")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(
+                    securityProperties.getAuthHeader(),
+                    jwtTokenizer.getAuthToken(
+                        TEST_USER_COMPETITION_MANAGER_EMAIL,
+                        List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
+                    )))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
+    }
+
     //@Transactional
+    @Test
     public void searchCompetitionList() throws Exception {
         CompetitionSearchDto competitionSearchDto = new CompetitionSearchDto("name test", LocalDateTime.now(),LocalDateTime.now(),LocalDateTime.now(),LocalDateTime.now());
         for (int i = 0; i < 30; i++) {
@@ -292,7 +350,7 @@ public class CompetitionEndpointTest extends TestDataProvider {
                 competitionSearchDto.getEndRegistrationDate(),
                 competitionSearchDto.getName());
 
-        //assertEquals(allByBeginOfCompetitionAfterAndNameStartingWithAndDescriptionContainingIgnoreCase.size(), response.size());
+        assertEquals(allByBeginOfCompetitionAfterAndNameStartingWithAndDescriptionContainingIgnoreCase.size(), response.size());
         List<Competition> compList = (List<Competition>) competitionRepository.findAll();
         assertEquals(compList.size(),30);
         assertEquals(30,allByBeginOfCompetitionAfterAndNameStartingWithAndDescriptionContainingIgnoreCase.size());

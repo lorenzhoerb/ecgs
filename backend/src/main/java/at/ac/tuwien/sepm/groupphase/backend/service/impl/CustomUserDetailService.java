@@ -20,6 +20,7 @@ import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository
 import at.ac.tuwien.sepm.groupphase.backend.repository.SecurityUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ManagedByRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
+import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import at.ac.tuwien.sepm.groupphase.backend.service.EmailService;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepm.groupphase.backend.validation.ForgotPasswordValidator;
@@ -82,13 +83,13 @@ public class CustomUserDetailService implements UserService {
                                    JwtTokenizer jwtTokenizer, ManagedByRepository managedByRepository,
                                    UserValidator userValidator, ClubManagerTeamImportDtoValidator teamValidator,
                                    EmailService emailService, UserMapper userMapper, SessionUtils sessionUtils,
-            RegistrationValidator validator,
+            RegistrationValidator registrationValidator, 
             PasswordChangeValidator passwordChangeValidator, ForgotPasswordValidator forgotPasswordValidator) {
         this.userRepository = userRepository;
         this.securityUserRepository = securityUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
-        this.registrationValidator = validator;
+        this.registrationValidator = registrationValidator;
         this.passwordChangeValidator = passwordChangeValidator;
         this.forgotPasswordValidator = forgotPasswordValidator;
         this.managedByRepository = managedByRepository;

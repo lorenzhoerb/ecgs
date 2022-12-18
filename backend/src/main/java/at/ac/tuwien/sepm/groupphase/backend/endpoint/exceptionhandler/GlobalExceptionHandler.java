@@ -4,6 +4,7 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ErrorListRestDto;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.UnauthorizedException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import org.slf4j.Logger;
@@ -42,6 +43,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleNotFound(RuntimeException ex, WebRequest request) {
         LOGGER.warn(ex.getMessage());
         return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+    }
+
+    /**
+     * Use the @ExceptionHandler annotation to write handler for custom exceptions.
+     */
+    @ExceptionHandler(value = {UnauthorizedException.class})
+    protected ResponseEntity<Object> handleUnauthorized(RuntimeException ex, WebRequest request) {
+        LOGGER.warn(ex.getMessage());
+        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
     }
 
     /**

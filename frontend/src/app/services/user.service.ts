@@ -1,11 +1,13 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {map, Observable} from 'rxjs';
+import {UserInfoDto} from '../dtos/userInfoDto';
+import {Globals} from '../global/globals';
+import {ResponseParticipantRegistrationDto} from '../dtos/responseParticipantRegistrationDto';
+import {CompetitionDetail} from '../dtos/competition-detail';
 import { ClubManagerTeamImportDto } from '../dtos/club-manager-team';
 import { CalendarViewCompetition } from '../dtos/competition';
 import { GeneralResponseDto } from '../dtos/general-response';
-import { UserInfoDto } from '../dtos/userInfoDto';
-import { Globals } from '../global/globals';
 
 @Injectable({
   providedIn: 'root'
@@ -28,5 +30,20 @@ export class UserService {
   getUserInfo(): Observable<UserInfoDto> {
     console.log('Load user info');
     return this.httpClient.get<UserInfoDto>(this.userBaseUri);
+  }
+
+  registerToCompetition(competitionId: number, groupPreference: number): Observable<ResponseParticipantRegistrationDto> {
+    const uri = this.userBaseUri + '/competitions/' + competitionId;
+    if (groupPreference) {
+      return this.httpClient
+        .post<ResponseParticipantRegistrationDto>(uri, {groupPreference});
+    }
+    return this.httpClient
+      .post<ResponseParticipantRegistrationDto>(uri, null);
+  }
+
+  isRegisteredToCompetition(competitionId: number): Observable<void> {
+    return this.httpClient
+      .get<void>(this.userBaseUri + '/competitions/' + competitionId);
   }
 }

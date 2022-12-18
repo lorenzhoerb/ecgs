@@ -32,9 +32,9 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -86,6 +86,7 @@ public class CompetitionServiceTest extends TestDataProvider {
         applicationUserRepository.deleteAll();
         applicationUserRepository.flush();
         setUpCompetitionUser();
+        setUpParticipantUser();
     }
 
     @Test

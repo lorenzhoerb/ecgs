@@ -8,6 +8,8 @@ import {CompetitionComponent} from './components/competition/competition.compone
 import { UidemoComponent } from './components/uidemo/uidemo.component';
 import { environment } from 'src/environments/environment';
 import {RegisterComponent} from './components/register/register.component';
+import { ClubManagerImportTeamComponent } from './components/club-manager-import-team/club-manager-import-team.component';
+import { CompetitionCalenderViewComponent } from './components/competition-calender-view/competition-calender-view.component';
 import {ForgotPasswordComponent} from './components/forgot-password/forgot-password.component';
 import {ResetPasswordComponent} from './components/reset-password/reset-password.component';
 import {ChangePasswordComponent} from './components/change-password/change-password.component';
@@ -23,6 +25,12 @@ const routbuilding: Routes = [
   {path: 'forgot', component: ForgotPasswordComponent},
   {path: 'reset', component: ResetPasswordComponent},
   {path: 'changePassword', canActivate: [AuthGuard], component: ChangePasswordComponent},
+  {path: 'ui-demo', component: UidemoComponent},
+  {path: 'user', children: [
+      {path: 'calendar', component: CompetitionCalenderViewComponent},
+      {path: 'import-team', component: ClubManagerImportTeamComponent}
+    ]
+  },
   {
     path: 'competition', children:
       [
@@ -30,7 +38,8 @@ const routbuilding: Routes = [
         {path: ':id', component: CompetitionComponent},
         //{path: ':id/participants', canActivate: [AuthGuard], component: ViewParticipantsComponent},
       ]
-  }
+  },
+  {path: '**', component: UidemoComponent},
 ];
 
 // These Routes will be visible in Dev mode, but not when
@@ -39,7 +48,7 @@ if(!environment.production) {
   routbuilding.push({path: 'ui-demo', component: UidemoComponent});
 }
 
-routbuilding.push({path: '**', redirectTo: ''});
+// routbuilding.push({path: '**', redirectTo: ''});
 
 const routes: Routes = routbuilding;
 

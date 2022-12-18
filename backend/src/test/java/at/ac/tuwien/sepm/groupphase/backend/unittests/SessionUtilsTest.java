@@ -35,7 +35,7 @@ public class SessionUtilsTest extends TestDataProvider {
     }
 
     @Test
-    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    @WithMockUser(username = TEST_USER_TOURNAMENT_MANAGER_EMAIL)
     public void givenLoggedInCompUser_whenGettingSessionUser_expectUserEntity() {
         UserRegisterDto userExpected = getValidRegistrationDtoForCompetitionManager();
         setUpCompetitionUser();
@@ -59,20 +59,20 @@ public class SessionUtilsTest extends TestDataProvider {
     }
 
     @Test
-    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    @WithMockUser(username = TEST_USER_TOURNAMENT_MANAGER_EMAIL)
     public void givenLoggedInCompUser_whenCheckingRole_expectTrue() {
         setUpCompetitionUser();
         assertTrue(sessionUtils.isCompetitionManager());
     }
 
     @Test
-    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    @WithMockUser(username = TEST_USER_TOURNAMENT_MANAGER_EMAIL)
     public void givenLoggedInUserAndNoUserInPersistence_whenGettingSessionUser_expectRuntimeException() {
         assertThrows(RuntimeException.class, () -> sessionUtils.getSessionUser());
     }
 
     @Test
-    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    @WithMockUser(username = TEST_USER_TOURNAMENT_MANAGER_EMAIL)
     public void givenLoggedInCompUser_whenGettingSessionRole_expectCompRole() {
         setUpCompetitionUser();
         assertEquals(ApplicationUser.Role.TOURNAMENT_MANAGER, sessionUtils.getApplicationUserRole());
@@ -84,7 +84,7 @@ public class SessionUtilsTest extends TestDataProvider {
     }
 
     @Test
-    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    @WithMockUser(username = TEST_USER_TOURNAMENT_MANAGER_EMAIL)
     public void givenLoggedInCompUser_whenCheckingCompUser_checkRoles() {
         setUpCompetitionUser();
         assertTrue(sessionUtils.isCompetitionManager());
@@ -102,7 +102,7 @@ public class SessionUtilsTest extends TestDataProvider {
 
     @Test
     public void testSetSessionUserEmail() {
-        sessionUtils.setSessionUserEmail(TEST_USER_COMPETITION_MANAGER_EMAIL);
+        sessionUtils.setSessionUserEmail(TEST_USER_TOURNAMENT_MANAGER_EMAIL);
         UserRegisterDto userRegisterDto = getValidRegistrationDtoForCompetitionManager();
         setUpCompetitionUser();
         assertAll(

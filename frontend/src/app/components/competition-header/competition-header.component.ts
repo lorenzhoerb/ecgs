@@ -2,11 +2,11 @@ import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '
 import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service' ;
 
 @Component({
-  selector: 'app-tournament-header',
-  templateUrl: './tournament-header.component.html',
-  styleUrls: ['./tournament-header.component.scss']
+  selector: 'app-competition-header',
+  templateUrl: './competition-header.component.html',
+  styleUrls: ['./competition-header.component.scss']
 })
-export class TournamentHeaderComponent implements OnInit, AfterViewInit {
+export class CompetitionHeaderComponent implements OnInit, AfterViewInit {
 
   @Input() title = '...';
 

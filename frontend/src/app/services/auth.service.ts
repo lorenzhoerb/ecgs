@@ -20,7 +20,9 @@ export class AuthService {
   private resetUri: string = this.globals.backendUri + '/reset';
   private changeUri: string = this.globals.backendUri + '/changePassword';
 
-  constructor(private httpClient: HttpClient, private globals: Globals) {
+  constructor(
+    private httpClient: HttpClient,
+    private globals: Globals) {
 
   }
 

@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepm.groupphase.backend.util;
+package at.ac.tuwien.sepm.groupphase.backend.validation;
 
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
@@ -12,11 +12,11 @@ import java.lang.invoke.MethodHandles;
 import java.util.Date;
 
 @Component
-public class Validator {
+public class UserValidator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Autowired
-    public Validator() {
+    public UserValidator() {
     }
 
     public void validateRegistration(ApplicationUser toValidate) {

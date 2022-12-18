@@ -1,0 +1,91 @@
+.week-picker {
+    margin-bottom: 30px;
+}
+
+.calendar {
+    padding-right: 40px;
+    padding-top: 20px;
+}
+
+.week-header {
+    padding-bottom: 0px;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    background-color: #fff;
+    color: #444;
+}
+
+
+.day-header {
+    text-align: center;
+    border-right: 3px dashed rgb(22, 10, 10);
+    border-bottom: 3px dashed rgb(22, 10, 10);
+    color: rgb(178, 222, 251);
+    padding: 12px;
+    font-size: 150%;
+    color: #444;
+    border-radius: 2px;
+}
+
+.no-right-border {
+    border-right: none !important;
+}
+
+
+
+.week-body {
+    //padding: 17px;
+    padding-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-rows: auto;
+    background-color: #fff;
+    color: #444;
+    min-height: 70vh;
+}
+
+.day-body {
+    text-align: center;
+    border-right: 3px dashed rgb(22, 10, 10);
+    color: #fff;
+    padding: 12px;
+    font-size: 150%;
+    min-width: 16%;
+}
+
+
+.competition {
+    margin-top: auto;
+    margin-bottom: auto;
+    text-align: center;
+    align-items: center;
+    background-color: rgba(59, 53, 97, 1);
+    color: #fff;
+    border-radius: 5px;
+    margin-left: 10px;
+    margin-right: 10px;
+    grid-area: 1 / 1 / 2 / 4;
+    align-items: center;
+    justify-content: center;
+    
+    overflow-wrap: break-word; 
+    overflow-x: clip;
+    text-overflow: ellipsis;
+    padding-left: 3%;
+    padding-right: 3%;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /*define how many line you want to show */
+    -webkit-box-orient: vertical;
+    outline: solid 0px #c41e3dff;
+    transition: outline 0.2s linear;
+}
+
+.competition:hover {
+    outline-width: 4px;
+}
+
+
+div{
+    white-space:pre-line;
+}

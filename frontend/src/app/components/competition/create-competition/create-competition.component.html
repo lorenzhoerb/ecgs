@@ -17,7 +17,7 @@
       </div>
     </div>
     <div class="scrollabove">
-      <app-tournament-header [isEdit]="true">
+      <app-competition-header [isEdit]="true">
         <div class="form-group">
           <input type="text" name="name" formControlName="name" class="form-control"
             [ngClass]="dynamicCssClassesForInput(competitionForm.controls.name)" id="inputName" autocomplete="off"
@@ -26,7 +26,7 @@
             Title is required
           </span>
         </div>
-      </app-tournament-header>
+      </app-competition-header>
 
       <div class="spacer-2"></div>
 

@@ -20,18 +20,18 @@ public class UserRegisterDto {
     @Size(min = 8, max = 64, message = "password must be between 8 and 64 characters long")
     private String password;
 
-    @Size(min = 2, max = 32, message = "username must be between 2 and 32 characters long")
+    @Size(min = 2, max = 32, message = "First name must be between 2 and 32 characters long")
     @Pattern(regexp = "^[a-zA-Z_.\\-]+$", message = "username can only contain letters and .-_ ")
     private String firstName;
 
-    @Size(min = 2, max = 32, message = "username must be between 2 and 32 characters long")
+    @Size(min = 2, max = 32, message = "Last name must be between 2 and 32 characters long")
     @Pattern(regexp = "^[a-zA-Z_.\\-]+$", message = "username can only contain letters and .-_ ")
     private String lastName;
 
     @NotNull(message = "Gender must not be null")
     private ApplicationUser.Gender gender;
 
-    @NotNull(message = "Gender must not be null")
+    @NotNull(message = "Date of birth must not be null")
     private Date dateOfBirth;
 
     @NotNull(message = "Type must not be null")

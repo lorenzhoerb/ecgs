@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepm.groupphase.backend.validation;
 
+import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +51,7 @@ public abstract class Validator<T> {
         Set<ConstraintViolation<T>> violations = validator.validate(toValidate);
         if (!violations.isEmpty()) {
             List<String> errMessages = violations.stream().map(ConstraintViolation::getMessage).toList();
-            throw new ValidationListException("Failed to validate competition", errMessages);
+            throw new ValidationListException("Validation failed", errMessages);
         }
     }
 

@@ -11,6 +11,7 @@ export const genderMap: Map<Gender, string> = new Map<Gender, string>([
 ]);
 
 export class UserDetail {
+  id: number;
   firstName: string;
   lastName: string;
   gender: Gender;

@@ -9,6 +9,8 @@ import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.ManyToMany;
+import javax.persistence.JoinTable;
 import javax.persistence.CascadeType;
 import javax.transaction.Transactional;
 
@@ -60,13 +62,29 @@ public class Competition {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "competition", fetch = FetchType.EAGER)
     private Set<GradingGroup> gradingGroups;
 
+    public Set<ApplicationUser> getJudges() {
+        return judges;
+    }
+
+    public void setJudges(Set<ApplicationUser> judges) {
+        this.judges = judges;
+    }
+
     //ToDO: cascadeType: delete
     @ManyToOne()
     @JoinColumn(referencedColumnName = "id")
     private ApplicationUser creator;
 
+    @ManyToMany(cascade = CascadeType.MERGE)
+    @JoinTable(
+        name = "Competition_Judge",
+        joinColumns = { @JoinColumn(name = "competition_id") },
+        inverseJoinColumns = { @JoinColumn(name = "judge_id") }
+    )
+    private Set<ApplicationUser> judges;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "competition")
-    private Set<Judge> judges;
+    private Set<Judge> judgings;
 
     public Competition() {
     }
@@ -199,12 +217,12 @@ public class Competition {
         this.creator = creator;
     }
 
-    public Set<Judge> getJudges() {
-        return judges;
+    public Set<Judge> getJudgings() {
+        return judgings;
     }
 
-    public void setJudges(Set<Judge> judges) {
-        this.judges = judges;
+    public void setJudgings(Set<Judge> judges) {
+        this.judgings = judges;
     }
 
     @Override
@@ -222,7 +240,7 @@ public class Competition {
             + ", email='" + email + '\''
             + ", phone='" + phone + '\''
             + ", competition=" + gradingGroups
-            + ", judges=" + judges
+            + ", judges=" + judgings
             + '}';
     }
 }

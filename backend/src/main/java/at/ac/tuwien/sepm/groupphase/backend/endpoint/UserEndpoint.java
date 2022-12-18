@@ -6,6 +6,8 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CalenderViewCompetition
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GeneralResponseDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserInfoDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.helptypes.StatusText;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.CompetitionMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
@@ -126,4 +128,11 @@ public class UserEndpoint {
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
+    @Secured({"ROLE_TOURNAMENT_MANAGER"})
+    @GetMapping("search")
+    public Set<UserDetailDto> getUserByName(UserSearchDto searchDto) {
+        return userService.findByUserName(searchDto);
+    }
+
 }

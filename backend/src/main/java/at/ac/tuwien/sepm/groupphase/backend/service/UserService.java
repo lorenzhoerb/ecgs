@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.service;
 
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
@@ -93,4 +95,12 @@ public interface UserService extends UserDetailsService {
     Set<Competition> getCompetitionsForCalendar(ApplicationUser competitionManager, int year, int weekNumber);
 
     ClubManagerTeamImportResults importTeam(ApplicationUser clubManager, ClubManagerTeamImportDto clubManagerTeamImportDto);
+
+    /**
+     * Search application user by name.
+     *
+     * @param searchDto dto with "first last" name string to search for and max results
+     * @return Users matching the name
+     */
+    Set<UserDetailDto> findByUserName(UserSearchDto searchDto);
 }

@@ -34,11 +34,11 @@ public abstract class TestDataProvider {
     protected static final String COMPETITION_BASE_URI = BASE_URI + COMPETITION_URI;
 
     protected static final String TEST_USER_BASIC_EMAIL = "basic@email.com";
-    protected static final String TEST_USER_COMPETITION_MANAGER_EMAIL = "comp.manager@email.com";
+    protected static final String TEST_USER_TOURNAMENT_MANAGER_EMAIL = "comp.manager@email.com";
 
     protected UserRegisterDto getValidRegistrationDtoForCompetitionManager() {
         return new UserRegisterDto(
-            TEST_USER_COMPETITION_MANAGER_EMAIL,
+            TEST_USER_TOURNAMENT_MANAGER_EMAIL,
             "12345678",
             "firstNameTest",
             "lastNameTest",

@@ -1,0 +1,54 @@
+<dir class="calendar">
+    <div style="display: flex; justify-content: space-between;">
+        <div>
+            <input
+            type="week"
+            [(ngModel)]="defaultWeekToShow"
+            (ngModelChange)="onWeekPickerChange($event)"
+            class="week-picker"
+            >
+        </div>
+        <div style="margin: 30px; color: red; font-size: 22px;">
+            {{this.interactionText}}
+        </div>
+        <div></div>
+    </div>
+    <div class="week-header">
+        <div
+            class="day-header"
+            *ngFor="let index of [1, 2, 3, 4, 5, 6]">
+            {{dayNumberToString(index)}}
+        </div>        
+        <div
+            class="day-header no-right-border"
+        >
+            {{dayNumberToString(7)}}
+        </div>
+    </div>
+
+    <div class="week-body">
+        <div
+            *ngFor="let index of [1,2,3,4,5,6]"
+            class="day-body"
+            [style.grid-area]="getDayBodyGridArea(index)"
+            >
+        </div>
+        <div
+            class="day-body no-right-border"
+            [style.grid-area]="getDayBodyGridArea(7)"
+            >
+        </div>  
+
+        <div 
+            *ngFor="let competition of competitions; let i = index" 
+            class="competition" 
+            [style.grid-area]="getNextCompetitionGridArea(competition, i)"
+            [style.font-size]="getNextCompetitionFontSize(competition)"
+            [routerLink]="'/competition/' + competition.id"
+        >
+            {{competition.name}}
+        </div>
+        <!-- <div class="competition competition2">COMP</div>
+        <div class="competition competition3">COMP</div> -->
+    </div>
+</dir>

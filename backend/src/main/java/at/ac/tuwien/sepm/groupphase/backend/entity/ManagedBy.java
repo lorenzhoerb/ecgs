@@ -19,11 +19,11 @@ public class ManagedBy {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(referencedColumnName = "id")
     private ApplicationUser manager;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(referencedColumnName = "id")
     private ApplicationUser member;
 

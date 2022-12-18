@@ -129,6 +129,7 @@ public class AccountEndpointTest implements TestData {
             .andDo(print())
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
+        // @TODO: Is changing the Status code really the correct solution?
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
     }
 
@@ -247,6 +248,8 @@ public class AccountEndpointTest implements TestData {
         assertEquals(account.getUser().getEmail(), userCredentialUpdateDto.getEmail());
         assertTrue(passwordEncoder.matches(userCredentialUpdateDto.getPassword(), account.getUser().getPassword()));
     }
+
+
 
     @AfterEach
     public void afterEach() {

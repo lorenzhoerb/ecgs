@@ -46,7 +46,7 @@ public class CompetitionServiceImpl implements CompetitionService {
 
     public CompetitionServiceImpl(CompetitionRepository competitionRepository, CompetitionMapper competitionMapper,
                                   CompetitionValidator competitionValidator, UserMapper userMapper,
-                                  SessionUtils sessionUtils, GradingGroupRepository gradingGroupRepository, 
+                                  SessionUtils sessionUtils, GradingGroupRepository gradingGroupRepository,
                                   GradingGroupMapper gradingGroupMapper) {
         this.competitionRepository = competitionRepository;
         this.competitionMapper = competitionMapper;
@@ -145,18 +145,4 @@ public class CompetitionServiceImpl implements CompetitionService {
 
         throw new NotFoundException(String.format("Could not find competition with id %s", id));
     }
-
-
-    /*
-    //TO BE FIXXED , not RELEVANT FOR FEATURE 32
-    @Override
-    public List<CompetitionListDto> searchCompetitions(CompetitionSearchDto compoCompetitionSearchDto) {
-
-        List<Competition> allByBeginOfCompetitionAfterAndNameStartingWithAndDescriptionContainingIgnoreCase =
-            competitionRepository.findAllByBeginOfCompetitionAfterAndNameStartingWithAndDescriptionContainingIgnoreCase(compoCompetitionSearchDto.getName(),
-                compoCompetitionSearchDto.getDescription(),
-                compoCompetitionSearchDto.getBeginDate());
-        return competitionMapper.competitionsToCompetitionListDto(allByBeginOfCompetitionAfterAndNameStartingWithAndDescriptionContainingIgnoreCase);
-    }
-    */
 }

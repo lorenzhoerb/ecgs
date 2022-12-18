@@ -1,5 +1,5 @@
 <div class="user" *ngIf="!loggedIn">
-    <button class="secondary-btn">{{localize.login}}</button>
+    <button class="secondary-btn" routerLink="/login">{{localize.login}}</button>
 </div>
 
 <div class="user" *ngIf="loggedIn">

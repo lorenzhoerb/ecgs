@@ -116,7 +116,7 @@ public class CompetitionEndpointTest extends TestDataProvider {
                 .header(
                     securityProperties.getAuthHeader(),
                     jwtTokenizer.getAuthToken(
-                        TEST_USER_COMPETITION_MANAGER_EMAIL,
+                        TEST_USER_TOURNAMENT_MANAGER_EMAIL,
                         List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
                     ))
                 .content(body))
@@ -131,7 +131,7 @@ public class CompetitionEndpointTest extends TestDataProvider {
         assertNotNull(errorListRestDto);
         assertThat(errorListRestDto.errors().size())
             .isGreaterThan(0);
-        assertEquals("Failed to validate competition", errorListRestDto.message());
+        assertEquals("Validation failed", errorListRestDto.message());
     }
 
     @Test
@@ -146,7 +146,7 @@ public class CompetitionEndpointTest extends TestDataProvider {
                 .header(
                     securityProperties.getAuthHeader(),
                     jwtTokenizer.getAuthToken(
-                        TEST_USER_COMPETITION_MANAGER_EMAIL,
+                        TEST_USER_TOURNAMENT_MANAGER_EMAIL,
                         List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
                     ))
                 .content(body))
@@ -190,7 +190,7 @@ public class CompetitionEndpointTest extends TestDataProvider {
                 .header(
                     securityProperties.getAuthHeader(),
                     jwtTokenizer.getAuthToken(
-                        TEST_USER_COMPETITION_MANAGER_EMAIL,
+                        TEST_USER_TOURNAMENT_MANAGER_EMAIL,
                         List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
                     ))
             )
@@ -230,7 +230,7 @@ public class CompetitionEndpointTest extends TestDataProvider {
                     .header(
                         securityProperties.getAuthHeader(),
                         jwtTokenizer.getAuthToken(
-                            TEST_USER_COMPETITION_MANAGER_EMAIL,
+                            TEST_USER_TOURNAMENT_MANAGER_EMAIL,
                             List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
                         ))
             )

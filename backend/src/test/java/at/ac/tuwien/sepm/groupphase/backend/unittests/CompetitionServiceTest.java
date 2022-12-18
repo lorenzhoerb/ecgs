@@ -16,7 +16,6 @@ import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
-import at.ac.tuwien.sepm.groupphase.backend.service.impl.CompetitionServiceImpl;
 import at.ac.tuwien.sepm.groupphase.backend.service.impl.CustomUserDetailService;
 import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -86,7 +85,7 @@ public class CompetitionServiceTest extends TestDataProvider {
     }
 
     @Test
-    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    @WithMockUser(username = TEST_USER_TOURNAMENT_MANAGER_EMAIL)
     public void givenValidCompetition_createValidCompetition() {
         CompetitionDetailDto result = competitionService.create(getValidCompetitionDetailDto());
         assertNotNull(result);
@@ -94,7 +93,7 @@ public class CompetitionServiceTest extends TestDataProvider {
     }
 
     @Test
-    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    @WithMockUser(username = TEST_USER_TOURNAMENT_MANAGER_EMAIL)
     public void givenEmptyOrNullTitle_whenCreatingCompetition_thenValidationException() {
         CompetitionDetailDto competitionDetailDto = getValidCompetitionDetailDto();
         assertThrows(ValidationListException.class, () -> {
@@ -109,7 +108,7 @@ public class CompetitionServiceTest extends TestDataProvider {
     }
 
     @Test
-    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    @WithMockUser(username = TEST_USER_TOURNAMENT_MANAGER_EMAIL)
     public void givenPastTodayRegistration_whenCreatingCompetition_thenValidationException() {
         CompetitionDetailDto competitionDetailDto = getValidCompetitionDetailDto();
         assertThrows(ValidationListException.class, () -> {
@@ -131,7 +130,7 @@ public class CompetitionServiceTest extends TestDataProvider {
     }
 
     @Test
-    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    @WithMockUser(username = TEST_USER_TOURNAMENT_MANAGER_EMAIL)
     public void getParticipants_forExistingCompetition() throws Exception {
         Competition competition = createCompetitionEntity(
             applicationUserRepository,
@@ -153,7 +152,7 @@ public class CompetitionServiceTest extends TestDataProvider {
     }
 
     @Test
-    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    @WithMockUser(username = TEST_USER_TOURNAMENT_MANAGER_EMAIL)
     public void getParticipants_forNotAcceptedParticipant() throws Exception {
         Competition competition = createCompetitionEntity(
             applicationUserRepository,
@@ -171,7 +170,7 @@ public class CompetitionServiceTest extends TestDataProvider {
     }
 
     @Test
-    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    @WithMockUser(username = TEST_USER_TOURNAMENT_MANAGER_EMAIL)
     public void getParticipants_forCompetitionInDraft() throws Exception {
         Competition competition = createCompetitionEntity(
             applicationUserRepository,
@@ -188,7 +187,7 @@ public class CompetitionServiceTest extends TestDataProvider {
     }
 
     @Test
-    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    @WithMockUser(username = TEST_USER_TOURNAMENT_MANAGER_EMAIL)
     public void getParticipants_forNotExistingCompetition() throws Exception {
         Competition competition = createCompetitionEntity(
             applicationUserRepository,
@@ -236,7 +235,7 @@ public class CompetitionServiceTest extends TestDataProvider {
     }
 
     @Test
-    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    @WithMockUser(username = TEST_USER_TOURNAMENT_MANAGER_EMAIL)
     public void givenValidCompetitionWithGradingGroups_createValidCompetitionAndGradingGroups() {
         CompetitionDetailDto comp = getValidCompetitionDetailDto();
         comp.setGradingGroups(getValidGradingGroupDtos());
@@ -255,7 +254,7 @@ public class CompetitionServiceTest extends TestDataProvider {
     }
 
     @Test
-    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    @WithMockUser(username = TEST_USER_TOURNAMENT_MANAGER_EMAIL)
     public void givenValidCompetitionWithInvalidGradingGroups_thenValidationException() {
         CompetitionDetailDto comp = getValidCompetitionDetailDto();
 

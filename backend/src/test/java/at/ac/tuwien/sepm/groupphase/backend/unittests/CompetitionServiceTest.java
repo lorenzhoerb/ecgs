@@ -2,6 +2,8 @@ package at.ac.tuwien.sepm.groupphase.backend.unittests;
 
 import at.ac.tuwien.sepm.groupphase.backend.basetest.TestDataProvider;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
@@ -32,6 +34,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -138,7 +141,7 @@ public class CompetitionServiceTest extends TestDataProvider {
             gradingGroupRepository,
             competitionRepository,
             true,
-           false
+            false
         );
 
         Set<UserDetailDto> participants =
@@ -267,5 +270,28 @@ public class CompetitionServiceTest extends TestDataProvider {
             comp.setGradingGroups(getGradingGroupDtosWithEmptyNames());
             competitionService.create(comp);
         });
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_TOURNAMENT_MANAGER_EMAIL)
+    public void createAndSearchForCompetitions_ShouldSuccess() {
+        for (int i = 0; i < 5; i++) {
+            CompetitionDetailDto comp = getValidCompetitionDetailDto();
+            if (i % 2 == 0) {
+            } else {
+                comp.setName("Show this please");
+            }
+            competitionService.create(comp);
+        }
+        List<CompetitionListDto> searchList =
+            competitionService.searchCompetitions(
+                new CompetitionSearchDto(
+                    "this",
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                    LocalDateTime.now()));
+
+        assertEquals(2,searchList.size());
     }
 }

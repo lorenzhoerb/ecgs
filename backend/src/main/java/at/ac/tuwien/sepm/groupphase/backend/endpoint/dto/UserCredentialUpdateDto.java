@@ -11,7 +11,7 @@ public class UserCredentialUpdateDto {
     private String email;
 
     @NotNull(message = "password must not be null")
-    @Size(min = 8, max = 64, message = "password must be between 8 and 64 characters long")
+    @Size(min = 8, max = 256, message = "password must be between 8 and 256 characters long")
     private String password;
 
     public String getEmail() {

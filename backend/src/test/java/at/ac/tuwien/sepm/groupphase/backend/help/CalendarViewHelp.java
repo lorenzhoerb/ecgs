@@ -38,9 +38,6 @@ public class CalendarViewHelp {
 
     static {
         LocalDateTime startOfThisWeek = LocalDateTime.now();
-        while (startOfThisWeek.getDayOfWeek() != DayOfWeek.MONDAY) {
-            startOfThisWeek = startOfThisWeek.minusDays(1);
-        }
         CURRENT_YEAR = startOfThisWeek.getYear();
         CURRENT_WEEK_NUMBER = startOfThisWeek.get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear()) - 1;
     }

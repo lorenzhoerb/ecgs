@@ -15,31 +15,29 @@ import {ResetPasswordComponent} from './components/reset-password/reset-password
 import {ChangePasswordComponent} from './components/change-password/change-password.component';
 import {CreateCompetitionComponent} from './components/competition/create-competition/create-competition.component';
 import {ViewParticipantsComponent} from './components/competition/view-participants/view-participants.component';
+import { CompetitionListViewComponent } from './components/competition-list-view/competition-list-view.component';
 
 
 const routbuilding: Routes = [
-  {path: '', component: HomeComponent},
+  {path: '', component: CompetitionListViewComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'login', component: LoginComponent},
   {path: 'message', canActivate: [AuthGuard], component: MessageComponent},
   {path: 'forgot', component: ForgotPasswordComponent},
   {path: 'reset', component: ResetPasswordComponent},
   {path: 'changePassword', canActivate: [AuthGuard], component: ChangePasswordComponent},
-  {path: 'ui-demo', component: UidemoComponent},
+  {path: 'competition', children:[
+      {path: 'list', component: CompetitionListViewComponent},
+      {path: 'create', canActivate: [AuthGuard], component: CreateCompetitionComponent},
+      {path: ':id', component: CompetitionComponent}
+    ]
+  },
   {path: 'user', children: [
       {path: 'calendar', component: CompetitionCalenderViewComponent},
       {path: 'import-team', component: ClubManagerImportTeamComponent}
     ]
   },
-  {
-    path: 'competition', children:
-      [
-        {path: 'create', canActivate: [AuthGuard], component: CreateCompetitionComponent},
-        {path: ':id', component: CompetitionComponent},
-        //{path: ':id/participants', canActivate: [AuthGuard], component: ViewParticipantsComponent},
-      ]
-  },
-  {path: '**', component: UidemoComponent},
+  {path: '**', component: CompetitionListViewComponent},
 ];
 
 // These Routes will be visible in Dev mode, but not when

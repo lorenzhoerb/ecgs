@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../services/auth.service';
 import {Router} from '@angular/router';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-forgot-password',
@@ -12,12 +13,13 @@ export class ForgotPasswordComponent implements OnInit {
 
   forgotPasswordForm: UntypedFormGroup;
   submitted = false;
-  // Error flag
-  error = false;
   success = false;
-  errorMessage = '';
 
-  constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private router: Router) {
+
+  constructor(private formBuilder: UntypedFormBuilder,
+              private authService: AuthService,
+              private router: Router,
+              private notification: ToastrService) {
     this.forgotPasswordForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
     });
@@ -29,29 +31,17 @@ export class ForgotPasswordComponent implements OnInit {
       this.authService.requestPasswordReset(this.forgotPasswordForm.controls.email.value).subscribe({
         next: () => {
           console.log('Password reset link has been sent');
-          alert('Password reset link has been sent');
+          this.notification.success('Password reset link has been sent');
           this.router.navigate(['/login']);
-          //TODO add alert from designer
         },
         error: error => {
-          console.log('Could not send reset link due to:');
-          console.log(error);
-          this.error = true;
-          if (typeof error.error === 'object') {
-            this.errorMessage = error.error.error;
-          } else {
-            this.errorMessage = error.error;
-          }
+          console.log('error.error object: ', error.error.error);
+          this.notification.error('Error: Email ' + error.error.error);
         }
       });
+    } else {
+      this.notification.error('Invalid input, please enter valid Email');
     }
-  }
-
-  /**
-   * Error flag will be deactivated, which clears the error message
-   */
-  vanishError() {
-    this.error = false;
   }
 
   ngOnInit(): void {

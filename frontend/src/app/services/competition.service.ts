@@ -1,10 +1,13 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {UserDetail} from '../dtos/user-detail';
 import {Competition} from '../dtos/competition';
 import {CompetitionDetail} from '../dtos/competition-detail';
 import {Observable, map} from 'rxjs';
 import {Globals} from '../global/globals';
+
+import { SimpleCompetitionListDto } from '../dtos/simpleCompetitionListDto';
+import { CompetitionSearchDto } from '../dtos/competitionSearchDto';
 
 @Injectable({
   providedIn: 'root'
@@ -59,6 +62,35 @@ export class CompetitionService {
             for(const d of data) {
               d.dateOfBirth = new Date(d.dateOfBirth);
               console.log(d.dateOfBirth);
+            }
+            return data;
+          })
+        );
+  }
+
+  /**
+   * Searches competitions by searchParameters.
+   *
+   * @param searchParameters the parameters for the search
+   */
+  searchCompetitions(searchParameters: CompetitionSearchDto): Observable<SimpleCompetitionListDto> {
+    let params = new HttpParams();
+    Object.entries(searchParameters).forEach(
+      ([k, v]) => {
+        params = params.append(k, v);
+      }
+    );
+
+    return this.httpClient
+      .get<SimpleCompetitionListDto>(this.competitionBaseUri + '/search', {params})
+        .pipe(
+          map((data: SimpleCompetitionListDto) => {
+            console.log(data.length);
+            for(const d of data) {
+              d.beginOfCompetition = new Date(d.beginOfCompetition);
+              d.endOfCompetition = new Date(d.endOfCompetition);
+              d.beginOfRegistration = new Date(d.beginOfRegistration);
+              d.endOfRegistration = new Date(d.endOfRegistration);
             }
             return data;
           })

@@ -5,6 +5,8 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.CompetitionMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -18,11 +20,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.security.PermitAll;
 import java.lang.invoke.MethodHandles;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -66,6 +73,26 @@ public class CompetitionEndpoint {
         return competitionService.create(competitionDetailDto);
     }
 
+
+    @PermitAll
+    @GetMapping("/search")
+    @Operation(summary = "Search a competition list", security = @SecurityRequirement(name = "apiKey"))
+    @ResponseStatus(code = HttpStatus.OK)
+    public List<CompetitionListDto> search(@RequestParam("name") String name,
+                                           @RequestParam("begin") String begin, @RequestParam("end") String end,
+                                           @RequestParam(value = "beginRegistration") String beginRegistration,
+                                           @RequestParam(value = "endRegistration") String endRegistration) {
+        LOGGER.info("GET /{}", BASE_PATH);
+        CompetitionSearchDto competitionSearchDto = new CompetitionSearchDto(
+            name,
+            LocalDateTime.parse(begin),
+            LocalDateTime.parse(end),
+            LocalDateTime.parse(beginRegistration),
+            LocalDateTime.parse(endRegistration));
+        return competitionService.searchCompetitions(competitionSearchDto);
+    }
+
+
     @Secured({"ROLE_PARTICIPANT", "ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER"})
     @GetMapping(value = "/{id}/participants")
     @Operation(summary = "Get participants of competition", security = @SecurityRequirement(name = "apiKey"))
@@ -73,5 +100,4 @@ public class CompetitionEndpoint {
         LOGGER.info("GET {}", BASE_PATH);
         return competitionService.getParticipants(id);
     }
-
 }

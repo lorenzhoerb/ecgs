@@ -3,6 +3,7 @@ import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../services/auth.service';
 import {UserCredentialUpdate} from '../../dtos/userCredentialUpdate';
 import {Router} from '@angular/router';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-change-password',
@@ -14,17 +15,16 @@ export class ChangePasswordComponent implements OnInit {
   changePasswordForm: UntypedFormGroup;
   // After first submission attempt, form validation will start
   submitted = false;
-  // Error flag
-  error = false;
-  errorMessage = '';
+  hide = true;
 
   constructor(private formBuilder: UntypedFormBuilder,
               private authService: AuthService,
-              private router: Router) {
+              private router: Router,
+              private notification: ToastrService) {
     this.changePasswordForm = this.formBuilder.group({
       email: [authService.getUserName(), [Validators.required, Validators.email]],
-      passwordOne: ['', [Validators.required]],
-      passwordTwo: ['', [Validators.required]]
+      passwordOne: ['', [Validators.required, Validators.minLength(8)]],
+      passwordTwo: ['', [Validators.required, Validators.minLength(8)]]
     });
   }
 
@@ -35,26 +35,32 @@ export class ChangePasswordComponent implements OnInit {
         const userCredentialUpdate: UserCredentialUpdate = new UserCredentialUpdate(
           this.changePasswordForm.controls.email.value,
           this.changePasswordForm.controls.passwordOne.value);
-        alert(userCredentialUpdate.email);
-        alert(userCredentialUpdate.password);
         this.authService.changePassword(userCredentialUpdate).subscribe({
           next: () => {
             console.log('Password successfully changed');
-            alert('Password successfully changed');
+            this.notification.success('Password successfully changed');
             this.router.navigate(['']);
-            //TODO add alert from designer
           },
           error: error => {
             console.log('Could not change password due to:');
-            console.log(error);
-            this.error = true;
             if (typeof error.error === 'object') {
-              this.errorMessage = error.error.error;
+              error.error.errors.map(err => {
+                this.notification.error(err);
+                console.log(err);
+              });
             } else {
-              this.errorMessage = error.error;
+              console.log('error.error object: ' , error.error);
+              const parsedError = JSON.parse(error.error);
+              console.log(parsedError);
+              parsedError.errors.map(err => {
+                this.notification.error(err);
+                console.log(err);
+              });
             }
           }
         });
+      } else {
+        this.notification.error('Both passwords must match!');
       }
     }
   }
@@ -62,10 +68,4 @@ export class ChangePasswordComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  /**
-   * Error flag will be deactivated, which clears the error message
-   */
-  vanishError() {
-    this.error = false;
-  }
 }

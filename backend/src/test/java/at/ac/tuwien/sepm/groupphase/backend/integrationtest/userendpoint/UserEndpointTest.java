@@ -30,6 +30,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -73,7 +74,7 @@ public class UserEndpointTest implements TestData {
         this.cmGenerator = cmGenerator;
     }
 
-    @BeforeAll
+    @BeforeEach
     public void refreshTestDate() {
         cleaner.clear();
         cvGenerator.setup();
@@ -83,7 +84,7 @@ public class UserEndpointTest implements TestData {
     @Test
     @Order(0)
     public void competitionManagerDefaultCalendar() throws Exception {
-        MvcResult mvcResult = this.mockMvc.perform(get(BASE_CALENDAR_URI + String.format("/%d/%d", CURRENT_YEAR, CURRENT_WEEK_NUMBER))
+        MvcResult mvcResult = this.mockMvc.perform(get(BASE_CALENDAR_URI + String.format("/%d/%d", 2022, 38))
             .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken("test@test.test", CALENDAR_TEST_ROLES))
         )
             .andDo(print())

@@ -1,6 +1,8 @@
 package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.CompetitionMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.GradingGroupMapper;
@@ -56,7 +58,6 @@ public class CompetitionServiceImpl implements CompetitionService {
         this.gradingGroupMapper = gradingGroupMapper;
         this.gradingGroupRepository = gradingGroupRepository;
     }
-
 
 
     @Override
@@ -144,5 +145,13 @@ public class CompetitionServiceImpl implements CompetitionService {
         }
 
         throw new NotFoundException(String.format("Could not find competition with id %s", id));
+    }
+
+    @Override
+    public List<CompetitionListDto> searchCompetitions(CompetitionSearchDto competitionSearchDto) {
+        List<Competition> searchResult =
+            competitionRepository.findAllByBeginOfCompetitionAfterAndEndOfCompetitionAfterAndBeginOfRegistrationAfterAndEndOfRegistrationAfterAndNameContainingIgnoreCaseAndIsPublicIsTrue(
+                competitionSearchDto.getBeginDate(), competitionSearchDto.getEndDate(), competitionSearchDto.getBeginRegistrationDate(), competitionSearchDto.getEndRegistrationDate(), competitionSearchDto.getName());
+        return competitionMapper.competitionListToCompetitionListDtoList(searchResult);
     }
 }

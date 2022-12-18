@@ -1,12 +1,15 @@
 import {ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren} from '@angular/core';
 import {AbstractControl, FormControl, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
+import {UserService} from '../../../services/user.service';
 import {CompetitionService} from '../../../services/competition.service';
 import {CompetitionDetail} from '../../../dtos/competition-detail';
 import {ListError} from '../../../dtos/list-error';
 import { GradingGroupDetail } from 'src/app/dtos/gradingGroupDetail';
 import { cloneDeep } from 'lodash';
 import { ToastrService } from 'ngx-toastr';
+import {UserDetail} from '../../../dtos/user-detail';
+import {of} from 'rxjs';
 
 @Component({
   selector: 'app-create-competition',
@@ -18,6 +21,8 @@ export class CreateCompetitionComponent implements OnInit {
   @ViewChildren('inputVariables') inputVariables: QueryList<ElementRef>;
 
   gradingGroups: any[] = [];
+  judges: UserDetail[] = [];
+  currentJudge: UserDetail;
 
   ids: any[] = [];
 
@@ -35,7 +40,8 @@ export class CreateCompetitionComponent implements OnInit {
     private router: Router,
     private toastr: ToastrService,
     private changeDetectorRef: ChangeDetectorRef,
-    private competitionService: CompetitionService) {
+    private competitionService: CompetitionService,
+    private userService: UserService) {
     this.competitionForm = this.formBuilder.group({
       name: ['', [Validators.required]],
       description: ['', []],
@@ -94,7 +100,7 @@ export class CreateCompetitionComponent implements OnInit {
       if(invalidErrors.length !== 0) {
         this.toastr.error(
           `Das Turnier kann nicht gespeichert werden da folgende Formeln Probleme aufweisen:
-<ul>          
+<ul>
 ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
           `Ungültige Formeln`,{
             enableHtml :  true
@@ -140,6 +146,7 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
 
 
     competition.gradingGroups = this.gradingGroups;
+    competition.judges = this.judges;
 
     this.competitionService.createCompetition(competition)
       .subscribe({
@@ -292,4 +299,36 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
     };
   }
 
+  formatJudge(judge: UserDetail) {
+    if(judge === undefined || judge === null) {
+      return '';
+    }
+
+    return judge.firstName + ' ' + judge.lastName + ' (' +
+      judge.dateOfBirth.toLocaleDateString() + ')';
+  }
+
+  judgeSuggestions = (input: string) => (input === '')
+    ? of([])
+    : this.userService.searchByName(input, 5);
+
+  addJudge() {
+    if(this.currentJudge === undefined) {
+      this.error = true;
+      this.errMsg.message = 'Kein Wettkampfrichter ausgewählt';
+      return;
+    }
+
+    if(this.judges.filter((p) => this.currentJudge.id === p.id).length > 0) {
+      this.error = true;
+      this.toastr.error('Wettkampfrichter bereits ausgewählt');
+      return;
+    }
+
+    this.judges.push(this.currentJudge);
+  }
+
+  removeJudge(index: number) {
+    this.judges.splice(index, 1);
+  }
 }

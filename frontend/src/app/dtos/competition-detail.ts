@@ -1,4 +1,5 @@
 import { GradingGroupDetail } from './gradingGroupDetail';
+import {UserDetail} from './user-detail';
 
 export class CompetitionDetail {
   id: number;
@@ -13,4 +14,5 @@ export class CompetitionDetail {
   email: string;
   phone: string;
   gradingGroups: GradingGroupDetail[];
+  judges: UserDetail[];
 }

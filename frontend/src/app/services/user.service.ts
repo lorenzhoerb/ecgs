@@ -1,4 +1,4 @@
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {map, Observable} from 'rxjs';
 import {UserInfoDto} from '../dtos/userInfoDto';
@@ -8,6 +8,7 @@ import {CompetitionDetail} from '../dtos/competition-detail';
 import { ClubManagerTeamImportDto } from '../dtos/club-manager-team';
 import { CalendarViewCompetition } from '../dtos/competition';
 import { GeneralResponseDto } from '../dtos/general-response';
+import {UserDetail} from '../dtos/user-detail';
 
 @Injectable({
   providedIn: 'root'
@@ -45,5 +46,18 @@ export class UserService {
   isRegisteredToCompetition(competitionId: number): Observable<void> {
     return this.httpClient
       .get<void>(this.userBaseUri + '/competitions/' + competitionId);
+  }
+
+  searchByName(name: string, max: number): Observable<UserDetail[]> {
+    console.log('search users by name');
+    const params = new HttpParams()
+      .set('name', name)
+      .set('max', max);
+    return this.httpClient.get<UserDetail[]>(this.userBaseUri + '/search', {params})
+      .pipe(
+        map((data: UserDetail[]) => data.map((user: UserDetail) => {
+          user.dateOfBirth = new Date(user.dateOfBirth);
+          return user;
+        })));
   }
 }

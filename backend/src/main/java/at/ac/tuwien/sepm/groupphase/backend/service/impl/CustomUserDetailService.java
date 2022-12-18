@@ -1,11 +1,13 @@
 package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserCredentialUpdateDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamMemberImportDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserPasswordResetRequestDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamMemberImportDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserCredentialUpdateDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserPasswordResetRequestDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
@@ -83,7 +85,7 @@ public class CustomUserDetailService implements UserService {
                                    JwtTokenizer jwtTokenizer, ManagedByRepository managedByRepository,
                                    UserValidator userValidator, ClubManagerTeamImportDtoValidator teamValidator,
                                    EmailService emailService, UserMapper userMapper, SessionUtils sessionUtils,
-            RegistrationValidator registrationValidator, 
+            RegistrationValidator registrationValidator,
             PasswordChangeValidator passwordChangeValidator, ForgotPasswordValidator forgotPasswordValidator) {
         this.userRepository = userRepository;
         this.securityUserRepository = securityUserRepository;
@@ -293,5 +295,50 @@ public class CustomUserDetailService implements UserService {
     public Optional<SecurityUser> findSecurityUserByEmail(String email) {
         LOGGER.debug("Find security user by email");
         return securityUserRepository.findByEmail(email);
+    }
+
+    @Override
+    public Set<UserDetailDto> findByUserName(UserSearchDto searchDto) {
+        LOGGER.debug("Find User By Name {}", searchDto);
+        String name = "";
+        Long max = 10L;
+
+        if (searchDto.max() != null
+            && searchDto.max() > 0
+            && searchDto.max() < 10) {
+
+            max = searchDto.max();
+        }
+
+        if (searchDto.name() != null
+            && searchDto.name().length() > 0
+            && searchDto.name().length() <= 255) {
+
+            name = searchDto.name();
+        } else {
+            // Nothing to search for
+            return Set.of();
+        }
+
+        String[] split = name.split(" ");
+        String firstName = "";
+        String lastName = "";
+
+        if (split.length == 0) {
+            // Nothing to search for
+            return Set.of();
+        } else if (split.length == 1) {
+            firstName = split[0];
+        } else {
+            firstName = split[0];
+            lastName  = split[1];
+        }
+
+        Set<ApplicationUser> result =
+            userRepository
+                .findApplicationUserByFirstNameStartingWithIgnoreCaseAndLastNameStartingWithIgnoreCase(firstName, lastName)
+                .stream().limit(max).collect(Collectors.toSet());
+
+        return userMapper.applicationUserSetToUserDetailDtoSet(result);
     }
 }

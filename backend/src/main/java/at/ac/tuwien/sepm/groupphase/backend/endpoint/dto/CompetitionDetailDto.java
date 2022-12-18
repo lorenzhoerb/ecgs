@@ -2,6 +2,7 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 
 import at.ac.tuwien.sepm.groupphase.backend.validation.annotation.DateBeforeOrEquals;
 import at.ac.tuwien.sepm.groupphase.backend.validation.annotation.HasOnlyUniqueProperty;
+import at.ac.tuwien.sepm.groupphase.backend.validation.annotation.UserIdsValid;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.Valid;
@@ -58,6 +59,21 @@ public class CompetitionDetailDto {
     @Valid
     @HasOnlyUniqueProperty(property = "title", message = "Grading groups must have unique names")
     private GradingGroupDto[] gradingGroups;
+
+    public UserDetailDto[] getJudges() {
+        return judges;
+    }
+
+    public CompetitionDetailDto setJudges(UserDetailDto[] judges) {
+        this.judges = judges;
+        return this;
+    }
+
+    @Valid
+    @HasOnlyUniqueProperty(property = "id", message = "A judge can not be assigned twice to a competition")
+    @UserIdsValid(message = "Id of a judge invalid")
+    private UserDetailDto[] judges;
+
 
     public String getName() {
         return name;

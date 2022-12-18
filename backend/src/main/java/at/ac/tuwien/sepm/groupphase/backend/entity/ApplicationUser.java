@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
@@ -10,6 +11,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.JoinColumn;
 import javax.persistence.Column;
 import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
@@ -78,6 +80,9 @@ public class ApplicationUser {
 
     public ApplicationUser() {
     }
+
+    @ManyToMany(cascade = CascadeType.MERGE, mappedBy = "judges")
+    private Set<Competition> judging;
 
     public ApplicationUser(Role type, String firstName, String lastName, Gender gender,
                            Date dateOfBirth, String picturePath) {

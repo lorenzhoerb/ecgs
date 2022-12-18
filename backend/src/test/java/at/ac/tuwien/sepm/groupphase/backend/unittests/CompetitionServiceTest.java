@@ -6,15 +6,12 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
-import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.GradingSystemRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.*;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import at.ac.tuwien.sepm.groupphase.backend.service.impl.CustomUserDetailService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,6 +24,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -61,6 +59,9 @@ public class CompetitionServiceTest extends TestDataProvider {
 
     @Autowired
     private CustomUserDetailService customUserDetailService;
+
+    @Autowired
+    private SecurityUserRepository securityUserRepository;
 
     // Test Competition for findOne
     private final Competition competition = new Competition(
@@ -241,7 +242,7 @@ public class CompetitionServiceTest extends TestDataProvider {
 
     @Test
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
-    public void givenValidCompetitionWithGradingGroups_createValidCompetitionAndGradingGroups() 
+    public void givenValidCompetitionWithGradingGroups_createValidCompetitionAndGradingGroups()
         throws JsonProcessingException {
         CompetitionDetailDto comp = getValidCompetitionDetailDto();
         comp.setGradingGroups(getValidGradingGroupDtos());
@@ -299,4 +300,79 @@ public class CompetitionServiceTest extends TestDataProvider {
 
         assertEquals(2,searchList.size());
     }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void givenValidCompetitionWithDuplicateJudge_thenValidationException() {
+        CompetitionDetailDto comp = getValidCompetitionDetailDto();
+
+        ValidationListException e = assertThrows(ValidationListException.class, () -> {
+            comp.setJudges(getDuplicateJudges(
+                applicationUserRepository,
+                securityUserRepository
+            ));
+            competitionService.create(comp);
+        });
+
+        assertEquals(e.errors().get(0), "A judge can not be assigned twice to a competition");
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void givenValidCompetitionWithNotExistingJudge_thenValidationException() {
+        CompetitionDetailDto comp = getValidCompetitionDetailDto();
+
+        ValidationListException e = assertThrows(ValidationListException.class, () -> {
+            comp.setJudges(new UserDetailDto[] {
+                new UserDetailDto(
+                    -1L, "first", "last", ApplicationUser.Gender.MALE,
+                    new Date(2000,1,1),
+                    ""
+                )
+            });
+            competitionService.create(comp);
+        });
+
+        assertEquals(e.errors().get(0), "Id of a judge invalid");
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void givenValidCompetitionWithInvalidJudgeId_thenValidationException() {
+        CompetitionDetailDto comp = getValidCompetitionDetailDto();
+
+        ValidationListException e = assertThrows(ValidationListException.class, () -> {
+            comp.setJudges(new UserDetailDto[] {
+                new UserDetailDto(
+                    null, "first", "last", ApplicationUser.Gender.MALE,
+                    new Date(2000,1,1),
+                    ""
+                )
+            });
+            competitionService.create(comp);
+        });
+
+        assertEquals(e.errors().get(0), "Id of a judge invalid");
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void givenValidCompetitionWithvalidJudgeIds_create() {
+        CompetitionDetailDto comp = getValidCompetitionDetailDto();
+
+        comp.setJudges(
+            getValidJudges(applicationUserRepository,securityUserRepository)
+        );
+
+        CompetitionDetailDto result = competitionService.create(comp);
+
+        assertNotNull(result);
+        assertNotNull(result.getId());
+        assertNotNull(result.getJudges());
+        assertNotNull(result.getJudges()[0]);
+        assertNotNull(result.getJudges()[0].id());
+        assertNotNull(result.getJudges()[1]);
+        assertNotNull(result.getJudges()[1].id());
+    }
+
 }

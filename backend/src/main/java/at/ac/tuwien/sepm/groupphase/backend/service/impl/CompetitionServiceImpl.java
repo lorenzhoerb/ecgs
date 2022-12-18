@@ -114,6 +114,16 @@ public class CompetitionServiceImpl implements CompetitionService {
             gradingGroupRepository.saveAll(gradingGroups);
             gradingSystemRepository.saveAll(gradingSystems);
         }
+
+        if (competitionDetailDto.getJudges() != null) {
+            Set<ApplicationUser> judges =
+                userMapper.userDetailDtoSetToApplicationUserSet(
+                    Set.of(competitionDetailDto.getJudges())
+                );
+
+            competition.setJudges(judges);
+        }
+
         competition = competitionRepository.save(competition);
 
         GradingGroupDto[] gradingGroupDtos = new GradingGroupDto[] {};
@@ -129,9 +139,21 @@ public class CompetitionServiceImpl implements CompetitionService {
                 .toArray(gradingGroupDtos);
         }
 
+        UserDetailDto[] judgeDtos = new UserDetailDto[] {};
+
+        if (competition.getJudges() != null) {
+            Set<UserDetailDto> judgeDtoSet = userMapper.applicationUserSetToUserDetailDtoSet(
+                competition.getJudges()
+            );
+
+            judgeDtos = new UserDetailDto[judgeDtoSet.size()];
+            judgeDtoSet.toArray(judgeDtos);
+        }
+
         return competitionMapper
             .competitionToCompetitionDetailDto(competition)
-            .setGradingGroups(gradingGroupDtos);
+            .setGradingGroups(gradingGroupDtos)
+            .setJudges(judgeDtos);
     }
 
     @Override

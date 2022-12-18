@@ -1,18 +1,13 @@
 package at.ac.tuwien.sepm.groupphase.backend.basetest;
 
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingSystemDetailDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.*;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.*;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.strategys.Strategy;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.*;
-import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.*;
 import at.ac.tuwien.sepm.groupphase.backend.service.impl.CustomUserDetailService;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.strategys.Mean;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.structural.GradingSystem;
@@ -28,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
+import java.util.Random;
 import java.util.Set;
 
 @SpringBootTest
@@ -36,6 +32,9 @@ public abstract class TestDataProvider {
 
     @Autowired
     private CustomUserDetailService customUserDetailService;
+
+    @Autowired
+    private UserMapper userMapper;
 
     protected static final String BASE_URI = "/api/v1";
     protected static final String COMPETITION_URI = "/competitions";
@@ -263,5 +262,126 @@ public abstract class TestDataProvider {
             getGradingSystemFormula()
         );
     }
+
+    protected UserDetailDto[] getDuplicateJudges(
+        ApplicationUserRepository applicationUserRepository,
+        SecurityUserRepository securityUserRepository
+    ) {
+        SecurityUser securityUser = new SecurityUser("duplicate@email.com", "password");
+
+        ApplicationUser applicationUser = new ApplicationUser(
+            ApplicationUser.Role.PARTICIPANT,
+            "firstName", "lastName",
+            ApplicationUser.Gender.MALE,
+            new Date(2000, 11, 1),
+            ""
+        );
+        applicationUser.setUser(securityUser);
+        securityUser.setUser(applicationUser);
+
+        securityUserRepository.save(securityUser);
+        applicationUserRepository.save(applicationUser);
+
+        return new UserDetailDto[] {
+            userMapper.applicationUserToUserDetailDto(applicationUser),
+            userMapper.applicationUserToUserDetailDto(applicationUser)
+        };
+    }
+
+    protected UserDetailDto[] getValidJudges(
+        ApplicationUserRepository applicationUserRepository,
+        SecurityUserRepository securityUserRepository
+    ) {
+        SecurityUser securityUser1 = new SecurityUser("valid1@email.com", "password");
+        SecurityUser securityUser2 = new SecurityUser("valid2@email.com", "password");
+
+        ApplicationUser applicationUser1 = new ApplicationUser(
+            ApplicationUser.Role.PARTICIPANT,
+            "firstName", "lastName",
+            ApplicationUser.Gender.MALE,
+            new Date(2000, 11, 1),
+            ""
+        );
+        ApplicationUser applicationUser2 = new ApplicationUser(
+            ApplicationUser.Role.CLUB_MANAGER,
+            "firstName", "lastName",
+            ApplicationUser.Gender.FEMALE,
+            new Date(2000, 11, 1),
+            ""
+        );
+        applicationUser1.setUser(securityUser1);
+        securityUser1.setUser(applicationUser1);
+        applicationUser2.setUser(securityUser2);
+        securityUser2.setUser(applicationUser2);
+
+        securityUserRepository.save(securityUser1);
+        applicationUserRepository.save(applicationUser1);
+        securityUserRepository.save(securityUser2);
+        applicationUserRepository.save(applicationUser2);
+
+        return new UserDetailDto[] {
+            userMapper.applicationUserToUserDetailDto(applicationUser1),
+            userMapper.applicationUserToUserDetailDto(applicationUser2)
+        };
+    }
+
+    protected void setupRandomApplicationUsers(
+        ApplicationUserRepository applicationUserRepository,
+        SecurityUserRepository securityUserRepository
+    ) {
+        Random random = new Random();
+        random.setSeed(0);
+
+        String[] names = {
+            "Naima Bryan", "Theodore Hewitt", "Ciara Macdonald", "Jayson Butler",
+            "Ellie-Mae Wallace", "Pearl Daniel", "Karl Montgomery", "Victor Wolf",
+            "Momeo Edwards", "Alma Snow", "Mazel Evans", "Lewis Gregory",
+            "Connie Webb", "Sharon Connor", "Mdil Graves", "Brooklyn Bailey",
+            "Elisa Price", "Made Huff", "Anaya Mckenzie", "Jonty Booth",
+            "Alice David", "Louie Oconnell", "Henry Glenn", "Genevieve Wise",
+            "Juan Farmer", "Ronan Archer", "Maksymilian Prince", "Saarah Sandoval",
+            "Ela Stein", "Ali Atkins", "Maizie Roy", "Tasneem Fleming",
+            "Penny Solis", "Muhammed Brady", "Aamina Hanna", "Aliyah Hicks",
+            "Maryam Ball", "Khadijah Hahn", "Joel Lin", "Leyla Ortega", "Kezia Mcpherson", "Yousuf Robbins",
+            "Jean Combs", "Clayton Reid", "Nettie Kirby", "Antony Proctor", "Madeleine Nelson",
+            "Conner Ochoa", "Albie Simon", "Nikita Campos", "Elodie Acevedo",
+            "Aya Finch", "Tahlia Holman", "Mya Yang", "Tom Underwood",
+            "Miana Boyle", "Jake Webb", "Jannat Mcguire", "Michael Pitts",
+            "Melvin Bailey", "Clyde Holder", "Stephen Butler", "Kayla Santana",
+            "Junior Newton", "Serena Oconnell", "Asa Dillon", "Dana Buckley", "Abraham Benjamin",
+            "Anton Hood", "Autumn Sykes", "Riya Watkins", "Mohamad Barron",
+            "Chelsea Cotton", "Sabrina Rowe", "Damien Golden", "Haris John",
+            "Krystal Carney", "Byron Humphrey", "Eleni Saunders", "Miriam Davila",
+            "Gracie Huff", "Emilio Ryan", "Benedict Garza", "Emilia Lawrence",
+            "Matie Holmes", "Eliot Curry", "Milly-May Arroyo", "Jane Griffith",
+            "Isabella Clark", "Dalton Berry",
+        };
+        ApplicationUser.Role[] roles = ApplicationUser.Role.values();
+        ApplicationUser.Gender[] genders = ApplicationUser.Gender.values();
+
+        for (int i = 0; i < names.length; ++i) {
+            String[] split = names[i].split(" ");
+            String firstName = split[0];
+            String lastName = split[1];
+
+            SecurityUser securityUser = new SecurityUser("email" + i + "@email.com", "password");
+
+            ApplicationUser applicationUser = new ApplicationUser(
+                roles[random.nextInt(roles.length)],
+                firstName, lastName,
+                genders[random.nextInt(genders.length)],
+                new Date(random.nextInt(100) + 1920,
+                    random.nextInt(12)+1,
+                    random.nextInt(27)+1),
+                ""
+            );
+            applicationUser.setUser(securityUser);
+            securityUser.setUser(applicationUser);
+
+            securityUserRepository.save(securityUser);
+            applicationUserRepository.save(applicationUser);
+        }
+    }
+
 
 }

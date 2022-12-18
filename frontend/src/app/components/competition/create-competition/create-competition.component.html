@@ -137,6 +137,36 @@
         </div>
       </app-content-card>
 
+      <div class="spacer-2"></div>
+
+      <app-content-card [title]="'Wettkampfrichter hinzufügen'">
+        <div class="flex-center">
+          <app-autocomplete
+            [textInputClass]="'form-control'"
+            valueNeedsToMatchSuggestion="true"
+            (valueChange)="currentJudge=$event"
+            [formatModel]="formatJudge"
+            [suggestions]="judgeSuggestions"
+            [ngClass]="'flex-grow'"
+          ></app-autocomplete>
+          <button type="button" (click)="addJudge()" class="primary-btn">hinzufügen</button>
+        </div>
+
+        <table>
+          <thead>
+          <th>Vorname</th>
+          <th>Nachname</th>
+          </thead>
+          <tbody>
+          <tr *ngFor="let j of this.judges;let i=index;">
+            <td>{{j.firstName}}</td>
+            <td>{{j.lastName}}</td>
+            <button type="button" (click)="removeJudge(i)" class="primary-btn">entfernen</button>
+          </tr>
+          </tbody>
+        </table>
+      </app-content-card>
+
       <div class="spacer-3"></div>
       <div class="sticky-heading heading">
         <h1>Bewertungsgruppen</h1>

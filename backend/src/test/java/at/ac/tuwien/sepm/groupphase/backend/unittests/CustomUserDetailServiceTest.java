@@ -1,12 +1,15 @@
 package at.ac.tuwien.sepm.groupphase.backend.unittests;
 
 import at.ac.tuwien.sepm.groupphase.backend.basetest.TestDataProvider;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.SecurityUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import at.ac.tuwien.sepm.groupphase.backend.service.impl.CustomUserDetailService;
@@ -21,6 +24,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -33,6 +37,9 @@ public class CustomUserDetailServiceTest extends TestDataProvider {
 
     @Autowired
     private ApplicationUserRepository applicationUserRepository;
+
+    @Autowired
+    private SecurityUserRepository securityUserRepository;
 
     @Autowired
     private CustomUserDetailService customUserDetailService;
@@ -74,5 +81,83 @@ public class CustomUserDetailServiceTest extends TestDataProvider {
             ApplicationUser.Gender.MALE,
             new Date(),
             ApplicationUser.Role.PARTICIPANT);
+    }
+
+    @Test
+    public void findByUserName_NameNull() {
+        UserSearchDto searchDto = new UserSearchDto(null, 5L);
+
+        setupRandomApplicationUsers(applicationUserRepository,
+            securityUserRepository);
+
+        Set<UserDetailDto> result = customUserDetailService.findByUserName(searchDto);
+
+        assertNotNull(result);
+        assertEquals(result.size(), 0);
+    }
+
+    @Test
+    public void findByUserName_NameEmpty() {
+        UserSearchDto searchDto = new UserSearchDto("", 5L);
+
+        setupRandomApplicationUsers(applicationUserRepository,
+            securityUserRepository);
+
+        Set<UserDetailDto> result = customUserDetailService.findByUserName(searchDto);
+
+        assertNotNull(result);
+        assertEquals(result.size(), 0);
+    }
+
+    @Test
+    public void findByUserName_NameLongerThan255() {
+        UserSearchDto searchDto = new UserSearchDto("A".repeat(256), 5L);
+
+        setupRandomApplicationUsers(applicationUserRepository,
+            securityUserRepository);
+
+        Set<UserDetailDto> result = customUserDetailService.findByUserName(searchDto);
+
+        assertNotNull(result);
+        assertEquals(result.size(), 0);
+    }
+
+    @Test
+    public void findByUserName_MaxNull() {
+        UserSearchDto searchDto = new UserSearchDto("M", null);
+
+        setupRandomApplicationUsers(applicationUserRepository,
+            securityUserRepository);
+
+        Set<UserDetailDto> result = customUserDetailService.findByUserName(searchDto);
+
+        assertNotNull(result);
+        assertEquals(result.size(), 10);
+    }
+
+    @Test
+    public void findByUserName_MaxLessThan0() {
+        UserSearchDto searchDto = new UserSearchDto("M", -1L);
+
+        setupRandomApplicationUsers(applicationUserRepository,
+            securityUserRepository);
+
+        Set<UserDetailDto> result = customUserDetailService.findByUserName(searchDto);
+
+        assertNotNull(result);
+        assertEquals(result.size(), 10);
+    }
+
+    @Test
+    public void findByUserName_MaxBiggerThan10() {
+        UserSearchDto searchDto = new UserSearchDto("M", 100L);
+
+        setupRandomApplicationUsers(applicationUserRepository,
+            securityUserRepository);
+
+        Set<UserDetailDto> result = customUserDetailService.findByUserName(searchDto);
+
+        assertNotNull(result);
+        assertEquals(result.size(), 10);
     }
 }

@@ -22,4 +22,7 @@ public interface UserMapper {
     UserDetailDto applicationUserToUserDetailDto(ApplicationUser applicationUser);
 
     Set<UserDetailDto> applicationUserSetToUserDetailDtoSet(Set<ApplicationUser> users);
+
+    Set<ApplicationUser> userDetailDtoSetToApplicationUserSet(Set<UserDetailDto> users);
+
 }

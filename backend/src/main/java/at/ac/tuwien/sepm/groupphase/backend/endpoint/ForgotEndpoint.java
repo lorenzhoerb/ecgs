@@ -41,7 +41,6 @@ public class ForgotEndpoint {
     public String requestResetPassword(@RequestBody UserPasswordResetRequestDto userPasswordResetRequestDto) {
         try {
             String token = RandomString.make(32);
-            System.out.println(userPasswordResetRequestDto.getEmail() + "###");
             userService.updateResetPasswordToken(userPasswordResetRequestDto.getEmail(), token);
             String resetLink = "http://localhost:4200/#/reset?token=" + token;
             sendPasswordResetMail(userPasswordResetRequestDto.getEmail(), resetLink);

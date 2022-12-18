@@ -11,14 +11,15 @@ import java.util.ArrayList;
 
 
 public interface CompetitionGeneratorHelper {
+    LocalDateTime baseDate = LocalDateTime.of(2022, 9, 20, 0, 0);
     List<Competition> testCompetitions = new ArrayList<>() {
         {
             add(new Competition(
                 "name1",
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                LocalDateTime.now().minusDays(2),
-                LocalDateTime.now().plusDays(2),
+                baseDate,
+                baseDate,
+                baseDate.minusDays(2),
+                baseDate.plusDays(2),
                 "desc1",
                 "path1",
                 true,
@@ -27,10 +28,10 @@ public interface CompetitionGeneratorHelper {
                 "1123456789"));
             add(new Competition(
                 "name2",
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(15),
+                baseDate,
+                baseDate,
+                baseDate.plusDays(10),
+                baseDate.plusDays(15),
                 "desc2",
                 "path2",
                 true,
@@ -39,10 +40,10 @@ public interface CompetitionGeneratorHelper {
                 "2123456789"));
             add(new Competition(
                 "name3",
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                LocalDateTime.now().minusDays(10),
-                LocalDateTime.now(),
+                baseDate,
+                baseDate,
+                baseDate.minusDays(10),
+                baseDate,
                 "desc3",
                 "path3",
                 true,
@@ -51,10 +52,10 @@ public interface CompetitionGeneratorHelper {
                 "3123456789"));
             add(new Competition(
                 "name4",
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                LocalDateTime.now().minusDays(20),
-                LocalDateTime.now().plusDays(1),
+                baseDate,
+                baseDate,
+                baseDate.minusDays(20),
+                baseDate.plusDays(1),
                 "desc4",
                 "path4",
                 true,
@@ -63,10 +64,10 @@ public interface CompetitionGeneratorHelper {
                 "4123456789"));
             add(new Competition(
                 "name5",
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                LocalDateTime.now().plusDays(9),
-                LocalDateTime.now().plusDays(20),
+                baseDate,
+                baseDate,
+                baseDate.plusDays(9),
+                baseDate.plusDays(20),
                 "desc5",
                 "path5",
                 true,
@@ -75,10 +76,10 @@ public interface CompetitionGeneratorHelper {
                 "5123456789"));
             add(new Competition(
                 "name6",
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                LocalDateTime.now().minusDays(3),
-                LocalDateTime.now().plusDays(3),
+                baseDate,
+                baseDate,
+                baseDate.minusDays(3),
+                baseDate.plusDays(3),
                 "desc6",
                 "path6",
                 true,
@@ -87,10 +88,10 @@ public interface CompetitionGeneratorHelper {
                 "6123456789"));
             add(new Competition(
                 "name7AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                LocalDateTime.now().plusWeeks(4),
-                LocalDateTime.now().plusWeeks(4),
+                baseDate,
+                baseDate,
+                baseDate.plusWeeks(4),
+                baseDate.plusWeeks(4),
                 "desc7",
                 "path7",
                 true,
@@ -99,10 +100,10 @@ public interface CompetitionGeneratorHelper {
                 "6123456789"));
             add(new Competition(
                 "name8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                LocalDateTime.now().plusWeeks(5).plusDays(1),
-                LocalDateTime.now().plusWeeks(5).plusDays(1),
+                baseDate,
+                baseDate,
+                baseDate.plusWeeks(5).plusDays(1),
+                baseDate.plusWeeks(5).plusDays(1),
                 "desc7",
                 "path7",
                 true,
@@ -111,10 +112,10 @@ public interface CompetitionGeneratorHelper {
                 "6123456789"));
             add(new Competition(
                 "name9AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                LocalDateTime.now().plusWeeks(5).minusDays(1),
-                LocalDateTime.now().plusWeeks(5).minusDays(1),
+                baseDate,
+                baseDate,
+                baseDate.plusWeeks(5).minusDays(1),
+                baseDate.plusWeeks(5).minusDays(1),
                 "desc7",
                 "path7",
                 true,

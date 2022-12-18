@@ -1,0 +1,35 @@
+<div class="whole-box">
+    <div class="filter-elements">
+        <div class="filter-element">
+            <label>Name</label>
+            <div style="padding-right: 5px;">
+                <input
+                    type="text"
+                    class="form-control ng-pristine ng-invalid ng-touched"
+                    [(ngModel)]="competitionSearch.name"
+                />
+            </div>
+        </div>
+        <div class="filter-element">
+            <label for="takes-place-input">Begins at / after</label>
+            <div>
+                <div style="display: inline-block; padding-right: 5px;">
+                    <input
+                        type="date"
+                        class="form-control ng-pristine ng-invalid ng-touched"
+                        [(ngModel)]="competitionSearch.begin"
+                    />
+                </div>
+            </div>
+        </div>
+        <div class="filter-element">
+            <label>Registration open</label>
+            <div style="padding-right: 5px;">
+                <input type="checkbox" class="" [(ngModel)]="registrationPossible" />
+            </div>
+        </div>
+    </div>
+    <div class="filter-buttons">
+        <button class="filter-button-save" (click)="onSearchButtonClicked()">Search</button>
+    </div>
+</div>

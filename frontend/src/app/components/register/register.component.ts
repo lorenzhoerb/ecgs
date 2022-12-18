@@ -3,6 +3,7 @@ import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../services/auth.service';
 import {Router} from '@angular/router';
 import {AuthRequest, RegisterRequest} from '../../dtos/auth-request';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-register',
@@ -14,11 +15,10 @@ export class RegisterComponent implements OnInit {
   registerForm: UntypedFormGroup;
   // After first submission attempt, form validation will start
   submitted = false;
-  // Error flag
-  error = false;
-  errorMessage = '';
+  hide = true;
 
-  constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private router: Router) {
+  constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService,
+              private router: Router, private notification: ToastrService) {
     this.registerForm = this.formBuilder.group({
       password: ['', [Validators.required, Validators.minLength(8)]],
       firstName: ['', [Validators.required]],
@@ -59,28 +59,27 @@ export class RegisterComponent implements OnInit {
     console.log('RegisterRequest gets send', registerRequest);
     this.authService.registerUser(registerRequest).subscribe({
       next: () => {
-        console.log('Successfully registered  ');
-        alert('Gratulation du hast nen user erstellt!');
-        //TODO add alert from designer
+        console.log('Successfully registered');
+        this.notification.success('Successfully registered!');
+        this.router.navigate(['/login']);
       },
       error: error => {
         console.log('Could not register due to:');
         console.log(error);
-        this.error = true;
         if (typeof error.error === 'object') {
-          this.errorMessage = error.error.error;
+          console.log('error.error.error object: ' +error.error.error);
+          this.notification.error(error.error.error);
         } else {
-          this.errorMessage = error.error;
+          console.log('error.error object: ' , error.error);
+          const parsedError = JSON.parse(error.error);
+          console.log(parsedError);
+          parsedError.errors.map(err => {
+            this.notification.error(err);
+            console.log(err);
+          });
         }
       }
     });
-  }
-
-  /**
-   * Error flag will be deactivated, which clears the error message
-   */
-  vanishError() {
-    this.error = false;
   }
 
   ngOnInit() {

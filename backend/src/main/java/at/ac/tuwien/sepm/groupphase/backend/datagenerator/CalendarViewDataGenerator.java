@@ -38,6 +38,7 @@ public class CalendarViewDataGenerator implements CompetitionGeneratorHelper {
 
     @PostConstruct
     public void setup() {
+        applicationUserRepository.flush();
         setupManagers();
         setupCompetitions();
     }
@@ -81,8 +82,6 @@ public class CalendarViewDataGenerator implements CompetitionGeneratorHelper {
         t.setCreator(generatedCompetitionManagers.get(0));
         generatedCompetitions.add(competitionRepository.save(t));
 
-
-        competitionRepository.flush();
         var temp = applicationUserRepository.findAll();
 
         reloadGeneratedManagers();

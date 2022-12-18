@@ -1,6 +1,5 @@
 package at.ac.tuwien.sepm.groupphase.backend.integrationtest;
 
-import aj.org.objectweb.asm.TypeReference;
 import at.ac.tuwien.sepm.groupphase.backend.basetest.TestDataProvider;
 import at.ac.tuwien.sepm.groupphase.backend.config.properties.SecurityProperties;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
@@ -8,15 +7,15 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ErrorListRestDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
-import at.ac.tuwien.sepm.groupphase.backend.entity.GradingGroup;
-import at.ac.tuwien.sepm.groupphase.backend.entity.RegisterTo;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,30 +24,34 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
+
+import static at.ac.tuwien.sepm.groupphase.backend.integrationtest.TestData.ADMIN_ROLES;
+import static at.ac.tuwien.sepm.groupphase.backend.integrationtest.TestData.ADMIN_USER;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 public class CompetitionEndpointTest extends TestDataProvider {
-
+    static int compId = 0;
     @Autowired
     private MockMvc mockMvc;
 
@@ -261,5 +264,48 @@ public class CompetitionEndpointTest extends TestDataProvider {
         MockHttpServletResponse response = mvcResult.getResponse();
 
         assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
+    }
+
+    @Test
+    //@Transactional
+    public void searchCompetitionList() throws Exception {
+        CompetitionSearchDto competitionSearchDto = new CompetitionSearchDto("name test", LocalDateTime.now(),LocalDateTime.now(),LocalDateTime.now(),LocalDateTime.now());
+        for (int i = 0; i < 30; i++) {
+            competitionRepository.save(createCompetition());
+        }
+
+        MvcResult mvcResult = mockMvc.perform(get(COMPETITION_BASE_URI + "/search")
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES))
+                .queryParam("begin", competitionSearchDto.getBeginDate().toString())
+                .queryParam("end", competitionSearchDto.getEndDate().toString())
+                .queryParam("beginRegistration", competitionSearchDto.getBeginRegistrationDate().toString())
+                .queryParam("endRegistration", competitionSearchDto.getEndRegistrationDate().toString())
+                .queryParam("name", competitionSearchDto.getName())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andDo(print()).andReturn();
+
+        List<CompetitionListDto> response = Arrays.asList(objectMapper.readValue(mvcResult.getResponse().getContentAsString(), CompetitionListDto[].class));
+        List<Competition> allByBeginOfCompetitionAfterAndNameStartingWithAndDescriptionContainingIgnoreCase =
+            competitionRepository.findAllByBeginOfCompetitionAfterAndEndOfCompetitionAfterAndBeginOfRegistrationAfterAndEndOfRegistrationAfterAndNameContainingIgnoreCaseAndIsPublicIsTrue(
+                competitionSearchDto.getBeginDate(),
+                competitionSearchDto.getEndDate(),
+                competitionSearchDto.getBeginRegistrationDate(),
+                competitionSearchDto.getEndRegistrationDate(),
+                competitionSearchDto.getName());
+
+        //assertEquals(allByBeginOfCompetitionAfterAndNameStartingWithAndDescriptionContainingIgnoreCase.size(), response.size());
+        List<Competition> compList = (List<Competition>) competitionRepository.findAll();
+        assertEquals(compList.size(),30);
+        assertEquals(30,allByBeginOfCompetitionAfterAndNameStartingWithAndDescriptionContainingIgnoreCase.size());
+    }
+
+
+    public Competition createCompetition() {
+        compId++;
+        return new Competition("name test" + compId, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(compId),
+            LocalDateTime.now().plusDays(3), LocalDateTime.now().plusDays(4),
+            "test desc" + compId,
+            null, true,
+            false, null, null);
     }
 }

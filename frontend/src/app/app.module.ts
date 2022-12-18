@@ -28,6 +28,12 @@ import {ErrorComponent} from './components/error/error.component';
 import {ToastrModule} from 'ngx-toastr';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { FormularEditorComponent } from './components/competition/formular-editor/formular-editor.component';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import { CompetitionListViewComponent } from './components/competition-list-view/competition-list-view.component';
+import { CompetitionListViewEntryComponent }
+  from './components/competition-list-view/competition-list-view-entry/competition-list-view-entry.component';
+import { CompetitionListViewFilterComponent }
+  from './components/competition-list-view/competition-list-view-filter/competition-list-view-filter.component';
 import { ClubManagerImportTeamComponent } from './components/club-manager-import-team/club-manager-import-team.component';
 import { CompetitionCalenderViewComponent } from './components/competition-calender-view/competition-calender-view.component';
 import { CompetitionHeaderComponent } from './components/competition-header/competition-header.component';
@@ -50,6 +56,12 @@ import { CompetitionHeaderComponent } from './components/competition-header/comp
     ForgotPasswordComponent,
     ResetPasswordComponent,
     ChangePasswordComponent,
+    CompetitionListViewComponent,
+    CompetitionListViewEntryComponent,
+    CompetitionListViewFilterComponent,
+    ForgotPasswordComponent,
+    ResetPasswordComponent,
+    ChangePasswordComponent,
     ViewParticipantsComponent,
     ErrorComponent,
     FormularEditorComponent,
@@ -57,18 +69,19 @@ import { CompetitionHeaderComponent } from './components/competition-header/comp
     CompetitionCalenderViewComponent,
     CompetitionHeaderComponent
   ],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    AppRoutingModule,
-    ReactiveFormsModule,
-    HttpClientModule,
-    NgbModule,
-    FormsModule,
-    MatIconModule,
-    ToastrModule.forRoot(),
-    DragDropModule
-  ],
+    imports: [
+        BrowserModule,
+        BrowserAnimationsModule,
+        AppRoutingModule,
+        ReactiveFormsModule,
+        HttpClientModule,
+        NgbModule,
+        FormsModule,
+        MatIconModule,
+        ToastrModule.forRoot(),
+        DragDropModule,
+        MatFormFieldModule
+    ],
   providers: [httpInterceptorProviders],
   bootstrap: [AppComponent]
 })

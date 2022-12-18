@@ -1,8 +1,8 @@
 /* Checkout variables.scss for default colors, margins and more */
 // TODO: maybe remove Bootstrap for f*cking with my styles
 @import '../node_modules/bootstrap/scss/bootstrap';
-@import 'ngx-toastr/toastr';
 @import './variables.scss';
+@import '~ngx-toastr/toastr';
 
 h6,
 .h6,
@@ -26,15 +26,6 @@ body {
   color: $font-color;
   margin: 0;
   padding: 0;
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-a:hover {
-  color: inherit;
 }
 
 ////////////////////////////////////
@@ -129,16 +120,19 @@ main>* {
   width: 0;
   margin: 1rem 0 0 0;
 }
+
 .spacer-2 {
   height: 0;
   width: 0;
   margin: 2rem 0 0 0;
 }
+
 .spacer-3 {
   height: 0;
   width: 0;
   margin: 3rem 0 0 0;
 }
+
 .spacer-4 {
   height: 0;
   width: 0;
@@ -171,6 +165,7 @@ main>* {
   display: flex;
   align-items: center;
 }
+
 .heading h1 {
   margin-left: 1em;
   margin-right: 1em;
@@ -277,7 +272,6 @@ h3 {
   margin: 0 -2rem -2rem -2rem;
   top: 0;
   height: 5rem;
-  z-index: 1;
 }
 
 ///////// Table (unfinished TODO: create consistent Table style)
@@ -339,7 +333,7 @@ table {
   transition: linear 0.3s;
 }
 
-.turnier-header > * {
+.turnier-header * {
   margin: 0 2rem;
 }
 
@@ -454,7 +448,12 @@ table {
   background-color: $sizzling-red;
 }
 
-mat-icon.mat-icon {
-  height: auto;
-  width: auto;
+.main-menu {
+  display: block;
+  padding: 1.5%;
+  margin-top: 1.5%;
+  margin-left: 6.5%;    
+  margin-right: 6.5%; 
+  background-color: white;
+  border-radius: 8px;
 }

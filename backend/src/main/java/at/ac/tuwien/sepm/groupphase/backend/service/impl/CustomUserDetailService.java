@@ -1,14 +1,17 @@
 package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserCredentialUpdateDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamMemberImportDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserPasswordResetRequestDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ManagedBy;
 import at.ac.tuwien.sepm.groupphase.backend.entity.SecurityUser;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
@@ -19,6 +22,9 @@ import at.ac.tuwien.sepm.groupphase.backend.repository.ManagedByRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepm.groupphase.backend.service.EmailService;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
+import at.ac.tuwien.sepm.groupphase.backend.validation.ForgotPasswordValidator;
+import at.ac.tuwien.sepm.groupphase.backend.validation.PasswordChangeValidator;
+import at.ac.tuwien.sepm.groupphase.backend.validation.RegistrationValidator;
 import at.ac.tuwien.sepm.groupphase.backend.service.helprecords.ClubManagerTeamImportResults;
 import at.ac.tuwien.sepm.groupphase.backend.util.PasswordGenerator;
 import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
@@ -26,6 +32,7 @@ import at.ac.tuwien.sepm.groupphase.backend.validation.ClubManagerTeamImportDtoV
 import at.ac.tuwien.sepm.groupphase.backend.validation.UserValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -34,9 +41,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import javax.transaction.Transactional;
 import java.lang.invoke.MethodHandles;
+import java.util.LinkedList;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -54,6 +61,10 @@ public class CustomUserDetailService implements UserService {
     private final SecurityUserRepository securityUserRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenizer jwtTokenizer;
+    private final RegistrationValidator registrationValidator;
+    private final PasswordChangeValidator passwordChangeValidator;
+    private final ForgotPasswordValidator forgotPasswordValidator;
+    private final UserMapper userMapper;
 
     private final ManagedByRepository managedByRepository;
 
@@ -62,25 +73,28 @@ public class CustomUserDetailService implements UserService {
 
     private final EmailService emailService;
 
-    private final UserMapper userMapper;
-
     private final SessionUtils sessionUtils;
 
 
+    @Autowired
     public CustomUserDetailService(ApplicationUserRepository userRepository,
                                    SecurityUserRepository securityUserRepository, PasswordEncoder passwordEncoder,
                                    JwtTokenizer jwtTokenizer, ManagedByRepository managedByRepository,
                                    UserValidator userValidator, ClubManagerTeamImportDtoValidator teamValidator,
-                                   EmailService emailService, UserMapper userMapper, SessionUtils sessionUtils) {
+                                   EmailService emailService, UserMapper userMapper, SessionUtils sessionUtils,
+            RegistrationValidator validator,
+            PasswordChangeValidator passwordChangeValidator, ForgotPasswordValidator forgotPasswordValidator) {
         this.userRepository = userRepository;
         this.securityUserRepository = securityUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
+        this.registrationValidator = validator;
+        this.passwordChangeValidator = passwordChangeValidator;
+        this.forgotPasswordValidator = forgotPasswordValidator;
         this.managedByRepository = managedByRepository;
         this.userValidator = userValidator;
         this.teamValidator = teamValidator;
         this.emailService = emailService;
-
         this.userMapper = userMapper;
         this.sessionUtils = sessionUtils;
     }
@@ -109,10 +123,17 @@ public class CustomUserDetailService implements UserService {
 
     @Override
     public ApplicationUser registerUser(UserRegisterDto userRegisterDto) {
+        List<String> errorList = new LinkedList<>();
         LOGGER.debug("Registers user with the given data");
+        registrationValidator.validate(userRegisterDto);
+        Optional<ApplicationUser> alreadyCreated = userRepository.findApplicationUserByUserEmail(userRegisterDto.getEmail());
+        if (alreadyCreated.isPresent()) {
+            errorList.add("User with given Email is already registered!");
+            throw new ConflictException("Given data conflicts with the data in the system", errorList);
+        }
         ApplicationUser applicationUser = userMapper.registerDtoToApplicationUser(userRegisterDto);
-        LOGGER.debug("ApplicatiuonUser " + applicationUser);
-        LOGGER.debug("ApplicatiuonUser " + applicationUser.toString());
+        LOGGER.debug("ApplicationUser " + applicationUser);
+        LOGGER.debug("ApplicationUser " + applicationUser.toString());
         userValidator.validateRegistration(applicationUser);
         applicationUser.getUser().setPassword(passwordEncoder.encode(applicationUser.getUser().getPassword()));
         ApplicationUser save = userRepository.save(applicationUser);
@@ -239,9 +260,8 @@ public class CustomUserDetailService implements UserService {
     @Override
     public void updateResetPasswordToken(String email, String token) {
         LOGGER.debug("updateResetPasswordToken {}{}", email, token);
-        //Optional<ApplicationUser> toUpdateResetPasswordToken = userRepository.findApplicationUserByUserEmail(email);
+        forgotPasswordValidator.validate(new UserPasswordResetRequestDto(email));
         Optional<SecurityUser> toUpdateResetPasswordToken = securityUserRepository.findByEmail(email);
-        Optional<SecurityUser> tmp = securityUserRepository.findById(2L);
         if (toUpdateResetPasswordToken.isPresent()) {
             SecurityUser temp = toUpdateResetPasswordToken.get();
             temp.setResetPasswordToken(token);
@@ -260,6 +280,7 @@ public class CustomUserDetailService implements UserService {
     @Override
     public void updateSecurityUserPassword(SecurityUser toUpdate, String newPassword) {
         LOGGER.debug("updateSecurityUserPassword {}{}", toUpdate, newPassword);
+        passwordChangeValidator.validate(new UserCredentialUpdateDto(toUpdate.getEmail(), newPassword));
         userValidator.validatePasswordUpdate(newPassword);
         String passwordEncoded = passwordEncoder.encode(newPassword);
         toUpdate.setPassword(passwordEncoded);

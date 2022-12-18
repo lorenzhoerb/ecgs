@@ -52,7 +52,7 @@ public class CompetitionManagerServiceTest extends TestDataProvider {
     @Test
     public void allManagedInTimeCompetitionsAreRetrieved() {
         var managedCompetitions = userService.getCompetitionsForCalendar(
-            generator.generatedCompetitionManagers.get(0), CURRENT_YEAR, CURRENT_WEEK_NUMBER);
+            generator.generatedCompetitionManagers.get(0), 2022, 38);
         assertThat(managedCompetitions)
             .map(Competition::getName,
                 (t -> t.getBeginOfRegistration().toLocalDate().toString()),
@@ -62,7 +62,7 @@ public class CompetitionManagerServiceTest extends TestDataProvider {
                 Competition::getDescription, Competition::getPicturePath, Competition::getPublic, Competition::getDraft,
                 Competition::getEmail, Competition::getPhone)
             // @TODO: are the checking dates computed correctly because this competition is not in the given week
-            //.contains(CalendarViewHelp.generateTupleOfCompetition(CalendarViewDataGenerator.testCompetitions.get(0)))
+            .contains(CalendarViewHelp.generateTupleOfCompetition(CalendarViewDataGenerator.testCompetitions.get(0)))
             .contains(CalendarViewHelp.generateTupleOfCompetition(CalendarViewDataGenerator.testCompetitions.get(2)));
     }
 

@@ -3,6 +3,7 @@ import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../services/auth.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {UserPasswordReset} from '../../dtos/userPasswordReset';
+import {ToastrService} from'ngx-toastr';
 
 @Component({
   selector: 'app-reset-password',
@@ -13,22 +14,24 @@ export class ResetPasswordComponent implements OnInit {
 
   resetPasswordForm: UntypedFormGroup;
   submitted = false;
-  // Error flag
-  error = false;
   success = false;
-  errorMessage = '';
   token;
 
   constructor(private formBuilder: UntypedFormBuilder,
               private authService: AuthService,
               private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              private notification: ToastrService) {
     this.resetPasswordForm = this.formBuilder.group({
-      passwordOne: ['', [Validators.required]],
-      passwordTwo: ['', [Validators.required]]
+      passwordOne: ['', [Validators.required, Validators.minLength(8)]],
+      passwordTwo: ['', [Validators.required, Validators.minLength(8)]],
     });
     this.route.queryParams.subscribe(params => {
       this.token = params['token'];
+      if (this.token.length !== 32) {
+        this.notification.error('Redirected because of malformed token');
+        this.router.navigate(['/login']);
+      }
     });
   }
 
@@ -40,35 +43,26 @@ export class ResetPasswordComponent implements OnInit {
     if (this.resetPasswordForm.valid) {
       if (this.resetPasswordForm.controls.passwordOne.value === this.resetPasswordForm.controls.passwordTwo.value) {
         const userPasswordReset: UserPasswordReset = new UserPasswordReset(this.token, this.resetPasswordForm.controls.passwordOne.value);
-        alert(userPasswordReset.token);
-        alert(userPasswordReset.password);
         this.authService.resetPassword(userPasswordReset).subscribe({
           next: () => {
             console.log('Password successfully reset');
-            alert('Password successfully reset');
+            this.notification.success('Password successfully reset');
             this.router.navigate(['/login']);
-            //TODO add alert from designer
           },
           error: error => {
             console.log('Could not reset password due to:');
-            console.log(error);
-            this.error = true;
             if (typeof error.error === 'object') {
-              this.errorMessage = error.error.error;
+              console.log('error.error.errors: ' + error.error.errors);
+              this.notification.error('' + error.error.errors);
             } else {
-              this.errorMessage = error.error;
+              this.notification.error(error.error);
             }
           }
         });
+      } else {
+        this.notification.error('Both passwords must match!');
       }
     }
-  }
-
-  /**
-   * Error flag will be deactivated, which clears the error message
-   */
-  vanishError() {
-    this.error = false;
   }
 
 }

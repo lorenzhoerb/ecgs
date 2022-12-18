@@ -123,7 +123,7 @@ public class SessionUtils {
         Optional<ApplicationUser> user = applicationUserRepository.findApplicationUserByUserEmail(sessionUserEmail);
 
         if (user.isEmpty()) {
-            throw new RuntimeException("User is authenticated but not persisted. This should never happen");
+            return null;
         }
 
         return user.get();

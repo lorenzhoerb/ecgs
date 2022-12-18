@@ -9,7 +9,7 @@ export class CompetitionDetail {
   endOfRegistration: string;
   beginOfCompetition: string;
   endOfCompetition: string;
-  isPublic: boolean;
+  public: boolean;
   draft: boolean;
   email: string;
   phone: string;

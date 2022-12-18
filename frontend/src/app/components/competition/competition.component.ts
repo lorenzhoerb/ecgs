@@ -10,6 +10,7 @@ import {RegisterModalComponent} from './register-modal/register-modal.component'
 import {UserService} from '../../services/user.service';
 import {cloneDeep} from 'lodash';
 import {UserDetail} from '../../dtos/user-detail';
+import { SimpleGradingGroup } from 'src/app/dtos/simple-grading-group';
 
 @Component({
   selector: 'app-competition-view',
@@ -24,6 +25,7 @@ export class CompetitionComponent implements OnInit {
   isRegisteredToCompetition = false;
   canRegister = false;
   participants: UserDetail[];
+  groups: SimpleGradingGroup[];
 
   constructor(private service: CompetitionService,
               private route: ActivatedRoute,
@@ -46,7 +48,15 @@ export class CompetitionComponent implements OnInit {
           next: data => {
             this.competition = data;
             this.error = null;
-            this.initCanRegister();
+            this.service.getGroups(this.id).subscribe({
+              next: data2 => {
+                this.groups = data2;
+                this.initCanRegister();
+              },
+              error: err => console.log(err)
+            });
+            this.fetchIsRegistered(this.id);
+            this.fetchParticipants();
           },
           error: error => {
             console.error('Error fetching competition information', error);
@@ -54,9 +64,6 @@ export class CompetitionComponent implements OnInit {
             this.competition = null;
           }
         });
-
-        this.fetchIsRegistered(this.id);
-        this.fetchParticipants();
       }
     });
   }
@@ -82,6 +89,7 @@ export class CompetitionComponent implements OnInit {
   initCanRegister() {
     const now = new Date();
     this.canRegister = now >= this.competition.beginOfRegistration && now <= this.competition.endOfRegistration;
+    this.canRegister = this.canRegister && this.groups.length > 0;
     console.log(this.canRegister);
   }
 

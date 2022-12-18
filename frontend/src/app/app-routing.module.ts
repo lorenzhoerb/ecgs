@@ -28,7 +28,7 @@ const routbuilding: Routes = [
   {path: 'changePassword', canActivate: [AuthGuard], component: ChangePasswordComponent},
   {path: 'competition', children:[
       {path: 'list', component: CompetitionListViewComponent},
-      {path: 'create', canActivate: [AuthGuard], component: CreateCompetitionComponent},
+      {path: 'create', canActivate: [TournamentManagerGuard], component: CreateCompetitionComponent},
       {path: ':id', component: CompetitionComponent}
     ]
   },

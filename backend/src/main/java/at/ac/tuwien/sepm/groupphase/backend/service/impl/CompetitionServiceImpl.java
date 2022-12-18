@@ -172,7 +172,7 @@ public class CompetitionServiceImpl implements CompetitionService {
 
         Competition competition = competitionOptional.get();
 
-        if (competition.getDraft()) {
+        if (competition.getDraft() && !competition.getCreator().getId().equals(sessionUtils.getSessionUser().getId())) {
             // @Notice: competition shown as not found if in draft mode
             // as a competition in draft should not be exposed.
             throw new NotFoundException("Didn't find competition with id " + id);
@@ -205,6 +205,11 @@ public class CompetitionServiceImpl implements CompetitionService {
         List<Competition> searchResult =
             competitionRepository.findAllByBeginOfCompetitionAfterAndEndOfCompetitionAfterAndBeginOfRegistrationAfterAndEndOfRegistrationAfterAndNameContainingIgnoreCaseAndIsPublicIsTrue(
                 competitionSearchDto.getBeginDate(), competitionSearchDto.getEndDate(), competitionSearchDto.getBeginRegistrationDate(), competitionSearchDto.getEndRegistrationDate(), competitionSearchDto.getName());
+
+        searchResult = searchResult.stream()
+            .filter(s -> !s.getDraft() || (sessionUtils.getSessionUser() != null && s.getCreator().getId().equals(sessionUtils.getSessionUser().getId()))).collect(
+            Collectors.toList());
+
         return competitionMapper.competitionListToCompetitionListDtoList(searchResult);
     }
 }

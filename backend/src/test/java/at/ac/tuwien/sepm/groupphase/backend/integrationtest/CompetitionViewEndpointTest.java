@@ -3,7 +3,9 @@ package at.ac.tuwien.sepm.groupphase.backend.integrationtest;
 import at.ac.tuwien.sepm.groupphase.backend.basetest.TestData;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionViewDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
+import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
+import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +39,12 @@ public class CompetitionViewEndpointTest implements TestData {
     @Autowired
     private CompetitionRepository competitionRepository;
 
+
+    @Autowired
+    private ApplicationUserRepository applicationUserRepository;
+
+    @Autowired
+    private SessionUtils sessionUtils;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -56,6 +64,7 @@ public class CompetitionViewEndpointTest implements TestData {
 
     @BeforeEach
     public void beforeEach() {
+        //applicationUserRepository.deleteAll();
         competitionRepository.deleteAll();
     }
 

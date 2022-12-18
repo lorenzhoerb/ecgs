@@ -3,6 +3,7 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 import at.ac.tuwien.sepm.groupphase.backend.validation.annotation.DateBeforeOrEquals;
 import at.ac.tuwien.sepm.groupphase.backend.validation.annotation.HasOnlyUniqueProperty;
 import at.ac.tuwien.sepm.groupphase.backend.validation.annotation.UserIdsValid;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.Valid;
@@ -45,6 +46,7 @@ public class CompetitionDetailDto {
     private LocalDateTime endOfCompetition;
 
     @NotNull(message = "isPublic must be given")
+    @JsonProperty("public")
     private boolean isPublic;
 
     @NotNull(message = "draft must be given")

@@ -51,7 +51,7 @@ export class CreateCompetitionComponent implements OnInit {
       endOfRegistration: ['', [Validators.required]],
       beginOfCompetition: ['', [Validators.required]],
       endOfCompetition: ['', [Validators.required]],
-      isPublic: ['FALSE', [Validators.required]],
+      public: ['FALSE', [Validators.required]],
       draft: ['TRUE', [Validators.required]],
     });
   }
@@ -152,7 +152,7 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
       .subscribe({
         next: value => {
           this.toastr.success('Turnier erfolgreich erstellt!');
-          this.router.navigate(['/competition',value.id]);
+          //this.router.navigate(['/competition',value.id]);
           //ToDO: Integrate with dashboard
         },
         error: err => {

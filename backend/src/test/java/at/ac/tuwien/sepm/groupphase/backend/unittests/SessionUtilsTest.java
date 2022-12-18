@@ -68,7 +68,7 @@ public class SessionUtilsTest extends TestDataProvider {
     @Test
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
     public void givenLoggedInUserAndNoUserInPersistence_whenGettingSessionUser_expectRuntimeException() {
-        assertThrows(RuntimeException.class, () -> sessionUtils.getSessionUser());
+        assertNull(sessionUtils.getSessionUser());
     }
 
     @Test

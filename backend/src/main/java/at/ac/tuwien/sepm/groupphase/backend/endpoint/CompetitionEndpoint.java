@@ -6,11 +6,13 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingSystemDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.CompetitionMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import at.ac.tuwien.sepm.groupphase.backend.service.GradingGroupService;
+import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.security.PermitAll;
+import javax.mail.Session;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -44,12 +47,14 @@ public class CompetitionEndpoint {
     private final CompetitionService competitionService;
     private final GradingGroupService gradingGroupService;
     private final CompetitionMapper mapper;
+    private final SessionUtils sessionUtils;
 
     @Autowired
-    public CompetitionEndpoint(CompetitionService service, GradingGroupService gradingGroupService, CompetitionMapper mapper) {
+    public CompetitionEndpoint(CompetitionService service, GradingGroupService gradingGroupService, CompetitionMapper mapper, SessionUtils sessionUtils) {
         this.competitionService = service;
         this.gradingGroupService = gradingGroupService;
         this.mapper = mapper;
+        this.sessionUtils = sessionUtils;
     }
 
     @PermitAll
@@ -58,10 +63,13 @@ public class CompetitionEndpoint {
     public CompetitionViewDto find(@PathVariable Long id) {
         LOGGER.info("GET /api/v1/messages/{}", id);
 
+        Competition competition = competitionService.findOne(id);
         CompetitionViewDto result =
-            mapper.competitionToCompetitionViewDto(competitionService.findOne(id));
+            mapper.competitionToCompetitionViewDto(competition);
 
-        if (!result.draft()) {
+        if (!result.draft()
+            || (this.sessionUtils.getSessionUser() != null
+                && competition.getCreator().getId().equals(this.sessionUtils.getSessionUser().getId()))) {
             return result;
         } else {
             throw new NotFoundException("competition not public or in draft!");

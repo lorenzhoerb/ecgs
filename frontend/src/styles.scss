@@ -25,6 +25,11 @@ a {
   text-decoration: none;
 }
 
+a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
 body {
   font-family: 'Noto Sans';
   background-color: $ming;
@@ -339,7 +344,22 @@ table {
 }
 
 .turnier-header * {
-  margin: 0 2rem;
+  margin: 0;
+}
+
+.turnier-header input {
+  margin: 0;
+  font-size: 28px;
+  color: white;
+}
+
+.turnier-header input:focus {
+  background-color: inherit;
+  color: white;
+}
+
+.turnier-header button {
+  margin-right: 2rem;
 }
 
 .turnier-header input.h1 {
@@ -355,6 +375,7 @@ table {
   background-color: var(--space-cadet);
   color: white;
   text-overflow: ellipsis;
+  padding: 0 2rem;
 }
 
 .turnier-header.stuck h1 {
@@ -461,4 +482,9 @@ table {
   margin-right: 6.5%; 
   background-color: white;
   border-radius: 8px;
+}
+
+mat-icon.mat-icon {
+  height: auto;
+  width: auto;
 }

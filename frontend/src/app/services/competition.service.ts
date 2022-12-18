@@ -5,6 +5,7 @@ import {Competition} from '../dtos/competition';
 import {CompetitionDetail} from '../dtos/competition-detail';
 import {Observable, map} from 'rxjs';
 import {Globals} from '../global/globals';
+import {SimpleGradingGroup} from '../dtos/simple-grading-group';
 
 import { SimpleCompetitionListDto } from '../dtos/simpleCompetitionListDto';
 import { CompetitionSearchDto } from '../dtos/competitionSearchDto';
@@ -56,16 +57,21 @@ export class CompetitionService {
   getParticipants(id: number): Observable<Array<UserDetail>> {
     return this.httpClient
       .get<Array<UserDetail>>(this.competitionBaseUri + '/' + id + '/participants')
-        .pipe(
-          map((data: Array<UserDetail>) => {
-            console.log(data.length);
-            for(const d of data) {
-              d.dateOfBirth = new Date(d.dateOfBirth);
-              console.log(d.dateOfBirth);
-            }
-            return data;
-          })
-        );
+      .pipe(
+        map((data: Array<UserDetail>) => {
+          console.log(data.length);
+          for (const d of data) {
+            d.dateOfBirth = new Date(d.dateOfBirth);
+            console.log(d.dateOfBirth);
+          }
+          return data;
+        })
+      );
+  }
+
+  getGroups(id: number): Observable<Array<SimpleGradingGroup>> {
+    return this.httpClient
+      .get<Array<SimpleGradingGroup>>(this.competitionBaseUri + '/' + id + '/groups');
   }
 
   /**
@@ -96,5 +102,4 @@ export class CompetitionService {
           })
         );
   }
-
 }

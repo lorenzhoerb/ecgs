@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionViewDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleGradingGroupDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingSystemDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.CompetitionMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
@@ -9,6 +10,7 @@ import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
+import at.ac.tuwien.sepm.groupphase.backend.service.GradingGroupService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
@@ -40,11 +42,13 @@ public class CompetitionEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final CompetitionService competitionService;
+    private final GradingGroupService gradingGroupService;
     private final CompetitionMapper mapper;
 
     @Autowired
-    public CompetitionEndpoint(CompetitionService service, CompetitionMapper mapper) {
+    public CompetitionEndpoint(CompetitionService service, GradingGroupService gradingGroupService, CompetitionMapper mapper) {
         this.competitionService = service;
+        this.gradingGroupService = gradingGroupService;
         this.mapper = mapper;
     }
 
@@ -100,5 +104,14 @@ public class CompetitionEndpoint {
     public Set<UserDetailDto> getParticipants(@PathVariable Long id) {
         LOGGER.info("GET {}", BASE_PATH);
         return competitionService.getParticipants(id);
+    }
+
+
+    @Secured({"ROLE_PARTICIPANT", "ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER"})
+    @GetMapping(value = "/{id}/groups")
+    @Operation(summary = "Get groups of a competition", security = @SecurityRequirement(name = "apiKey"))
+    public List<SimpleGradingGroupDto> getGroups(@PathVariable Long id) {
+        LOGGER.info("GET {}/{}/groups", BASE_PATH, id);
+        return gradingGroupService.getAllByCompetition(id);
     }
 }

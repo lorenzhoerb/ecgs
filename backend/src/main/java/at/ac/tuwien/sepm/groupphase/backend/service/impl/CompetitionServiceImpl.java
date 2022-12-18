@@ -75,7 +75,6 @@ public class CompetitionServiceImpl implements CompetitionService {
         this.gradingSystemValidator = gradingSystemValidator;
     }
 
-
     @Override
     public CompetitionDetailDto create(CompetitionDetailDto competitionDetailDto) {
         LOGGER.debug("Create competition {}", competitionDetailDto);

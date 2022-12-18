@@ -54,12 +54,12 @@ public class CustomUserDetailServiceTest extends TestDataProvider {
         customUserDetailService.registerUser(getValidRegistrationDtoForParticipant());
         UserDetails gotFromDB = customUserDetailService.loadUserByUsername("basic@email.com");
         assertNotNull(gotFromDB);
-        assertEquals(gotFromDB.getUsername(),"basic@email.com");
+        assertEquals(gotFromDB.getUsername(), "basic@email.com");
     }
 
     @Test
-    public void loginParticipantUser_thenGettingBackAuthToken_shouldSuccess(){
-        String authToken=null;
+    public void loginParticipantUser_thenGettingBackAuthToken_shouldSuccess() {
+        String authToken = null;
         authToken = customUserDetailService.login(UserLoginDto.UserLoginDtoBuilder.anUserLoginDto().withEmail("comp.manager@email.com").withPassword("12345678").build());
         assertNotNull(authToken);
         assertTrue(authToken.startsWith("Bearer "));

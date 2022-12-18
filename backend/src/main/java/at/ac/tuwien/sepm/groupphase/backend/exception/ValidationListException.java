@@ -13,4 +13,8 @@ public class ValidationListException extends ErrorListException {
     public ValidationListException(String messageSummary, List<String> errors) {
         super("Failed validations", messageSummary, errors);
     }
+
+    public ValidationListException(String messageSummary, String error) {
+        super("Failed validations", messageSummary, List.of(error));
+    }
 }

@@ -30,6 +30,22 @@ a:hover {
   text-decoration: none;
 }
 
+h6,
+.h6,
+h5,
+.h5,
+h4,
+.h4,
+h3,
+.h3,
+h2,
+.h2,
+h1,
+.h1 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 body {
   font-family: 'Noto Sans';
   background-color: $ming;

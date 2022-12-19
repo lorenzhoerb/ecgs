@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { NgxCsvParser, NgxCSVParserError } from 'ngx-csv-parser';
 import { ToastrService } from 'ngx-toastr';
 import { ClubManagerTeamImportDto, ClubManagerTeamMemberImportDto } from 'src/app/dtos/club-manager-team';
+import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
@@ -77,6 +78,10 @@ export class ClubManagerImportTeamComponent implements OnInit {
     private userService: UserService,
     private ngxCsvParser: NgxCsvParser,
   ) { }
+
+  public get localize(): LocalizeService {
+    return LocalizationService;
+  }
 
   ngOnInit(): void {
   }

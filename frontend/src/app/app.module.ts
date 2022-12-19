@@ -40,6 +40,7 @@ import { ClubManagerImportTeamComponent } from './components/club-manager-import
 import { CompetitionCalenderViewComponent } from './components/competition-calender-view/competition-calender-view.component';
 import { CompetitionHeaderComponent } from './components/competition-header/competition-header.component';
 import {AutocompleteComponent} from './components/autocomplete/autocomplete.component';
+import { HeaderCreateModalComponent } from './components/header-create-modal/header-create-modal.component';
 
 @NgModule({
   declarations: [
@@ -72,7 +73,8 @@ import {AutocompleteComponent} from './components/autocomplete/autocomplete.comp
     ClubManagerImportTeamComponent,
     CompetitionCalenderViewComponent,
     CompetitionHeaderComponent,
-    AutocompleteComponent
+    AutocompleteComponent,
+    HeaderCreateModalComponent,
   ],
   imports: [
     BrowserModule,

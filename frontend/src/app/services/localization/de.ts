@@ -45,6 +45,10 @@ export class German implements ILanguage {
     registrationNotDone: 'Registrierung nicht abgeschlossen',
     search: 'Suchen',
 
+    logout: 'Abmelden',
+    importCSV: 'Neue Teammitglieder',
+    createTournament: 'Neuer Wettkampf',
+
     username: 'Benutzername / Email',
     firstname: 'Vorname',
     lastname: 'Nachname',

@@ -29,9 +29,9 @@ export class Englisch implements ILanguage {
     participants: 'Participants',
 
     title: 'Title',
-    phoneNumber:'Phone number',
-    beginOfCompetition:'Begin of competition',
-    endOfCompetition:'End of competition',
+    phoneNumber: 'Phone number',
+    beginOfCompetition: 'Begin of competition',
+    endOfCompetition: 'End of competition',
     beginOfRegistration: 'Begin of registration',
     endOfRegistration: 'End of registration',
     settings: 'Settings',
@@ -45,6 +45,10 @@ export class Englisch implements ILanguage {
     registrationNotDone: 'Registration not closed',
     search: 'Search',
 
+    logout: 'Logout',
+    importCSV: 'New Team Members',
+    createTournament: 'New Competition',
+
     username: 'Username / Email',
     firstname: 'Firstname',
     lastname: 'Lastname',
@@ -56,15 +60,15 @@ export class Englisch implements ILanguage {
     enter: (type: string) => `Enter ${type}...`,
     reEnter: (type: string) => `Repeat ${type}...`,
     getType: (type: string) => ({
-        Participant: 'Participant',
-        ClubManager: 'Club Manager',
-        CompetitionManager: 'Competition Manager',
-      }[type]),
+      Participant: 'Participant',
+      ClubManager: 'Club Manager',
+      CompetitionManager: 'Competition Manager',
+    }[type]),
     getGender: (gender: string) => ({
-        Female: 'Female',
-        Male: 'Male',
-        Other: 'Other',
-      }[gender]),
+      Female: 'Female',
+      Male: 'Male',
+      Other: 'Other',
+    }[gender]),
 
     isRequired: (thing) => `Your ${thing} is required!`,
     isMalformed: (thing) => `Your ${thing} is malformed!`

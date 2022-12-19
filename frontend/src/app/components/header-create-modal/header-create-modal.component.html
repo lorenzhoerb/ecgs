@@ -1,0 +1,10 @@
+<div class="hide-area" *ngIf="showMenu" (click)="hide()">
+    <div class="menu">
+        <a class="menu-item" [routerLink]="['/user', 'import-team']" *ngIf="this.authService.getUserRole() === 'TOURNAMENT_MANAGER' || this.authService.getUserRole() === 'CLUB_MANAGER'">
+            <mat-icon style="margin-right: 8px;">add_box</mat-icon> {{localize.importCSV}}
+        </a>
+        <a class="menu-item" [routerLink]="['/competition', 'create']" *ngIf="this.authService.getUserRole() === 'TOURNAMENT_MANAGER'">
+            <mat-icon style="margin-right: 8px;">add_box</mat-icon> {{localize.createTournament}}
+        </a>
+    </div>
+</div>

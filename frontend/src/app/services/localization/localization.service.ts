@@ -8,9 +8,9 @@ export class LocalizeService extends LocalizationKeys {
 
     constructor() {
         super();
-        const language = navigator.language;
+        //const language = navigator.language;
+        this.changeLanguageInternal('de-DE');
 
-        this.changeLanguageInternal(language);
     }
 
     public localize(key: string, ...params: any[]) {

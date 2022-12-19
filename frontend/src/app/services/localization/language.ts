@@ -48,6 +48,10 @@ export class LocalizationKeys {
   registrationNotDone: string;
   search: string;
 
+  logout: string;
+  importCSV: string;
+  createTournament: string;
+
   username: string;
   firstname: string;
   lastname: string;

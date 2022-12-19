@@ -10,6 +10,7 @@ import {AuthService} from '../../services/auth.service';
 export class HeaderComponent implements OnInit {
 
   @Output() showMenu = new EventEmitter();
+  @Output() showCreateMenu = new EventEmitter();
 
   constructor(public authService: AuthService) { }
 

@@ -5,7 +5,10 @@
     </a>
   </div>
   <div class="flex">
-    <a routerLink="/competition/create">Turnier Erstellen</a>
+    <a (click)="showCreateMenu.emit()" *ngIf="this.authService.getUserRole() === 'TOURNAMENT_MANAGER' || this.authService.getUserRole() === 'CLUB_MANAGER'">
+      <mat-icon class="">add_box</mat-icon>
+      <mat-icon>expand_more</mat-icon>
+    </a>
     <app-user (showMenu)="showMenu.emit()"></app-user>
   </div>
 </div>

@@ -11,6 +11,7 @@ import {UserService} from '../../services/user.service';
 import {cloneDeep} from 'lodash';
 import {UserDetail} from '../../dtos/user-detail';
 import { SimpleGradingGroup } from 'src/app/dtos/simple-grading-group';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-competition-view',
@@ -30,7 +31,8 @@ export class CompetitionComponent implements OnInit {
   constructor(private service: CompetitionService,
               private route: ActivatedRoute,
               private modalService: NgbModal,
-              private userService: UserService) {
+              private userService: UserService,
+              private toastr: ToastrService) {
     console.log('init');
     this.localize.changeLanguage(this.currentLanguage);
   }
@@ -59,9 +61,7 @@ export class CompetitionComponent implements OnInit {
             this.fetchParticipants();
           },
           error: error => {
-            console.error('Error fetching competition information', error);
-            this.error = error;
-            this.competition = null;
+            this.toastr.error(error, 'Error fetching competition information');
           }
         });
       }
@@ -118,9 +118,7 @@ export class CompetitionComponent implements OnInit {
         this.error = null;
       },
       error: error => {
-        this.participants = [];
-        console.error('Error fetching competition information', error);
-        this.error = error;
+        this.toastr.warning('Teilnehmer könnnen nur geladen werden wenn Sie eingeloggt sind.', 'Nicht eingelogt');
       }
     });
   }

@@ -2,6 +2,7 @@ import { formatDate } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { debounceTime, Subject } from 'rxjs';
 import { CompetitionSearchDto } from 'src/app/dtos/competitionSearchDto';
+import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
 
 @Component({
   selector: 'app-competition-list-view-filter',
@@ -25,6 +26,9 @@ export class CompetitionListViewFilterComponent implements OnInit {
 
   constructor() { }
 
+  public get localize(): LocalizeService {
+    return LocalizationService;
+  }
 
   ngOnInit(): void {
     // this.registerDebounce();

@@ -5,7 +5,7 @@
     <div style="display: flex;" class="competition-details">
         <div class="info-entry">
             <div class="info-entry-title">
-                Time
+                {{localize.time}}
             </div>
             <div class="font-begin">
                 {{formatCompetitionDate(competition.beginOfCompetition)}}
@@ -16,7 +16,7 @@
         </div>
         <div class="info-entry">
             <div class="info-entry-title">
-                Registration
+                {{localize.registration}}
             </div>
             <div class="font-begin">
                 {{formatCompetitionDate(competition.beginOfRegistration)}}
@@ -27,7 +27,7 @@
         </div>
         <div class="info-entry">
             <div class="info-entry-title">
-                Contacts
+                {{localize.contact}}
             </div>
             <div *ngIf="!competition.email && !competition.phone">-</div>
             <div style="text-align: left; padding-left: 24%;">
@@ -36,7 +36,7 @@
                     email: {{competition.email}}
                 </div>
                 <div class="overflowed-contact-entry" *ngIf="competition.phone">
-                    phone: {{competition.phone}}
+                    {{localize.phoneNumber}}: {{competition.phone}}
                 </div>
             </div>
         </div>

@@ -4,6 +4,7 @@ import {AuthService} from '../../services/auth.service';
 import {UserCredentialUpdate} from '../../dtos/userCredentialUpdate';
 import {Router} from '@angular/router';
 import {ToastrService} from 'ngx-toastr';
+import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
 
 @Component({
   selector: 'app-change-password',
@@ -26,6 +27,10 @@ export class ChangePasswordComponent implements OnInit {
       passwordOne: ['', [Validators.required, Validators.minLength(8)]],
       passwordTwo: ['', [Validators.required, Validators.minLength(8)]]
     });
+  }
+
+  public get localize(): LocalizeService {
+    return LocalizationService;
   }
 
   changePassword() {

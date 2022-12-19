@@ -1,10 +1,10 @@
-<app-content-card title="Teilnehmer">
+<app-content-card [title]="localize.participants">
   <table>
     <thead>
-      <th>Vorname</th>
-      <th>Nachname</th>
-      <th>Geschlecht</th>
-      <th>Geburtsdatum</th>
+      <th>{{localize.firstname}}</th>
+      <th>{{localize.lastname}}</th>
+      <th>{{localize.gender}}</th>
+      <th>{{localize.dateOfBirth}}</th>
     </thead>
     <tbody>
       <tr *ngFor="let p of this.participants;">

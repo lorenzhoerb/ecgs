@@ -19,9 +19,50 @@ export class LocalizationKeys {
   succRegComp: string;
   errRegComp: string;
   competition: string;
-  endOfRegistration: string;
   groupPreference: string;
   noPreference: string;
+  forgotPassword: string;
+  sendResetLink: string;
+
+  datesAndContacts: string;
+  description: string;
+  until: string;
+  Tournamnet: string;
+  contact: string;
+  participants: string;
+
+  title: string;
+  phoneNumber: string;
+  beginOfCompetition: string;
+  endOfCompetition: string;
+  beginOfRegistration: string;
+  endOfRegistration: string;
+  settings: string;
+  publish: string;
+  public: string;
+  onlyClubs: string;
+  save: string;
+
+  time: string;
+  beginAtOrAfter: string;
+  registrationNotDone: string;
+  search: string;
+
+  username: string;
+  firstname: string;
+  lastname: string;
+  password: string;
+  changePassword: string;
+  dateOfBirth: string;
+  gender: string;
+  type: string;
+  enter: (type: string) => string;
+  reEnter: (type: string) => string;
+  getType: (type: string) => string;
+  getGender: (gender: string) => string;
+
+  isRequired: (thing: string) => string;
+  isMalformed: (thing: string) => string;
 }
 
 export interface ILanguage {

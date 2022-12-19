@@ -14,19 +14,19 @@
     <div class="spacer-2"></div>
 
     <app-golden-ratio-container>
-      <app-content-card [title]="'Daten und Kontakt'">
+      <app-content-card [title]="localize.datesAndContacts">
         <div>
-          Anmeldung:<br> <span class="c-ming">        {{formatDate(competition.beginOfRegistration)}}</span>
-          bis       <br> <span class="c-sizzling-red">{{formatDate(competition.endOfRegistration)}}</span> <br><br>
-          Wettkampf:<br> <span class="c-ming">        {{formatDate(competition.beginOfCompetition)}}</span>
-          bis       <br> <span class="c-sizzling-red">{{formatDate(competition.endOfCompetition)}}</span> <br><br>
+          {{localize.registration}}:<br> <span class="c-ming">        {{formatDate(competition.beginOfRegistration)}}</span>
+          {{localize.until}}       <br> <span class="c-sizzling-red">{{formatDate(competition.endOfRegistration)}}</span> <br><br>
+          {{localize.competition}}:<br> <span class="c-ming">        {{formatDate(competition.beginOfCompetition)}}</span>
+          {{localize.until}}       <br> <span class="c-sizzling-red">{{formatDate(competition.endOfCompetition)}}</span> <br><br>
 
-          Kontakt:  <br> <span>{{competition.email}}</span>
+          {{localize.contact}}:  <br> <span>{{competition.email}}</span>
                     <br> <span>{{competition.phone}}</span> <br><br>
         </div>
       </app-content-card>
 
-      <app-content-card [title]="'Beschreibung'" >
+      <app-content-card [title]="localize.description" >
         <div>
           {{competition.description}}
         </div>

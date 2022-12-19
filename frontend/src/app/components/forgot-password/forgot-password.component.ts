@@ -3,6 +3,7 @@ import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../services/auth.service';
 import {Router} from '@angular/router';
 import {ToastrService} from 'ngx-toastr';
+import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -15,7 +16,6 @@ export class ForgotPasswordComponent implements OnInit {
   submitted = false;
   success = false;
 
-
   constructor(private formBuilder: UntypedFormBuilder,
               private authService: AuthService,
               private router: Router,
@@ -23,6 +23,10 @@ export class ForgotPasswordComponent implements OnInit {
     this.forgotPasswordForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
     });
+  }
+
+  public get localize(): LocalizeService {
+    return LocalizationService;
   }
 
   requestPasswordReset() {

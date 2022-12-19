@@ -23,7 +23,7 @@
         <div class="horizontal-line"></div>
 
         <div class="formular">
-            Stations Ergebnis = <div class="calculation">
+            <b>{{name}}</b> Ergebnis = <div class="calculation">
                 <div *ngFor="let list of calculation; index as i;">
                     <div [class]="getFormulaClass(i)" cdkDropList [cdkDropListData]="list" cdkDropListSortingDisabled
                         (cdkDropListDropped)="drop($event, i)" (cdkDropListEntered)="entered()"

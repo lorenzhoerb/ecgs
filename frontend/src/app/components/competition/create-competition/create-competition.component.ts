@@ -10,6 +10,7 @@ import { cloneDeep } from 'lodash';
 import { ToastrService } from 'ngx-toastr';
 import {UserDetail} from '../../../dtos/user-detail';
 import {of} from 'rxjs';
+import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
 
 @Component({
   selector: 'app-create-competition',
@@ -54,6 +55,10 @@ export class CreateCompetitionComponent implements OnInit {
       public: ['FALSE', [Validators.required]],
       draft: ['TRUE', [Validators.required]],
     });
+  }
+
+  public get localize(): LocalizeService {
+    return LocalizationService;
   }
 
   ngOnInit(): void {
@@ -152,7 +157,7 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
       .subscribe({
         next: value => {
           this.toastr.success('Turnier erfolgreich erstellt!');
-          //this.router.navigate(['/competition',value.id]);
+          this.router.navigate(['/competition',value.id]);
           //ToDO: Integrate with dashboard
         },
         error: err => {

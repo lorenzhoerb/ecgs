@@ -21,6 +21,8 @@ export class FormularEditorComponent implements OnInit, OnChanges {
     data: {}
   };
 
+  @Input() name = 'Station';
+
   @Input() color = 'bc-ming';
 
   @Input() collapsed = false;

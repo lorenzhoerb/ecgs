@@ -3,6 +3,7 @@ import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {AuthService} from '../../services/auth.service';
 import {AuthRequest} from '../../dtos/auth-request';
+import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
 
 
 @Component({
@@ -24,6 +25,10 @@ export class LoginComponent implements OnInit {
       username: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(8)]]
     });
+  }
+
+  public get localize(): LocalizeService {
+    return LocalizationService;
   }
 
   /**

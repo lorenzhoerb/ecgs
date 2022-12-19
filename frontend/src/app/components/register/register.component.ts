@@ -4,6 +4,7 @@ import {AuthService} from '../../services/auth.service';
 import {Router} from '@angular/router';
 import {AuthRequest, RegisterRequest} from '../../dtos/auth-request';
 import {ToastrService} from 'ngx-toastr';
+import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
 
 @Component({
   selector: 'app-register',
@@ -28,6 +29,10 @@ export class RegisterComponent implements OnInit {
       dateOfBirth: ['', [Validators.required]],
       type: ['', [Validators.required]],
     });
+  }
+
+  public get localize(): LocalizeService {
+    return LocalizationService;
   }
 
   /**

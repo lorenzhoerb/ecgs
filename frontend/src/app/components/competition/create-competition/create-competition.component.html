@@ -11,7 +11,7 @@
   <main>
     <div class="hold-image">
       <div class="turnier-image">
-        <div>TODO: Add image</div>
+        <div>Hier können Sie bald ein eigenes Bild hochladen</div>
         <!-- <img *ngIf="pictureEmpty()" src="../../../assets/turnier.jpg" alt="turnier bild">
         <img *ngIf="!pictureEmpty()" [src]="competition.picturePath" alt="turnier bild"> -->
       </div>
@@ -21,9 +21,9 @@
         <div class="form-group turn-header">
           <input type="text" name="name" formControlName="name" class="form-control"
             [ngClass]="dynamicCssClassesForInput(competitionForm.controls.name)" id="inputName" autocomplete="off"
-            aria-describedby="name of competition" placeholder="Titel...">
+            aria-describedby="name of competition" [placeholder]="localize.title + '...'">
           <span class="invalid-feedback">
-            Title is required
+            {{localize.isRequired(localize.title)}}
           </span>
         </div>
       </app-competition-header>
@@ -31,40 +31,40 @@
       <div class="spacer-2"></div>
 
       <app-golden-ratio-container>
-        <app-content-card [title]="'Daten und Kontakt'">
+        <app-content-card [title]="localize.datesAndContacts">
           <div>
             <div class="form-group col-6">
-              <label for="inputBeginOfCompetition">Turnier Start:</label>
+              <label for="inputBeginOfCompetition">{{localize.competition}} Start:</label>
               <input type="datetime-local" name="beginOfCompetition" formControlName="beginOfCompetition"
                 class="form-control"
                 [min]="endOfRegistration.value ? inputBeginOfRegistration.value : dateNow | date: 'yyyy-MM-ddTHH:mm'"
                 #beginOfCompetition [ngClass]="dynamicCssClassesForInput(competitionForm.controls.beginOfCompetition)"
-                id="inputBeginOfCompetition" aria-describedby="begin of competition" placeholder="Begin of competition">
+                id="inputBeginOfCompetition" aria-describedby="begin of competition" [placeholder]="localize.beginOfCompetition">
               <div class="invalid-feedback">
-                Begin of competition is required
+                {{localize.isRequired(localize.beginOfCompetition)}}
               </div>
             </div>
             <div class="form-group col-6">
-              <label for="inputEndOfCompetition">Turnier Ende:</label>
+              <label for="inputEndOfCompetition">{{localize.competition}} Ende:</label>
               <input type="datetime-local" name="endOfCompetition" formControlName="endOfCompetition"
                 class="form-control"
                 [min]="beginOfCompetition.value ? beginOfCompetition.value : dateNow | date: 'yyyy-MM-ddTHH:mm'"
                 [ngClass]="dynamicCssClassesForInput(competitionForm.controls.endOfCompetition)"
-                id="inputEndOfCompetition" aria-describedby="end of competition" placeholder="End of competition">
+                id="inputEndOfCompetition" aria-describedby="end of competition" placeholder="localize.endOfCompetition">
               <div class="invalid-feedback">
-                End of competition is required
+                {{localize.isRequired(localize.endOfCompetition)}}
               </div>
             </div>
 
             <div class="spacer"></div>
 
-            <div class="bold">Kontakt: </div>
+            <div class="bold">{{localize.contact}}: </div>
             <div class="form-group col-6">
               <label for="inputEmail">Email</label>
               <input type="email" name="email" formControlName="email" class="form-control" id="inputEmail"
                 [ngClass]="dynamicCssClassesForInput(competitionForm.controls.email)" aria-describedby="email">
               <div class="invalid-feedback">
-                Invalid email
+                {{localize.isMalformed('Email')}}
               </div>
             </div>
 
@@ -73,16 +73,16 @@
               <input type="tel" name="phone" formControlName="phone" class="form-control" id="inputPhone"
                 [ngClass]="dynamicCssClassesForInput(competitionForm.controls.phone)" aria-describedby="phone">
               <div class="invalid-feedback">
-                Invalid phone
+                {{localize.isMalformed(localize.phoneNumber)}}
               </div>
             </div>
           </div>
         </app-content-card>
 
-        <app-content-card [title]="'Beschreibung'">
+        <app-content-card [title]="localize.description">
           <div class="form-group">
             <textarea rows="12" name="description" formControlName="description" class="form-control"
-              id="inputDescription" autocomplete="off" aria-describedby="description" placeholder="Beischreibung..."
+              id="inputDescription" autocomplete="off" aria-describedby="description" [placeholder]="localize.description + '...'"
               style="height:auto;">
           </textarea>
           </div>
@@ -92,47 +92,47 @@
 
       <div class="spacer-2"></div>
 
-      <app-content-card [title]="'Einstellungen'">
+      <app-content-card [title]="localize.settings">
         <div class="form-row row f-row">
           <div class="form-group col-6">
-            <label for="inputBeginOfRegistration">Registrierung von: </label>
+            <label for="inputBeginOfRegistration">{{localize.beginOfRegistration}}: </label>
             <input type="datetime-local" name="beginOfRegistration" formControlName="beginOfRegistration"
               class="form-control" min="{{dateNow | date: 'yyyy-MM-ddTHH:mm'}}"
               [ngClass]="dynamicCssClassesForInput(competitionForm.controls.beginOfRegistration)"
               id="inputBeginOfRegistration" #inputBeginOfRegistration aria-describedby="begin of registration"
               placeholder="Begin of registration">
             <div class="invalid-feedback">
-              Begin of registration is required
+              {{localize.isRequired(localize.beginOfRegistration)}}
             </div>
           </div>
           <div class="form-group col-6">
-            <label for="inputEndOfRegistration">Registrierung bis: </label>
+            <label for="inputEndOfRegistration">{{localize.endOfRegistration}}: </label>
             <input type="datetime-local" name="endOfRegistration" formControlName="endOfRegistration"
               min="{{inputBeginOfRegistration.value ? inputBeginOfRegistration.value : dateNow | date: 'yyyy-MM-ddTHH:mm'}}"
               class="form-control" #endOfRegistration
               [ngClass]="dynamicCssClassesForInput(competitionForm.controls.endOfRegistration)"
               id="inputEndOfRegistration" aria-describedby="end of registration" placeholder="End of registration">
             <div class="invalid-feedback">
-              End of registration is required
+              {{localize.isRequired(localize.endOfRegistration)}}
             </div>
           </div>
         </div>
         <div class="spacer"></div>
         <div class="form-group col-6">
-          <label for="inputCompetitionType">Competition Type</label>
+          <label for="inputCompetitionType">{{localize.competition}} Type</label>
           <select type="datetime-local" name="competitionType" formControlName="public" class="form-select"
             id="inputCompetitionType" aria-describedby="type of competition">
-            <option value="FALSE" selected>Private</option>
-            <option value="TRUE">Public</option>
+            <option value="FALSE" selected>{{localize.onlyClubs}}</option>
+            <option value="TRUE">{{localize.public}}</option>
           </select>
         </div>
 
         <div class="form-group col-6">
-          <label for="inputCompetitionStatus">Competition Status</label>
+          <label for="inputCompetitionStatus">{{localize.competition}} Status</label>
           <select type="datetime-local" name="competitionType" formControlName="draft" class="form-select"
             id="inputCompetitionStatus" aria-describedby="status of competition">
             <option value="TRUE" selected>Draft</option>
-            <option value="FALSE">Active</option>
+            <option value="FALSE">{{localize.publish}}</option>
           </select>
         </div>
       </app-content-card>
@@ -154,8 +154,8 @@
 
         <table>
           <thead>
-          <th>Vorname</th>
-          <th>Nachname</th>
+          <th>{{localize.firstname}}</th>
+          <th>{{localize.lastname}}</th>
           </thead>
           <tbody>
           <tr *ngFor="let j of this.judges;let i=index;">
@@ -171,7 +171,7 @@
       <div class="sticky-heading heading">
         <h1>Bewertungsgruppen</h1>
         <button type="button" (click)="createCompetition()" class="primary-btn">{{competitionForm.value.draft === 'TRUE'
-          ? 'Speichern' : 'Veröffentlichen'}}</button>
+          ? localize.save : localize.publish}}</button>
       </div>
 
       <div class="second-scrollabove">
@@ -212,7 +212,7 @@
                   </div>
                   <div class="horizontal-line"></div>
                   <div class="station-result">
-                    <app-formular-editor [vars]="station.variables" [(formula)]="station.formula"></app-formular-editor>
+                    <app-formular-editor [name]="station.title" [vars]="station.variables" [(formula)]="station.formula"></app-formular-editor>
                   </div>
                 </app-content-card>
                 <div class="spacer"></div>
@@ -227,7 +227,7 @@
               <div class="spacer-2"></div>
               <div class="horizontal-line"></div>
 
-              <app-formular-editor [color]="'bc-space'" [vars]="group.stationVariables" [(formula)]="group.formula"></app-formular-editor>
+              <app-formular-editor [name]="group.title" [color]="'bc-space'" [vars]="group.stationVariables" [(formula)]="group.formula"></app-formular-editor>
 
             </div>
 

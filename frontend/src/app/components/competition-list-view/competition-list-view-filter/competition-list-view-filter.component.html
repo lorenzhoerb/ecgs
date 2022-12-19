@@ -1,7 +1,7 @@
 <div class="whole-box">
     <div class="filter-elements">
         <div class="filter-element">
-            <label>Name</label>
+            <label>{{localize.title}}</label>
             <div style="padding-right: 5px;">
                 <input
                     type="text"
@@ -11,7 +11,7 @@
             </div>
         </div>
         <div class="filter-element">
-            <label for="takes-place-input">Begins at / after</label>
+            <label for="takes-place-input">{{localize.beginAtOrAfter}}</label>
             <div>
                 <div style="display: inline-block; padding-right: 5px;">
                     <input
@@ -23,13 +23,13 @@
             </div>
         </div>
         <div class="filter-element">
-            <label>Registration open</label>
+            <label>{{localize.registrationNotDone}}</label>
             <div style="padding-right: 5px;">
                 <input type="checkbox" class="" [(ngModel)]="registrationPossible" />
             </div>
         </div>
     </div>
     <div class="filter-buttons">
-        <button class="filter-button-save" (click)="onSearchButtonClicked()">Search</button>
+        <button class="filter-button-save" (click)="onSearchButtonClicked()">{{localize.search}}</button>
     </div>
 </div>

@@ -10,6 +10,10 @@ p {
     cursor: move;
 }
 
+.items .cdk-drag.symbol {
+    position: static;
+}
+
 .table,
 .menu {
     padding: var(--padding);

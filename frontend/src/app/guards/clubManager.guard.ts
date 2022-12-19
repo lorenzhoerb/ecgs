@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {CanActivate, Router} from '@angular/router';
 import {AuthService} from '../services/auth.service';
+import {ToastrService} from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,8 @@ import {AuthService} from '../services/auth.service';
 export class ClubManagerGuard implements CanActivate {
 
   constructor(private authService: AuthService,
-              private router: Router) {}
+              private router: Router,
+              private toastr: ToastrService) {}
 
   canActivate(): boolean {
     console.log(this.authService.isLoggedIn());
@@ -18,7 +20,8 @@ export class ClubManagerGuard implements CanActivate {
 
       return true;
     } else {
-      this.router.navigate(['/login']);
+      this.toastr.warning('Leider haben Sie keine Berechtigung auf diese Seite zuzugreifen. Sie wurden daher umgeleitet!');
+      this.router.navigate(['/']);
       return false;
     }
   }

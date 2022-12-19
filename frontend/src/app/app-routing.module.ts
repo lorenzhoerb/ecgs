@@ -34,7 +34,7 @@ const routbuilding: Routes = [
   },
   {path: 'user', children: [
       {path: 'calendar', component: CompetitionCalenderViewComponent},
-      {path: 'import-team', component: ClubManagerImportTeamComponent}
+      {path: 'import-team', canActivate: [ClubManagerGuard], component: ClubManagerImportTeamComponent}
     ]
   },
   {path: '**', component: CompetitionListViewComponent},

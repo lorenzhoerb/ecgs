@@ -22,7 +22,7 @@ export class CompetitionComponent implements OnInit {
   id: number;
   competition: Competition = null;
   error: Error = null;
-  currentLanguage = SupportedLanguages.English;
+  currentLanguage = SupportedLanguages.German;
   isRegisteredToCompetition = false;
   canRegister = false;
   participants: UserDetail[];

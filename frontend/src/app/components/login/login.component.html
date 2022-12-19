@@ -27,8 +27,11 @@
 
             <div class="form-group">
               <label for="password">{{localize.password}}</label>
-              <input type="password" name="password" formControlName="password" class="form-control" id="password"
+              <div class="relative-floating">
+                <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                <input [type]="hide ? 'password' : 'text'" name="password" formControlName="password" class="form-control" id="password"
                 [placeholder]="localize.enter(localize.password)">
+              </div>
               <div *ngIf="submitted && loginForm.controls.password.errors" class="error">
                 <small class="form-text text-warning" *ngIf="loginForm.controls.password.errors.required">
                   {{localize.isRequired(localize.password)}}

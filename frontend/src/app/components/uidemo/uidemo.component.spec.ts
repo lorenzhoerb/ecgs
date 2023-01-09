@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { UidemoComponent } from './uidemo.component';
+import {UidemoComponent} from './uidemo.component';
 
 describe('UidemoComponent', () => {
   let component: UidemoComponent;

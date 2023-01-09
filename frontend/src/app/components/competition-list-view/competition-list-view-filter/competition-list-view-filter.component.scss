@@ -1,0 +1,59 @@
+.filter-elements {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    border-bottom: 1px solid grey;
+}
+
+.whole-box {
+    border-radius: 8px;
+    padding: 25px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 3.5%;
+    background-color: rgb(255, 255, 255);
+
+}
+
+.filter-buttons {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 10px;
+}
+
+.filter-button-save {
+    width: 20%;
+    height: 14%;
+    background-color: rgba(201, 249, 255, 1);
+    font-size: 140%;
+}
+
+.filter-element {
+    display: block;
+    text-align: center;
+    width: 80%;
+}
+
+input {
+    margin: auto;
+    display: block;   
+    margin-top: 3%;
+}
+
+input[type=checkbox] {
+    margin-top: 4%;
+    width: 30px;
+    height: 30px;
+}
+
+input[type=date] {
+    margin-top: 3%;
+}
+
+label {
+    font-size: 160%;
+}
+
+* {
+    font-size: 100%;
+}

@@ -1,10 +1,10 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,25 +14,26 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.security.PermitAll;
+import java.lang.invoke.MethodHandles;
 
 @RestController
 @RequestMapping(value = "/api/v1/registration")
 public class RegistrationEndpoint {
     private final UserService userService;
-    private final UserMapper userMapper;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Autowired
-    public RegistrationEndpoint(UserService userService, UserMapper userMapper) {
+    public RegistrationEndpoint(UserService userService) {
         this.userService = userService;
-        this.userMapper = userMapper;
     }
 
     @PermitAll
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public String register(@RequestBody UserRegisterDto userRegisterDto) {
+        LOGGER.info("POST {}", "/api/v1/registration");
         ApplicationUser applicationUser = userService.registerUser(userRegisterDto);
-        //TODO return id or mapped user or login user idk
-        return "Account with id " + applicationUser.getId().toString() + " created!";
+        return "Account with email: " + applicationUser.getUser().getEmail() + " created!";
     }
 }

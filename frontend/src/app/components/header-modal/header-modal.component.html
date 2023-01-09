@@ -1,0 +1,17 @@
+<div class="hide-area" *ngIf="showMenu" (click)="hide()">
+    <div class="menu">
+        <div class="menu-item">
+            <mat-button-toggle-group name="language" [(ngModel)]="language" (change)="switchLanguage($event)"
+                aria-label="Switch Language">
+                <mat-button-toggle value="de-DE">Deutsch</mat-button-toggle>
+                <mat-button-toggle value="en-US">English</mat-button-toggle>
+            </mat-button-toggle-group>
+        </div>
+        <a class="menu-item" [routerLink]="['/changePassword']">
+            {{localize.changePassword}}
+        </a>
+        <a class="menu-item" (click)="logout()">
+            {{localize.logout}}
+        </a>
+    </div>
+</div>

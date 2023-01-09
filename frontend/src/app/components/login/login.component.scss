@@ -1,0 +1,20 @@
+.flex-space {
+    display: flex;
+    gap: 8px;
+}
+
+.flex-end {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row-reverse;
+}
+
+.relative-floating {
+  position: relative;
+}
+
+.relative-floating mat-icon {
+  position: absolute;
+  right: 8px;
+  top: 20%;
+}

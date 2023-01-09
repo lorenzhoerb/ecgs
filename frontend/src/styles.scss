@@ -1,7 +1,33 @@
 /* Checkout variables.scss for default colors, margins and more */
-// TODO: maybe remove Bootstrap for f*cking with my styles
 @import '../node_modules/bootstrap/scss/bootstrap';
 @import './variables.scss';
+@import '~ngx-toastr/toastr';
+
+h6,
+.h6,
+h5,
+.h5,
+h4,
+.h4,
+h3,
+.h3,
+h2,
+.h2,
+h1,
+.h1 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  color: inherit;
+  text-decoration: none;
+}
 
 h6,
 .h6,
@@ -25,6 +51,7 @@ body {
   color: $font-color;
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
 }
 
 ////////////////////////////////////
@@ -146,7 +173,7 @@ main>* {
 /////////// Header
 
 .header {
-  width: 100vw;
+  //width: 100vw;
   height: 4rem;
   background-color: var(--ming);
   color: white;
@@ -273,8 +300,6 @@ h3 {
   height: 5rem;
 }
 
-///////// Table (unfinished TODO: create consistent Table style)
-
 table {
   width: 100%;
   text-align: center;
@@ -306,7 +331,7 @@ table {
 }
 
 
-///////// Tournament Header
+///////// Competition Header
 
 .turnier-header {
   display: flex;
@@ -333,7 +358,22 @@ table {
 }
 
 .turnier-header * {
-  margin: 0 2rem;
+  margin: 0;
+}
+
+.turnier-header input {
+  margin: 0;
+  font-size: 28px;
+  color: white;
+}
+
+.turnier-header input:focus {
+  background-color: inherit;
+  color: white;
+}
+
+.turnier-header button {
+  margin-right: 2rem;
 }
 
 .turnier-header input.h1 {
@@ -349,6 +389,7 @@ table {
   background-color: var(--space-cadet);
   color: white;
   text-overflow: ellipsis;
+  padding: 0 2rem;
 }
 
 .turnier-header.stuck h1 {
@@ -445,4 +486,19 @@ table {
 
 .bc-sizzling-red {
   background-color: $sizzling-red;
+}
+
+.main-menu {
+  display: block;
+  padding: 1.5%;
+  padding-top: 1.5%;
+  padding-left: 6.5%;    
+  padding-right: 6.5%; 
+  background-color: white;
+  border-radius: 8px;
+}
+
+mat-icon.mat-icon {
+  height: auto;
+  width: auto;
 }

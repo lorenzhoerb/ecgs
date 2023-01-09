@@ -1,37 +1,40 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
-import at.ac.tuwien.sepm.groupphase.backend.entity.SecurityUser;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Date;
-import java.util.Objects;
 
 public class UserRegisterDto {
 
     @NotNull(message = "Email must not be null")
-    @Email
+    @Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,63}",
+        flags = Pattern.Flag.CASE_INSENSITIVE)
+    @NotEmpty(message = "Email must not be empty")
     private String email;
 
     @NotNull(message = "password must not be null")
-    @Size(min = 8, max = 64, message = "password must be between 8 and 64 characters long")
+    @Size(min = 8, max = 256, message = "password must be between 8 and 256 characters long")
     private String password;
 
-    @Size(min = 2, max = 32, message = "username must be between 2 and 32 characters long")
-    @Pattern(regexp = "^[a-zA-Z_.\\-]+$", message = "username can only contain letters and .-_ ")
+    @Size(min = 2, max = 32, message = "firstName must be between 2 and 32 characters long")
+    @Pattern(regexp = "^[a-zA-Z_.\\-]+$", message = "firstName can only contain letters and .-_ ")
     private String firstName;
 
-    @Size(min = 2, max = 32, message = "username must be between 2 and 32 characters long")
-    @Pattern(regexp = "^[a-zA-Z_.\\-]+$", message = "username can only contain letters and .-_ ")
+    @Size(min = 2, max = 32, message = "lastName must be between 2 and 32 characters long")
+    @Pattern(regexp = "^[a-zA-Z_.\\-]+$", message = "lastName can only contain letters and .-_ ")
     private String lastName;
 
     @NotNull(message = "Gender must not be null")
     private ApplicationUser.Gender gender;
 
-    @NotNull(message = "Gender must not be null")
+    @NotNull(message = "Date of Birth must not be null")
+    @Past
     private Date dateOfBirth;
 
     @NotNull(message = "Type must not be null")

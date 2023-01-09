@@ -1,5 +1,5 @@
-import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service' ;
+import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
 
 @Component({
   selector: 'app-tournament-header',

@@ -8,8 +8,10 @@ export class AuthRequest {
 export enum Role {
   participant = 'PARTICIPANT',
   clubManager = 'CLUB_MANAGER',
-  tournamentManager = 'TOURNAMENT_MANAGER'
+  competitionManager = 'TOURNAMENT_MANAGER'
 }
+
+export type Gender = 'MALE' | 'FEMALE' |'OTHER';
 
 
 export class RegisterRequest {
@@ -18,7 +20,7 @@ export class RegisterRequest {
     public password: string,
     public firstName: string,
     public lastName: string,
-    public gender: 'MALE' | 'FEMALE' |'OTHER',
+    public gender: Gender,
     public dateOfBirth: Date,
     public type: Role
   ) {}

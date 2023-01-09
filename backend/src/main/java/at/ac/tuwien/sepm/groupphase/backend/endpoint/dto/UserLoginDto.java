@@ -2,12 +2,14 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.Objects;
 
 public class UserLoginDto {
 
     @NotNull(message = "Email must not be null")
-    @Email
+    @Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,63}",
+        flags = Pattern.Flag.CASE_INSENSITIVE)
     private String email;
 
     @NotNull(message = "Password must not be null")
@@ -82,11 +84,5 @@ public class UserLoginDto {
             userLoginDto.setPassword(password);
             return userLoginDto;
         }
-
-
-        //TODO CREATE USERREGISTRATIONDTO
-        //TODO CREATE MAPPER FUNCTION
-        //TODO SERVICE ACCOUNT CREATE
-        //TODO EMAIL UNIQUE TRUE
     }
 }

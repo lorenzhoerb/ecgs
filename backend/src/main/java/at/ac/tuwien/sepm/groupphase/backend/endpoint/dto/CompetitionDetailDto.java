@@ -1,8 +1,12 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 
-import at.ac.tuwien.sepm.groupphase.backend.service.validator.annotation.DateBeforeOrEquals;
+import at.ac.tuwien.sepm.groupphase.backend.validation.annotation.DateBeforeOrEquals;
+import at.ac.tuwien.sepm.groupphase.backend.validation.annotation.HasOnlyUniqueProperty;
+import at.ac.tuwien.sepm.groupphase.backend.validation.annotation.UserIdsValid;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
@@ -13,6 +17,7 @@ import java.time.LocalDateTime;
 
 @DateBeforeOrEquals(first = "beginOfRegistration", second = "endOfRegistration", message = "End of registration date must be after begin of registration")
 @DateBeforeOrEquals(first = "beginOfCompetition", second = "endOfCompetition", message = "End of competition date must be after begin of competition")
+@DateBeforeOrEquals(first = "endOfRegistration", second = "beginOfCompetition", message = "Begin of competition date must be after end of registration")
 public class CompetitionDetailDto {
 
     private Long id;
@@ -20,36 +25,60 @@ public class CompetitionDetailDto {
     @Size(max = 4095)
     @NotBlank(message = "Name must be given")
     private String name;
+
+    @Size(max = 8191)
     private String description;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @FutureOrPresent(message = "Begin of registration must be in the future or now")
-    @NotNull
+    @NotNull(message = "Begin of registration must be given")
     private LocalDateTime beginOfRegistration;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    @NotNull
+    @NotNull(message = "End of registration must be given")
     private LocalDateTime endOfRegistration;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    @NotNull
+    @FutureOrPresent(message = "Begin of competition must be in the future or now")
+    @NotNull(message = "Begin of competition must be given")
     private LocalDateTime beginOfCompetition;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    @NotNull
+    @NotNull(message = "End of competition must be given")
     private LocalDateTime endOfCompetition;
 
-    @NotNull
+    @NotNull(message = "isPublic must be given")
+    @JsonProperty("public")
     private boolean isPublic;
 
-    @NotNull
+    @NotNull(message = "draft must be given")
     private boolean draft;
 
-    @Email
+    @Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,63}",
+        flags = Pattern.Flag.CASE_INSENSITIVE)
     private String email;
 
-    @Pattern(regexp = "^[\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6}$")
+    @Pattern(regexp = "^[\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6}$", message = "Invalid phone number")
     private String phone;
+
+    @Valid
+    @HasOnlyUniqueProperty(property = "title", message = "Grading groups must have unique names")
+    private GradingGroupDto[] gradingGroups;
+
+    public UserDetailDto[] getJudges() {
+        return judges;
+    }
+
+    public CompetitionDetailDto setJudges(UserDetailDto[] judges) {
+        this.judges = judges;
+        return this;
+    }
+
+    @Valid
+    @HasOnlyUniqueProperty(property = "id", message = "A judge can not be assigned twice to a competition")
+    @UserIdsValid(message = "Id of a judge invalid")
+    private UserDetailDto[] judges;
+
 
     public String getName() {
         return name;
@@ -141,6 +170,15 @@ public class CompetitionDetailDto {
         return this;
     }
 
+    public GradingGroupDto[] getGradingGroups() {
+        return gradingGroups;
+    }
+
+    public CompetitionDetailDto setGradingGroups(GradingGroupDto[] gradingGroups) {
+        this.gradingGroups = gradingGroups;
+        return this;
+    }
+
     public String getPhone() {
         return phone;
     }
@@ -152,7 +190,9 @@ public class CompetitionDetailDto {
 
     @Override
     public String toString() {
-        return "name='" + "CompetitionDetailDto{" + name + '\'' + ", description='" + description + '\'' + ", beginOfRegistration=" + beginOfRegistration + ", endOfRegistration=" + endOfRegistration + ", beginOfCompetition="
-            + beginOfCompetition + ", endOfCompetition=" + endOfCompetition + ", isPublic=" + isPublic + ", draft=" + draft + ", email='" + email + '\'' + ", phone='" + phone + '\'' + '}';
+        return "name='" + "CompetitionDetailDto{" + name + '\'' + ", description='" + description + '\'' + ", beginOfRegistration=" + beginOfRegistration
+            + ", endOfRegistration=" + endOfRegistration + ", beginOfCompetition="
+            + beginOfCompetition + ", endOfCompetition=" + endOfCompetition + ", isPublic=" + isPublic + ", draft=" + draft + ", email='" + email + '\''
+            + ", phone='" + phone + '\'' + '}';
     }
 }

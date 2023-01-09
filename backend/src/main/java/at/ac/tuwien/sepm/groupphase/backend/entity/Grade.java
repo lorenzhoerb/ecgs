@@ -1,13 +1,13 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Column;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.CascadeType;
 
 @Entity
 public class Grade {
@@ -16,7 +16,6 @@ public class Grade {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // @TODO: change name in the ER-Diagram as value is a keyword in h2
     @Column(nullable = false)
     private String grading;
 
@@ -24,7 +23,8 @@ public class Grade {
     @JoinColumn(referencedColumnName = "id")
     private Judge judging;
 
-    public Grade() {}
+    public Grade() {
+    }
 
     public Grade(String grading, Judge judging) {
         this.grading = grading;

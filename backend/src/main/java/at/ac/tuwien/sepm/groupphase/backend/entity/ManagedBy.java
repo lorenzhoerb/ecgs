@@ -1,15 +1,14 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Column;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.CascadeType;
-
 import java.util.Set;
 
 @Entity
@@ -19,11 +18,11 @@ public class ManagedBy {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(referencedColumnName = "id")
     private ApplicationUser manager;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(referencedColumnName = "id")
     private ApplicationUser member;
 
@@ -33,7 +32,8 @@ public class ManagedBy {
     @Column(nullable = false, length = 4095)
     private String teamName;
 
-    public ManagedBy() {}
+    public ManagedBy() {
+    }
 
     public ManagedBy(ApplicationUser manager, ApplicationUser member, String teamName) {
         this.manager = manager;

@@ -1,16 +1,14 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Column;
+import javax.persistence.Id;
 import javax.persistence.OneToOne;
-import javax.persistence.CascadeType;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-// @TODO: rename in ER-Diagram user is a keyword in h2
 @Entity
 public class SecurityUser {
     @Id
@@ -18,7 +16,6 @@ public class SecurityUser {
     private Long id;
 
     @Size(min = 4, max = 64, message = "email must be between 4 and 64 characters long")
-    @Pattern(regexp = "^[a-zA-Z0-9_.@\\-]+$", message = "email can only include letters, numbers and .-_@")
     @Column(nullable = false, length = 64, unique = true)
     private String email;
 
@@ -26,10 +23,15 @@ public class SecurityUser {
     @Column(nullable = false, length = 64)
     private String password;
 
+    @Size(min = 32, max = 32, message = "resetToken must be exactly 32 characters long")
+    @Column()
+    private String resetPasswordToken;
+
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
     private ApplicationUser user;
 
-    public SecurityUser() {}
+    public SecurityUser() {
+    }
 
     public SecurityUser(String email, String password) {
         this.email = email;
@@ -66,6 +68,14 @@ public class SecurityUser {
 
     public void setUser(ApplicationUser user) {
         this.user = user;
+    }
+
+    public String getResetPasswordToken() {
+        return resetPasswordToken;
+    }
+
+    public void setResetPasswordToken(String resetPasswordToken) {
+        this.resetPasswordToken = resetPasswordToken;
     }
 
     @Override

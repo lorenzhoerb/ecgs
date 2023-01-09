@@ -1,18 +1,19 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Column;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.CascadeType;
-import javax.persistence.FetchType;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-
 import java.util.Date;
 import java.util.Set;
 
@@ -35,7 +36,7 @@ public class ApplicationUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(referencedColumnName = "id")
     private SecurityUser user;
 
@@ -78,6 +79,9 @@ public class ApplicationUser {
 
     public ApplicationUser() {
     }
+
+    @ManyToMany(cascade = CascadeType.MERGE, mappedBy = "judges")
+    private Set<Competition> judging;
 
     public ApplicationUser(Role type, String firstName, String lastName, Gender gender,
                            Date dateOfBirth, String picturePath) {

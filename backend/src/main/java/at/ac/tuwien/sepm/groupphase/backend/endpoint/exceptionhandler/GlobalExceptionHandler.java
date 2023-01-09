@@ -4,6 +4,7 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ErrorListRestDto;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.UnauthorizedException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import org.slf4j.Logger;
@@ -11,11 +12,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -42,6 +42,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleNotFound(RuntimeException ex, WebRequest request) {
         LOGGER.warn(ex.getMessage());
         return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+    }
+
+    /**
+     * Use the @ExceptionHandler annotation to write handler for custom exceptions.
+     */
+    @ExceptionHandler(value = {UnauthorizedException.class})
+    protected ResponseEntity<Object> handleUnauthorized(RuntimeException ex, WebRequest request) {
+        LOGGER.warn(ex.getMessage());
+        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
     }
 
     /**
@@ -113,5 +122,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         LOGGER.info("Terminating request processing with status 403 due to {}: {}", e.getClass().getSimpleName(), e.getMessage());
         return handleExceptionInternal(e, new ErrorListRestDto("Forbidden",
             List.of(e.getMessage())), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
+    }
+
+    /**
+     * Handles UsernameNotFound Exception.
+     */
+    @ExceptionHandler(value = {UsernameNotFoundException.class})
+    public ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException e, WebRequest request) {
+        LOGGER.info("Terminating request processing with status 401 due to {}: {}", e.getClass().getSimpleName(), e.getMessage());
+        return handleExceptionInternal(e, new ErrorListRestDto("Unauthorized",
+            List.of(e.getMessage())), new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
     }
 }

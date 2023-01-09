@@ -35,6 +35,10 @@ public abstract class Validator<T> {
      * @throws ValidationListException A validation runtime exception if the annotation fails to validate or if the custom validation throws it.
      */
     public void validate(T toValidate) {
+        if (toValidate == null) {
+            throw new ValidationListException("empty object",
+                List.of("empty object"));
+        }
         LOGGER.trace("Validate {}", toValidate);
         validateAnnotations(toValidate);
         validateCustom(toValidate);
@@ -50,7 +54,7 @@ public abstract class Validator<T> {
         Set<ConstraintViolation<T>> violations = validator.validate(toValidate);
         if (!violations.isEmpty()) {
             List<String> errMessages = violations.stream().map(ConstraintViolation::getMessage).toList();
-            throw new ValidationListException("Failed to validate competition", errMessages);
+            throw new ValidationListException("Validation failed", errMessages);
         }
     }
 

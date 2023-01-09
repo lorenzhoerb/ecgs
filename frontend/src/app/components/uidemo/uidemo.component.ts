@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { SupportedLanguages } from 'src/app/services/localization/language';
-import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service' ;
+import {Component, OnInit} from '@angular/core';
+import {SupportedLanguages} from 'src/app/services/localization/language';
+import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
 
 @Component({
   selector: 'app-uidemo',

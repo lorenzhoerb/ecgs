@@ -47,7 +47,7 @@ public class CompetitionManagerServiceTest extends TestDataProvider {
     }
 
     @Test
-    public void allManagedInTimeCompetitionsAreRetrieved() {
+    public void getCompetitionsForCalendar_expectAllManagedCompetitionsRetrieved() {
         var managedCompetitions = userService.getCompetitionsForCalendar(
             generator.generatedCompetitionManagers.get(0), 2022, 38);
         assertThat(managedCompetitions)
@@ -63,7 +63,7 @@ public class CompetitionManagerServiceTest extends TestDataProvider {
     }
 
     @Test
-    public void nonManagedCompetitionIsNotRetrieved() {
+    public void getCompetitionsForCalendar_expectNoCompetitionsAssignedToOthersRetrieved() {
 
         var managedCompetitions = userService.getCompetitionsForCalendar(
             generator.generatedCompetitionManagers.get(0), CURRENT_YEAR, CURRENT_WEEK_NUMBER);

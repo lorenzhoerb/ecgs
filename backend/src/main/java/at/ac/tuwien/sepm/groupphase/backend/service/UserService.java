@@ -113,7 +113,7 @@ public interface UserService extends UserDetailsService {
      * @param clubManagerTeamImportDto a dto for club manager's team.
      * @return Dto that has a number of new participants added to the team and a number of already present ones. (present == managed by you)
      */
-    ClubManagerTeamImportResults importTeam(ApplicationUser clubManager, ClubManagerTeamImportDto clubManagerTeamImportDto);
+    ClubManagerTeamImportResults importTeam(ClubManagerTeamImportDto clubManagerTeamImportDto);
 
     /**
      * Search application user by name.

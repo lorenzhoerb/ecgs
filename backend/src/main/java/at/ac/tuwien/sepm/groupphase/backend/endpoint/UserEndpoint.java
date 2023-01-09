@@ -75,7 +75,7 @@ public class UserEndpoint {
     @ResponseStatus(code = HttpStatus.OK)
     public ClubManagerTeamImportResults importTeam(@RequestBody ClubManagerTeamImportDto clubManagerTeamImportDto) {
         logger.info("POST {}", BASE_URI + "/import-team");
-        return userService.importTeam(sessionUtils.getSessionUser(), clubManagerTeamImportDto);
+        return userService.importTeam(clubManagerTeamImportDto);
     }
 
     @Secured({"ROLE_PARTICIPANT", "ROLE_TOURNAMENT_MANAGER", "ROLE_CLUB_MANAGER"})

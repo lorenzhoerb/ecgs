@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {NgxCsvParser, NgxCSVParserError} from 'ngx-csv-parser';
 import {ToastrService} from 'ngx-toastr';
 import {ClubManagerTeamImportDto, ClubManagerTeamMemberImportDto} from 'src/app/dtos/club-manager-team';
+import { SupportedLanguages } from 'src/app/services/localization/language';
 import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
 import {UserService} from 'src/app/services/user.service';
 
@@ -30,47 +31,47 @@ export class ClubManagerImportTeamComponent implements OnInit {
     {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
     {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
     {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
+    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
+    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
+    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
+    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
+    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
+    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
+    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
+    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
+    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
+    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
+    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
+    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
+    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
+    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
+    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
+    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
+    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
+    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
+    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
+    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
+    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
+    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
+    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
+    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
+    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
+    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
+    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
+    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
+    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
+    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
+    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
+    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
+    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
+    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
+    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
+    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
+    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
+    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
+    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
+    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
+    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
   ];
 
   constructor(
@@ -92,13 +93,17 @@ export class ClubManagerImportTeamComponent implements OnInit {
     this.ngxCsvParser.parse(file, { header: true, delimiter: ',', encoding: 'utf8' })
       .pipe().subscribe({
         next: (result: ClubManagerTeamMemberImportDto[]): void => {
-          this.teamMembers = result;
-          this.notificiation.success(`Imported ${result.length} members.`);
+          this.teamMembers = [...result, ...this.teamMembers];
+          this.notificiation.info(`Imported ${result.length} members.`);
         },
         error: (error: NgxCSVParserError): void => {
-          this.notificiation.success(error.message, 'Error');
+          this.notificiation.error(error.message, 'Error');
         }
       });
+  }
+
+  public onFileClick(event: any) {
+    event.target.value = null;
   }
 
   public onClearClicked() {
@@ -177,7 +182,7 @@ export class ClubManagerImportTeamComponent implements OnInit {
     return this.teamMembers.slice(lowerBound, upperBound);
   }
 
-  public addNewMember() {
+  public onAddNewMemberClick() {
     this.teamMembers = [{
       firstName: '',
       lastName: '',
@@ -185,5 +190,26 @@ export class ClubManagerImportTeamComponent implements OnInit {
       gender: 'OTHER',
       dateOfBirth: ''
     }, ...this.teamMembers];
+  }
+
+  public onRemoveMemberClick(index: number) {
+    this.teamMembers.splice(index, 1);
+  }
+
+  public exportAsCSV() {
+    const blob = new Blob([this.formatCSVForExport()], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const tempAnchorTag = document.createElement('a');
+    tempAnchorTag.href = url;
+    tempAnchorTag.download = this.localize.getLanguage() === SupportedLanguages.English ? 'Exported-Team.csv' : 'Exportiertes-Team.csv';
+    tempAnchorTag.click();
+    tempAnchorTag.remove();
+  }
+
+  private formatCSVForExport() {
+    const headerPart = this.csvHeaders.forCsv.join(',');
+    const dataPart = this.teamMembers.map(member => this.csvHeaders.forCsv.map(header => member[header]).join(',')).join('\n');
+
+    return `${headerPart}\n${dataPart}`;
   }
 }

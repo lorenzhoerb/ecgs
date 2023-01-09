@@ -17,6 +17,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -52,10 +53,10 @@ public class ClubManagerServiceValidationTest {
     }
 
     @Test
-    public void teamWithInvalidTeamName() {
+    @WithMockUser(username = "cm_test@test.test")
+    public void importTeam_withInvalidTeamNames_shouldThrowValidationException() {
         ValidationException ve_exception = assertThrows(ValidationException.class, () -> {
                 userService.importTeam(
-                    ClubManagerTeamImportGeneratorHelper.generatedClubManagers.get(0),
                     null
                 );
             }
@@ -65,7 +66,6 @@ public class ClubManagerServiceValidationTest {
 
         ValidationListException exception = assertThrows(ValidationListException.class, () -> {
             userService.importTeam(
-                ClubManagerTeamImportGeneratorHelper.generatedClubManagers.get(0),
                 new ClubManagerTeamImportDto(
                     null,
                     ClubManagerTeamImportGeneratorHelper.testTeams.get(0).teamMembers()
@@ -76,7 +76,6 @@ public class ClubManagerServiceValidationTest {
 
         exception = assertThrows(ValidationListException.class, () -> {
             userService.importTeam(
-                ClubManagerTeamImportGeneratorHelper.generatedClubManagers.get(0),
                 new ClubManagerTeamImportDto(
                     "",
                     ClubManagerTeamImportGeneratorHelper.testTeams.get(0).teamMembers()
@@ -88,7 +87,6 @@ public class ClubManagerServiceValidationTest {
 
         exception = assertThrows(ValidationListException.class, () -> {
             userService.importTeam(
-                ClubManagerTeamImportGeneratorHelper.generatedClubManagers.get(0),
                 new ClubManagerTeamImportDto(
                     "A".repeat(256),
                     ClubManagerTeamImportGeneratorHelper.testTeams.get(0).teamMembers()
@@ -99,10 +97,10 @@ public class ClubManagerServiceValidationTest {
     }
 
     @Test
-    public void teamWithNullMembers() {
+    @WithMockUser(username = "cm_test@test.test")
+    public void importTeam_withNullMembers_shouldThrowValidationException() {
         ValidationListException exception = assertThrows(ValidationListException.class, () -> {
             userService.importTeam(
-                ClubManagerTeamImportGeneratorHelper.generatedClubManagers.get(0),
                 new ClubManagerTeamImportDto(
                     "A".repeat(252),
                     null
@@ -113,9 +111,9 @@ public class ClubManagerServiceValidationTest {
     }
 
     @Test
-    public void teamWithOkTeamName() {
+    @WithMockUser(username = "cm_test@test.test")
+    public void importTeam_withValidFields_shouldSucceed() {
         var results = userService.importTeam(
-                ClubManagerTeamImportGeneratorHelper.generatedClubManagers.get(0),
                 new ClubManagerTeamImportDto(
                     "A".repeat(254),
                     ClubManagerTeamImportGeneratorHelper.testTeams.get(0).teamMembers()
@@ -126,17 +124,17 @@ public class ClubManagerServiceValidationTest {
     }
 
     @Test
-    public void teamMemberWithInvalidFirstName() {
+    @WithMockUser(username = "cm_test@test.test")
+    public void importTeam_withTeamMemberWithInvalidFirstName_shouldThrowValidationException() {
         ValidationListException exception = assertThrows(ValidationListException.class, () -> {
             userService.importTeam(
-                ClubManagerTeamImportGeneratorHelper.generatedClubManagers.get(0),
                 new ClubManagerTeamImportDto(
                     "A".repeat(252),
                     new ArrayList<>() {
                         {
                             add(new ClubManagerTeamMemberImportDto(
                                 null, "lastname", ApplicationUser.Gender.MALE, new Date(10000000L), "valid@valid.com"
-                            ));
+                            )); // Thursday, January 1, 1970 2:46:40 AM
                         }
                     }
                 ));
@@ -147,14 +145,13 @@ public class ClubManagerServiceValidationTest {
 
         exception = assertThrows(ValidationListException.class, () -> {
             userService.importTeam(
-                ClubManagerTeamImportGeneratorHelper.generatedClubManagers.get(0),
                 new ClubManagerTeamImportDto(
                     "A".repeat(252),
                     new ArrayList<>() {
                         {
                             add(new ClubManagerTeamMemberImportDto(
                                 "", "lastname", ApplicationUser.Gender.MALE, new Date(10000000L), "valid@valid.com"
-                            ));
+                            )); // Thursday, January 1, 1970 2:46:40 AM
                         }
                     }
                 ));
@@ -164,14 +161,13 @@ public class ClubManagerServiceValidationTest {
 
         exception = assertThrows(ValidationListException.class, () -> {
             userService.importTeam(
-                ClubManagerTeamImportGeneratorHelper.generatedClubManagers.get(0),
                 new ClubManagerTeamImportDto(
                     "A".repeat(252),
                     new ArrayList<>() {
                         {
                             add(new ClubManagerTeamMemberImportDto(
                                 "A".repeat(256), "lastname", ApplicationUser.Gender.MALE, new Date(10000000L), "valid@valid.com"
-                            ));
+                            )); // Thursday, January 1, 1970 2:46:40 AM
                         }
                     }
                 ));
@@ -181,17 +177,17 @@ public class ClubManagerServiceValidationTest {
     }
 
     @Test
-    public void teamMemberWithInvalidLastName() {
+    @WithMockUser(username = "cm_test@test.test")
+    public void importTeam_withTeamMemberWithInvalidLastName_shouldThrowValidationException() {
         ValidationListException exception = assertThrows(ValidationListException.class, () -> {
             userService.importTeam(
-                ClubManagerTeamImportGeneratorHelper.generatedClubManagers.get(0),
                 new ClubManagerTeamImportDto(
                     "A".repeat(252),
                     new ArrayList<>() {
                         {
                             add(new ClubManagerTeamMemberImportDto(
                                 "firstname", null, ApplicationUser.Gender.MALE, new Date(10000000L), "valid@valid.com"
-                            ));
+                            )); // Thursday, January 1, 1970 2:46:40 AM
                         }
                     }
                 ));
@@ -202,14 +198,13 @@ public class ClubManagerServiceValidationTest {
 
         exception = assertThrows(ValidationListException.class, () -> {
             userService.importTeam(
-                ClubManagerTeamImportGeneratorHelper.generatedClubManagers.get(0),
                 new ClubManagerTeamImportDto(
                     "A".repeat(252),
                     new ArrayList<>() {
                         {
                             add(new ClubManagerTeamMemberImportDto(
                                 "firstname", "", ApplicationUser.Gender.MALE, new Date(10000000L), "valid@valid.com"
-                            ));
+                            )); // Thursday, January 1, 1970 2:46:40 AM
                         }
                     }
                 ));
@@ -219,14 +214,13 @@ public class ClubManagerServiceValidationTest {
 
         exception = assertThrows(ValidationListException.class, () -> {
             userService.importTeam(
-                ClubManagerTeamImportGeneratorHelper.generatedClubManagers.get(0),
                 new ClubManagerTeamImportDto(
                     "A".repeat(252),
                     new ArrayList<>() {
                         {
                             add(new ClubManagerTeamMemberImportDto(
                                 "firstname", "A".repeat(256), ApplicationUser.Gender.MALE, new Date(10000000L), "valid@valid.com"
-                            ));
+                            )); // Thursday, January 1, 1970 2:46:40 AM
                         }
                     }
                 ));
@@ -236,17 +230,17 @@ public class ClubManagerServiceValidationTest {
     }
 
     @Test
-    public void teamMemberWithInvalidDateOfBirth() {
+    @WithMockUser(username = "cm_test@test.test")
+    public void importTeam_withTeamMemberWithInvalidDateOfBirth_shouldThrowValidationException() {
         ValidationListException exception = assertThrows(ValidationListException.class, () -> {
             userService.importTeam(
-                ClubManagerTeamImportGeneratorHelper.generatedClubManagers.get(0),
                 new ClubManagerTeamImportDto(
                     "A".repeat(252),
                     new ArrayList<>() {
                         {
                             add(new ClubManagerTeamMemberImportDto(
                                 "firstname", "lastname", ApplicationUser.Gender.MALE, new Date(-1647533357000L), "valid@valid.com"
-                            ));
+                            )); // Wednesday, October 17, 1917 7:50:43 AM
                         }
                     }
                 ));
@@ -256,7 +250,6 @@ public class ClubManagerServiceValidationTest {
 
         ValidationListException exception2 = assertThrows(ValidationListException.class, () -> {
             userService.importTeam(
-                ClubManagerTeamImportGeneratorHelper.generatedClubManagers.get(0),
                 new ClubManagerTeamImportDto(
                     "A".repeat(252),
                     new ArrayList<>() {
@@ -273,17 +266,17 @@ public class ClubManagerServiceValidationTest {
     }
 
     @Test
-    public void teamMemberWithInvalidGender() {
+    @WithMockUser(username = "cm_test@test.test")
+    public void importTeam_withTeamMemberWithInvalidGender_shouldThrowValidationException() {
         ValidationListException exception = assertThrows(ValidationListException.class, () -> {
             userService.importTeam(
-                ClubManagerTeamImportGeneratorHelper.generatedClubManagers.get(0),
                 new ClubManagerTeamImportDto(
                     "A".repeat(252),
                     new ArrayList<>() {
                         {
                             add(new ClubManagerTeamMemberImportDto(
                                 "firstname", "lastname", null, new Date(0), "valid@valid.com"
-                            ));
+                            )); // Thursday, January 1, 1970 12:00:00 AM
                         }
                     }
                 ));

@@ -47,6 +47,15 @@ export class German implements ILanguage {
 
     logout: 'Abmelden',
     importCSV: 'Neue Teammitglieder',
+    teamName: 'Teamname',
+    page: 'Seite',
+    member: 'Teammitglied',
+    clearAll: 'Alle löschen',
+    genderMan: 'Herr',
+    genderWoman: 'Frau',
+    genderOther: 'Anders',
+    importCSVButton: 'Importieren als CSV',
+    exportCSVButton: 'Exportieren als CSV',
     createTournament: 'Neuer Wettkampf',
 
     username: 'Benutzername / Email',

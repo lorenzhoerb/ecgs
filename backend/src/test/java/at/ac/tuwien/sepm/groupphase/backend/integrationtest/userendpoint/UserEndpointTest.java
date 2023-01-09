@@ -130,7 +130,7 @@ public class UserEndpointTest implements TestData {
     }
 
     @Test
-    public void importValidTeam() throws Exception {
+    public void importTeam_withValidFields_shouldSucceedAndContainCorrectNumberOfNewMembers() throws Exception {
         String body = objectMapper.writeValueAsString(ClubManagerTeamImportGeneratorHelper.testTeams.get(0));
 
         MvcResult mvcResult = this.mockMvc.perform(post(BASE_IMPORT_TEAM_URI)
@@ -156,7 +156,7 @@ public class UserEndpointTest implements TestData {
     }
 
     @Test
-    public void importTeam_withInvalidTeamMembers() throws Exception {
+    public void importTeam_withInvalidTeamMembers_shouldReturnValidationFailedAnswer() throws Exception {
         String body = objectMapper.writeValueAsString(ClubManagerTeamImportGeneratorHelper.testTeams_withInvalidMembers.get(0));
 
         MvcResult mvcResult = this.mockMvc.perform(post(BASE_IMPORT_TEAM_URI)
@@ -178,7 +178,7 @@ public class UserEndpointTest implements TestData {
     }
 
     @Test
-    public void importTeam_withInvalidTeamName() throws Exception {
+    public void importTeam_withInvalidTeamName_shouldReturnValidationFailedAnswer() throws Exception {
         String body = objectMapper.writeValueAsString(ClubManagerTeamImportGeneratorHelper.testTeams_withInvalidTeamName.get(0));
 
         MvcResult mvcResult = this.mockMvc.perform(post(BASE_IMPORT_TEAM_URI)
@@ -200,7 +200,7 @@ public class UserEndpointTest implements TestData {
     }
 
     @Test
-    public void importTeam_withFewInvalidMembers() throws Exception {
+    public void importTeam_withFewInvalidMembers_shouldReturnValidationFailedAnswerForFewMembers() throws Exception {
         String body = objectMapper.writeValueAsString(new ClubManagerTeamImportDto(
             "teamnamee",
             new ArrayList<>() {

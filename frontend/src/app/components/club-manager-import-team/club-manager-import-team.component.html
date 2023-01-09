@@ -1,25 +1,43 @@
 <app-content-card [title]="localize.importCSV" class="main-menu">
     
     <div class="top-bar">
-        <div class="import-part">
-            <input style="display: none" type="file" (change)="onFileSelect($event)" #hiddenfileinput>
-            <button (click)="hiddenfileinput.click()" class="import-as-csv-button">Import as CSV</button>
+        <div style="display: flex; align-items: baseline; justify-content: space-between;">
+            <div class="team-name-label " style="line-break: auto; padding-right: 30px; width: 300px;">
+                {{localize.teamName}} 
+            </div>
+            <input type="text" class="form-control ng-pristine ng-invalid ng-touched" (input)="onTeamNameChange($event.target.value)" style="width: 70%;">
+
         </div>
         <div class="buttons">
-            <button class="save-button" (click)="onSaveClicked()">Save</button>
+            <button class="save-button" (click)="onSaveClicked()">{{localize.save}}</button>
         </div>
     </div>
     <div class="team-content">
         <div style="display: flex; align-items: baseline; justify-content: space-between;">
-            <div style="display: flex; align-items: baseline;  flex-wrap: wrap; padding-bottom: 30px;">
-                <div class="team-name-label " style=" padding-right: 30px; line-break: auto;">
-                    Team name: 
+            <div style="display: flex; align-items: baseline; justify-content: space-between;">
+                <div style="padding-right: 30px;display: flex;">
+                    <input 
+                        style="display: none" 
+                        type="file" 
+                        (change)="onFileSelect($event)" 
+                        (click)="onFileClick($event)"
+                        #hiddenfileinput>
+                    <button (click)="hiddenfileinput.click()" class="import-as-csv-button csv-button">
+                        <img src="/assets/team-import/import.png" class="csv-button-img">
+                        {{localize.importCSVButton}}</button>
                 </div>
-                <input type="text" class="form-control ng-pristine ng-invalid ng-touched" (input)="onTeamNameChange($event.target.value)" style="width: 70%;">
+                <div>
+                    <button (click)="exportAsCSV()" class="export-as-csv-button">
+                        <img src="/assets/team-import/export.png" class="csv-button-img csv-button">
+                        {{localize.exportCSVButton}}</button>
+                </div>
             </div>
         </div>
-        <div style="display: flex; align-items: baseline; justify-content: space-between;">
-            <div></div>
+        <div style="margin-top:50px;display: flex; align-items: baseline; justify-content: space-between;">
+            <div style="display: flex; width: 50%;">
+                <button (click)="onAddNewMemberClick()" class="add-new-member-btn">+ {{localize.member}}</button>
+                <button (click)="onClearClicked()" class="clear-members-btn">{{localize.clearAll}}</button>
+            </div>
             <div class="page-section">
                 <button 
                     style="margin-right: 15px;" 
@@ -28,7 +46,7 @@
                     >
                     &lt;
                 </button> 
-                Page {{this.currentPage}} 
+                {{localize.page}} {{this.currentPage}} 
                 <button 
                     style="margin-left: 15px;"
                     (click)="onPageChangeClick(1)"
@@ -47,7 +65,11 @@
                 <thead class="table-head">
                     <tr>
                         <th>#</th>
-                        <th *ngFor="let header of csvHeaders.forTableHeader">{{header}}</th>
+                        <th>{{localize.firstname}}</th>
+                        <th>{{localize.lastname}}</th>
+                        <th>Email</th>
+                        <th>{{localize.gender}}</th>
+                        <th>{{localize.dateOfBirth}}</th>
                     </tr>
                 </thead>
                 <hr />
@@ -91,9 +113,9 @@
                                     (input)="onTeamMemberFieldChange($event.target.value, i, 'gender')"
                                     #select (change)="select.blur()"
                                     >
-                                    <option value="MALE">Man</option>
-                                    <option value="FEMALE">Woman</option>
-                                    <option value="OTHER">Other</option>
+                                    <option value="MALE">{{localize.genderMan}}</option>
+                                    <option value="FEMALE">{{localize.genderWoman}}</option>
+                                    <option value="OTHER">{{localize.genderOther}}</option>
                                 </select>
                             </td>
                             <td style="width: 20%;">
@@ -106,6 +128,9 @@
                                     (input)="onTeamMemberFieldChange($event.target.value, i, 'dateOfBirth')"
                                     #date (change)="date.blur()"
                                 >
+                            </td>
+                            <td>
+                                <mat-icon (click)="onRemoveMemberClick(i)" style="cursor: pointer; color: hsla(349, 73%, 44%, 1);" _ngcontent-xam-c83="" role="img" class="mat-icon notranslate material-icons mat-ligature-font mat-icon-no-color ng-star-inserted" aria-hidden="true" data-mat-icon-type="font">delete</mat-icon>
                             </td>
                             
                             <!-- <td style="width: 20%;"></td>
@@ -138,7 +163,7 @@
                     >
                     &lt;
                 </button> 
-                Page {{this.currentPage}} 
+                {{localize.page}} {{this.currentPage}} 
                 <button 
                     style="margin-left: 15px;"
                     (click)="onPageChangeClick(1)"

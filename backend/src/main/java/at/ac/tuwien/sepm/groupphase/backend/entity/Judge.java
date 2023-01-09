@@ -1,13 +1,13 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.CascadeType;
+import javax.persistence.OneToMany;
 import java.util.Set;
 
 @Entity
@@ -28,7 +28,8 @@ public class Judge {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "judging")
     private Set<Grade> grades;
 
-    public Judge() {}
+    public Judge() {
+    }
 
     public Judge(ApplicationUser participant, Competition competition) {
         this.participant = participant;

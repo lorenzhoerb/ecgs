@@ -4,14 +4,17 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
-//TODO: replace this class with a correct ApplicationUser JPARepository implementation
 @Repository
+@Transactional
 public interface ApplicationUserRepository extends JpaRepository<ApplicationUser, Long> {
-
     Optional<ApplicationUser> findApplicationUserByUserEmail(String email);
 
-    void deleteAll();
-
+    List<ApplicationUser>
+        findApplicationUserByFirstNameStartingWithIgnoreCaseAndLastNameStartingWithIgnoreCase(
+            String firstName, String lastName
+    );
 }

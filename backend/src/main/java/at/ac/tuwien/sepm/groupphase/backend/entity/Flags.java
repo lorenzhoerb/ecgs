@@ -1,14 +1,14 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Column;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.JoinTable;
-import javax.persistence.CascadeType;
+import javax.persistence.ManyToMany;
 import java.util.Set;
 
 @Entity
@@ -29,7 +29,8 @@ public class Flags {
     )
     private Set<ManagedBy> clubs;
 
-    public Flags() {}
+    public Flags() {
+    }
 
     public Flags(String name) {
         this.name = name;

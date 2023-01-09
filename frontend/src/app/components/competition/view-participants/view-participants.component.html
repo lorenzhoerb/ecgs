@@ -1,0 +1,18 @@
+<app-content-card [title]="localize.participants">
+  <table>
+    <thead>
+      <th>{{localize.firstname}}</th>
+      <th>{{localize.lastname}}</th>
+      <th>{{localize.gender}}</th>
+      <th>{{localize.dateOfBirth}}</th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of this.participants;">
+        <td>{{p.firstName}}</td>
+        <td>{{p.lastName}}</td>
+        <td>{{formatGender(p.gender)}}</td>
+        <td>{{formatDate(p.dateOfBirth)}}</td>
+      </tr>
+    </tbody>
+  </table>
+</app-content-card>

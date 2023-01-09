@@ -2,7 +2,7 @@
 
 ## First Steps
 
-Navigate to the root folder of the project and execute `npm install`. Based on the *package.json* file, npm will download all required node_modules to run an Angular application.
+Navigate to the root folder of the project and execute `npm install --save`. Based on the *package.json* file, npm will download all required node_modules to run an Angular application.
 Afterwards, execute `npm install -g @angular/cli` to install the Angular CLI globally.
 
 ## Development

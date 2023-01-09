@@ -3,6 +3,7 @@ import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {AuthService} from '../../services/auth.service';
 import {AuthRequest} from '../../dtos/auth-request';
+import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
 
 
 @Component({
@@ -18,12 +19,17 @@ export class LoginComponent implements OnInit {
   // Error flag
   error = false;
   errorMessage = '';
+  hide = true;
 
   constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private router: Router) {
     this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(8)]]
     });
+  }
+
+  public get localize(): LocalizeService {
+    return LocalizationService;
   }
 
   /**
@@ -45,11 +51,9 @@ export class LoginComponent implements OnInit {
    * @param authRequest authentication data from the user login form
    */
   authenticateUser(authRequest: AuthRequest) {
-    console.log('Try to authenticate user: ' + authRequest.email);
     this.authService.loginUser(authRequest).subscribe({
       next: () => {
-        console.log('Successfully logged in user: ' + authRequest.email);
-        this.router.navigate(['/message']);
+        this.router.navigate(['/']);
       },
       error: error => {
         console.log('Could not log in due to:');

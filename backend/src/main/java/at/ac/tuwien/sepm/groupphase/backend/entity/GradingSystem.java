@@ -1,13 +1,14 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Column;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.CascadeType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import java.util.Set;
 
 @Entity
 public class GradingSystem {
@@ -28,18 +29,18 @@ public class GradingSystem {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String formula;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(referencedColumnName = "id")
-    private GradingGroup gradingGroup;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "gradingSystem", fetch = FetchType.EAGER)
+    private Set<GradingGroup> gradingGroups;
 
-    public GradingSystem() {}
+    public GradingSystem() {
+    }
 
-    public GradingSystem(String name, String description, Boolean isPublic, String formula, GradingGroup gradingGroup) {
+    public GradingSystem(String name, String description, Boolean isPublic, String formula, Set<GradingGroup> gradingGroups) {
         this.name = name;
         this.description = description;
         this.isPublic = isPublic;
         this.formula = formula;
-        this.gradingGroup = gradingGroup;
+        this.gradingGroups = gradingGroups;
     }
 
     public Long getId() {
@@ -78,7 +79,7 @@ public class GradingSystem {
             + ", description='" + description + '\''
             + ", isPublic=" + isPublic
             + ", formula='" + formula + '\''
-            + ", gradingGroup=" + gradingGroup
+            + ", gradingGroup=" + gradingGroups
             + '}';
     }
 
@@ -94,11 +95,11 @@ public class GradingSystem {
         this.formula = formula;
     }
 
-    public GradingGroup getGradingGroup() {
-        return gradingGroup;
+    public Set<GradingGroup> getGradingGroup() {
+        return gradingGroups;
     }
 
-    public void setGradingGroup(GradingGroup gradingGroup) {
-        this.gradingGroup = gradingGroup;
+    public void setGradingGroup(Set<GradingGroup> gradingGroups) {
+        this.gradingGroups = gradingGroups;
     }
 }

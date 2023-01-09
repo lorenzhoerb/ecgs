@@ -1,17 +1,17 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Column;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.CascadeType;
-
+import javax.persistence.OneToMany;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -25,21 +25,19 @@ public class Competition {
     @Column(nullable = false, length = 4095)
     private String name;
 
-    // @TODO: change name in the ER-Diagram to match end
     @Column(nullable = false)
     private LocalDateTime beginOfRegistration;
 
     @Column(nullable = false)
     private LocalDateTime endOfRegistration;
 
-    // @TODO: change name in the ER-Diagram as end is a keyword in h2
     @Column(nullable = false)
     private LocalDateTime endOfCompetition;
 
     @Column(nullable = false)
     private LocalDateTime beginOfCompetition;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(length = 8191)
     private String description;
 
     @Column(length = 4095)
@@ -57,23 +55,34 @@ public class Competition {
     @Column(nullable = true, length = 255)
     private String phone;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-        name = "competition_gradingGroup",
-        joinColumns = {@JoinColumn(referencedColumnName = "id")},
-        inverseJoinColumns = {@JoinColumn(referencedColumnName = "id")}
-    )
-    private Set<GradingGroup> competition;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "competition", fetch = FetchType.EAGER)
+    private Set<GradingGroup> gradingGroups;
 
-    //ToDO: cascadeType: delete
-    @ManyToOne(cascade = CascadeType.MERGE)
+    public Set<ApplicationUser> getJudges() {
+        return judges;
+    }
+
+    public void setJudges(Set<ApplicationUser> judges) {
+        this.judges = judges;
+    }
+
+    @ManyToOne()
     @JoinColumn(referencedColumnName = "id")
     private ApplicationUser creator;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "competition")
-    private Set<Judge> judges;
+    @ManyToMany(cascade = CascadeType.MERGE)
+    @JoinTable(
+        name = "Competition_Judge",
+        joinColumns = { @JoinColumn(name = "competition_id") },
+        inverseJoinColumns = { @JoinColumn(name = "judge_id") }
+    )
+    private Set<ApplicationUser> judges;
 
-    public Competition() {}
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "competition")
+    private Set<Judge> judgings;
+
+    public Competition() {
+    }
 
     public Competition(String name, LocalDateTime beginOfRegistration, LocalDateTime endOfRegistration,
                        LocalDateTime beginOfCompetition, LocalDateTime endOfCompetition, String description, String picturePath,
@@ -187,12 +196,12 @@ public class Competition {
         this.phone = phone;
     }
 
-    public Set<GradingGroup> getCompetition() {
-        return competition;
+    public Set<GradingGroup> getGradingGroups() {
+        return gradingGroups;
     }
 
-    public void setCompetition(Set<GradingGroup> competition) {
-        this.competition = competition;
+    public void setGradingGroups(Set<GradingGroup> competition) {
+        this.gradingGroups = competition;
     }
 
     public ApplicationUser getCreator() {
@@ -203,12 +212,12 @@ public class Competition {
         this.creator = creator;
     }
 
-    public Set<Judge> getJudges() {
-        return judges;
+    public Set<Judge> getJudgings() {
+        return judgings;
     }
 
-    public void setJudges(Set<Judge> judges) {
-        this.judges = judges;
+    public void setJudgings(Set<Judge> judges) {
+        this.judgings = judges;
     }
 
     @Override
@@ -225,8 +234,8 @@ public class Competition {
             + ", draft=" + draft
             + ", email='" + email + '\''
             + ", phone='" + phone + '\''
-            + ", competition=" + competition
-            + ", judges=" + judges
+            + ", competition=" + gradingGroups
+            + ", judges=" + judgings
             + '}';
     }
 }

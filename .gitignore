@@ -2,5 +2,5 @@
 log
 database
 frontend/frontend.iml
-frontend/package-lock.json
 **/.DS_Store
+backend.iml

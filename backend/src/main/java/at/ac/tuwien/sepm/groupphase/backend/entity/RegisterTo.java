@@ -1,23 +1,26 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.CascadeType;
 import java.io.Serializable;
 
 @Entity
 public class RegisterTo implements Serializable {
 
     @Id
-    @ManyToOne(cascade = CascadeType.ALL)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne()
     @JoinColumn(referencedColumnName = "id")
     private ApplicationUser participant;
 
-    @Id
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(referencedColumnName = "id")
     private GradingGroup gradingGroup;
 
@@ -27,7 +30,8 @@ public class RegisterTo implements Serializable {
     @Column(nullable = false)
     private Boolean accepted;
 
-    public RegisterTo() {}
+    public RegisterTo() {
+    }
 
     public RegisterTo(ApplicationUser participant, GradingGroup gradingGroup, Boolean accepted) {
         this.participant = participant;

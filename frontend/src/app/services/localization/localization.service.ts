@@ -1,6 +1,6 @@
-import { German } from './de';
-import { Englisch } from './en';
-import { LocalizationKeys, SupportedLanguages, ILanguage } from './language';
+import {German} from './de';
+import {Englisch} from './en';
+import {ILanguage, LocalizationKeys, SupportedLanguages} from './language';
 
 export class LocalizeService extends LocalizationKeys {
     private language: SupportedLanguages;
@@ -8,9 +8,9 @@ export class LocalizeService extends LocalizationKeys {
 
     constructor() {
         super();
-        const language = navigator.language;
+        //const language = navigator.language;
+        this.changeLanguageInternal('de-DE');
 
-        this.changeLanguageInternal(language);
     }
 
     public localize(key: string, ...params: any[]) {
@@ -37,6 +37,10 @@ export class LocalizeService extends LocalizationKeys {
         }
 
         this.changeLanguageInternal(newLanguage);
+    }
+
+    public getLanguage(): string {
+        return this.language;
     }
 
     private changeLanguageInternal(newLanguage: string) {

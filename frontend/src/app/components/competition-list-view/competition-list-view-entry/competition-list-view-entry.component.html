@@ -1,0 +1,44 @@
+<div style="background-color: aquamarine; border-radius: 8px;" class="whole-box">
+    <div class="name-box">
+        {{competition.name}}
+    </div>
+    <div style="display: flex;" class="competition-details">
+        <div class="info-entry">
+            <div class="info-entry-title">
+                {{localize.time}}
+            </div>
+            <div class="font-begin">
+                {{formatCompetitionDate(competition.beginOfCompetition)}}
+            </div>
+            <div class="font-end">
+                {{formatCompetitionDate(competition.endOfCompetition)}}
+            </div>
+        </div>
+        <div class="info-entry">
+            <div class="info-entry-title">
+                {{localize.registration}}
+            </div>
+            <div class="font-begin">
+                {{formatCompetitionDate(competition.beginOfRegistration)}}
+            </div>
+            <div class="font-end">
+                {{formatCompetitionDate(competition.endOfRegistration)}}
+            </div>
+        </div>
+        <div class="info-entry">
+            <div class="info-entry-title">
+                {{localize.contact}}
+            </div>
+            <div *ngIf="!competition.email && !competition.phone">-</div>
+            <div style="text-align: left; padding-left: 24%;">
+
+                <div class="overflowed-contact-entry" *ngIf="competition.email">
+                    email: {{competition.email}}
+                </div>
+                <div class="overflowed-contact-entry" *ngIf="competition.phone">
+                    {{localize.phoneNumber}}: {{competition.phone}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

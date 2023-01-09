@@ -1,0 +1,43 @@
+<app-error title="Wettkampffehler" [error]="error"></app-error>
+<main *ngIf="competition !== null">
+  <div class="hold-image">
+    <div class="turnier-image">
+      <img *ngIf="pictureEmpty()" src="../../../assets/turnier.jpg" alt="turnier bild">
+      <img *ngIf="!pictureEmpty()" [src]="competition.picturePath" alt="turnier bild">
+    </div>
+  </div>
+  <div class="scrollabove">
+    <app-error [error]="error"></app-error>
+
+    <app-competition-header [title]="competition.name" (register)="onRegister()" [isRegistered]="isRegisteredToCompetition" [canRegister]="canRegister"></app-competition-header>
+
+    <div class="spacer-2"></div>
+
+    <app-golden-ratio-container>
+      <app-content-card [title]="localize.datesAndContacts">
+        <div>
+          {{localize.registration}}:<br> <span class="c-ming">        {{formatDate(competition.beginOfRegistration)}}</span>
+          {{localize.until}}       <br> <span class="c-sizzling-red">{{formatDate(competition.endOfRegistration)}}</span> <br><br>
+          {{localize.competition}}:<br> <span class="c-ming">        {{formatDate(competition.beginOfCompetition)}}</span>
+          {{localize.until}}       <br> <span class="c-sizzling-red">{{formatDate(competition.endOfCompetition)}}</span> <br><br>
+
+          {{localize.contact}}:  <br> <span>{{competition.email}}</span>
+                    <br> <span>{{competition.phone}}</span> <br><br>
+        </div>
+      </app-content-card>
+
+      <app-content-card [title]="localize.description" >
+        <div>
+          {{competition.description}}
+        </div>
+      </app-content-card>
+
+      <div class="spacer-2"></div>
+
+    </app-golden-ratio-container>
+
+    <div class="spacer-2"></div>
+
+    <app-view-participants [participants]="participants"></app-view-participants>
+  </div>
+</main>

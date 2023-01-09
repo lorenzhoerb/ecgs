@@ -1,6 +1,14 @@
 <div class="header">
   <div class="heading">
-    <a routerLink="/"><h1>Stationary</h1></a>
+    <a routerLink="/">
+      <h1>ECGS</h1>
+    </a>
   </div>
-  <app-user></app-user>
+  <div class="flex">
+    <a (click)="showCreateMenu.emit()" *ngIf="this.authService.getUserRole() === 'TOURNAMENT_MANAGER' || this.authService.getUserRole() === 'CLUB_MANAGER'">
+      <mat-icon class="">add_box</mat-icon>
+      <mat-icon>expand_more</mat-icon>
+    </a>
+    <app-user (showMenu)="showMenu.emit()"></app-user>
+  </div>
 </div>

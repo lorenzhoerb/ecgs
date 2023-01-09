@@ -1,0 +1,13 @@
+<div class="main-menu">
+    <app-competition-list-view-filter 
+        (competitionSearchChange)="competitionSearchChange($event)">
+
+    </app-competition-list-view-filter>
+    
+    <app-competition-list-view-entry 
+        *ngFor="let competition of competitions" 
+        [competition]="competition"
+        [routerLink]="'/competition/' + competition.id"
+        >
+    </app-competition-list-view-entry>
+</div>

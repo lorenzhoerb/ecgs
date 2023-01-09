@@ -10,49 +10,54 @@
     <div class="col-md-6 mx-auto">
       <span class="anchor" id="formLogin"></span>
 
-      <div class="card rounded-0">
-        <div class="card-header">
-          <h3 class="mb-0">Login</h3>
-        </div>
-
+      <app-content-card [title]="localize.login">
         <div class="card-body">
           <form class="form" [formGroup]="loginForm" (ngSubmit)="loginUser()">
 
             <div class="form-group">
-              <label for="inputUsername">Username</label>
+              <label for="inputUsername">{{localize.username}}</label>
               <input type="text" name="username" formControlName="username" class="form-control" id="inputUsername"
-                     aria-describedby="usernameHelp" placeholder="Enter username">
+                aria-describedby="usernameHelp" [placeholder]="localize.enter(localize.username)">
               <div *ngIf="submitted && loginForm.controls.username.errors" class="error">
-                <small class="form-text text-warning" *ngIf="loginForm.controls.username.errors.required">Your username is
-                  required!
+                <small class="form-text text-warning" *ngIf="loginForm.controls.username.errors.required">
+                  {{localize.isRequired(localize.username)}}
                 </small>
               </div>
             </div>
 
             <div class="form-group">
-              <label for="password">Password</label>
-              <input type="password" name="password" formControlName="password" class="form-control" id="password"
-                     placeholder="Password">
+              <label for="password">{{localize.password}}</label>
+              <div class="relative-floating">
+                <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                <input [type]="hide ? 'password' : 'text'" name="password" formControlName="password" class="form-control" id="password"
+                [placeholder]="localize.enter(localize.password)">
+              </div>
               <div *ngIf="submitted && loginForm.controls.password.errors" class="error">
-                <small class="form-text text-warning" *ngIf="loginForm.controls.password.errors.required">Your password
-                  is
-                  required!
+                <small class="form-text text-warning" *ngIf="loginForm.controls.password.errors.required">
+                  {{localize.isRequired(localize.password)}}
                 </small>
                 <small class="form-text text-warning" *ngIf="loginForm.controls.password.errors.minlength">Your password
                   must be at least 8 characters long!
                 </small>
               </div>
             </div>
-
-            <button type="button" (click)="loginUser()" class="btn btn-success float-right">Login</button>
-
+            <div class="spacer"></div>
+            <div class="flex-end">
+              <div class="flex-space">
+                <a class="btn btn-secondary" routerLink="/register" aria-label="Register">
+                  <i class="bi bi-plus-lg"></i>
+                  {{localize.register}}
+                </a>
+                <a class="btn btn-secondary" routerLink="/forgot" aria-label="Forgot password">
+                  <i class="bi bi-plus-lg"></i>
+                  {{localize.forgotPassword}}
+                </a>
+              </div>
+              <button type="button" (click)="loginUser()" class="btn btn-success float-right">{{localize.login}}</button>
+            </div>
           </form>
         </div>
-        <a class="btn btn-secondary" routerLink="/register" aria-label="Register">
-          <i class="bi bi-plus-lg"></i>
-          Register
-        </a>
-      </div>
+      </app-content-card>
 
     </div>
   </div>

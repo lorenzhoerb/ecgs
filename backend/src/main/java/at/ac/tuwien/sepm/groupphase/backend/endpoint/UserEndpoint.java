@@ -21,13 +21,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
@@ -61,12 +62,12 @@ public class UserEndpoint {
     }
 
     @Secured({"ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER", "ROLE_PARTICIPANT"})
-    @GetMapping("/calendar/{year}/{weekNumber}")
-    public Set<CalenderViewCompetitionDto> getCompetitionsForCalender(@PathVariable int year, @PathVariable int weekNumber) {
-        logger.info("GET {}/calender/{}/{}", BASE_URI, year, weekNumber);
+    @GetMapping("/calendar")
+    public Set<CalenderViewCompetitionDto> getCompetitionsForCalender(@RequestParam int year, @RequestParam int weekNumber) {
+        logger.info("GET {}/calender?year={}&month={}", BASE_URI, year, weekNumber);
 
         return competitionMapper.competitionSetToCalenderViewCompetitionDtoSet(
-            userService.getCompetitionsForCalendar(sessionUtils.getSessionUser(), year, weekNumber)
+            userService.getCompetitionsForCalendar(year, weekNumber)
         );
     }
 

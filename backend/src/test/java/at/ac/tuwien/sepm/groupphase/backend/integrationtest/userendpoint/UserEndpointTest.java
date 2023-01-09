@@ -81,8 +81,8 @@ public class UserEndpointTest implements TestData {
     }
 
     @Test
-    public void competitionManagerDefaultCalendar() throws Exception {
-        MvcResult mvcResult = this.mockMvc.perform(get(BASE_CALENDAR_URI + String.format("/%d/%d", 2022, 38))
+    public void getCompetitionsForCalendar_expectsAllManagedCompetitionsRetrieved() throws Exception {
+        MvcResult mvcResult = this.mockMvc.perform(get(String.format("%s?year=%d&weekNumber=%d", BASE_CALENDAR_URI, 2022, 38))
             .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken("test@test.test", CALENDAR_TEST_ROLES))
         )
             .andDo(print())
@@ -106,8 +106,8 @@ public class UserEndpointTest implements TestData {
     }
 
     @Test
-    public void getCalendarForInvalidYear() throws Exception {
-        this.mockMvc.perform(get(BASE_CALENDAR_URI + String.format("/1800/%d", CURRENT_WEEK_NUMBER))
+    public void getCompetitionsForCalendar_withInvalidYear_expectsValidationExceptionThrown() throws Exception {
+        this.mockMvc.perform(get(String.format("%s?year=%d&weekNumber=%d", BASE_CALENDAR_URI, 1800, CURRENT_WEEK_NUMBER))
             .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken("test@test.test", CALENDAR_TEST_ROLES))
         )
             .andExpect(result -> assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus()))
@@ -118,8 +118,8 @@ public class UserEndpointTest implements TestData {
     }
 
     @Test
-    public void getCalendarForInvalidMonth() throws Exception {
-        this.mockMvc.perform(get(BASE_CALENDAR_URI + String.format("/%d/55", CURRENT_YEAR))
+    public void getCompetitionsForCalendar_withInvalidMonth_expectsValidationExceptionThrown() throws Exception {
+        this.mockMvc.perform(get(String.format("%s?year=%d&weekNumber=%d", BASE_CALENDAR_URI, CURRENT_YEAR, 55))
             .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken("test@test.test", CALENDAR_TEST_ROLES))
         )
             .andExpect(result -> assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus()))

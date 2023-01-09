@@ -1,8 +1,8 @@
 package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamMemberImportDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantSelfRegistrationDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamMemberImportDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserCredentialUpdateDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
@@ -171,7 +171,8 @@ public class CustomUserDetailService implements UserService {
     }
 
     @Override
-    public Set<Competition> getCompetitionsForCalendar(ApplicationUser user, int year, int weekNumber) {
+    public Set<Competition> getCompetitionsForCalendar(int year, int weekNumber) {
+        LOGGER.debug("getCompetitionsForCalendar(year={}, weekNumber={})", year, weekNumber);
         List<String> errors = new ArrayList<>();
         if (year < 2000) {
             errors.add("Year must be at least 2000");
@@ -183,6 +184,8 @@ public class CustomUserDetailService implements UserService {
             throw new ValidationListException("Invalid date requested", errors);
         }
 
+        ApplicationUser user = sessionUtils.getSessionUser();
+
         var firstMondayOfSelectedYear = LocalDateTime.of(year, 1, 1, 0, 0);
         while (!firstMondayOfSelectedYear.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
             firstMondayOfSelectedYear = firstMondayOfSelectedYear.plusDays(1);
@@ -191,12 +194,6 @@ public class CustomUserDetailService implements UserService {
             .plusWeeks(weekNumber - 1);
 
         final var endOfSelectedWeek = beginOfSelectedWeek.plusDays(7).minusSeconds(1);
-
-        Optional<ApplicationUser> userOptional = userRepository.findById(user.getId());
-        if (userOptional.isEmpty()) {
-            return null;
-        }
-        user = userOptional.get();
 
         var competitions = user.getCompetitions();
         if (competitions == null) {

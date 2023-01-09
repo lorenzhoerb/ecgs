@@ -161,11 +161,11 @@ public interface CompetitionGeneratorHelper {
             ));
             add(new SecurityUser(
                 "test2@test.test",
-                "$2a$10$dgJCPt2/G6wpP3lAZPw9oOuC9zufbyJLE6RfoCXvI/Ai0z9UXMmV."
+                "$2a$10$dgJCPt2/G6wpP3lAZPw9oOuC9zufbyJLE6RfoCXvI/Ai0z9UXMmV." //rootroot
             ));
             add(new SecurityUser(
                 "test3@test.test",
-                "$2a$10$dgJCPt2/G6wpP3lAZPw9oOuC9zufbyJLE6RfoCXvI/Ai0z9UXMmV."
+                "$2a$10$dgJCPt2/G6wpP3lAZPw9oOuC9zufbyJLE6RfoCXvI/Ai0z9UXMmV." //rootroot
             ));
         }
     };

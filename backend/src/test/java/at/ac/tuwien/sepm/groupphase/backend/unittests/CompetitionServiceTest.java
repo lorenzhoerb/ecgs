@@ -11,7 +11,12 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
-import at.ac.tuwien.sepm.groupphase.backend.repository.*;
+import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.GradingSystemRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.SecurityUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import at.ac.tuwien.sepm.groupphase.backend.service.impl.CustomUserDetailService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -30,9 +35,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -247,13 +250,10 @@ public class CompetitionServiceTest extends TestDataProvider {
         CompetitionDetailDto comp = getValidCompetitionDetailDto();
         comp.setGradingGroups(getValidGradingGroupDtos());
 
-
-        //TODO: fix this test case by including a gradingsystem
         CompetitionDetailDto result = competitionService.create(comp);
 
         assertNotNull(result);
         assertNotNull(result.getId());
-        //why not containing groups?
         GradingGroupDto[] groups = result.getGradingGroups();
         assertNotNull(groups);
         assertEquals(3, groups.length);

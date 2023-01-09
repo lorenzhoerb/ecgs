@@ -1,21 +1,21 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
-import at.ac.tuwien.sepm.groupphase.backend.entity.SecurityUser;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Date;
-import java.util.Objects;
 
 public class UserRegisterDto {
 
     @NotNull(message = "Email must not be null")
-    @Email
+    @Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,63}",
+        flags = Pattern.Flag.CASE_INSENSITIVE)
+    @NotEmpty(message = "Email must not be empty")
     private String email;
 
     @NotNull(message = "password must not be null")

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {ListError} from '../../dtos/list-error';
 
 @Component({

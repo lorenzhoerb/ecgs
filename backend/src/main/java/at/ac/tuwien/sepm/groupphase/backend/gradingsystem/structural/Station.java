@@ -1,6 +1,5 @@
 package at.ac.tuwien.sepm.groupphase.backend.gradingsystem.structural;
 
-import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Operation;
 import com.fasterxml.jackson.annotation.JsonProperty;

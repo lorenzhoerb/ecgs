@@ -1,10 +1,6 @@
 package at.ac.tuwien.sepm.groupphase.backend.config;
 
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtAuthorizationFilter;
-
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -16,6 +12,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Collections;
+import java.util.List;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)

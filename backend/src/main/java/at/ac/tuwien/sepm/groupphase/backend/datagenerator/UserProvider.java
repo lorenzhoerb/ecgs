@@ -3,7 +3,6 @@ package at.ac.tuwien.sepm.groupphase.backend.datagenerator;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;

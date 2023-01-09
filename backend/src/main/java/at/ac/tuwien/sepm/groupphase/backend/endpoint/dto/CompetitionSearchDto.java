@@ -1,7 +1,6 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 public class CompetitionSearchDto {
     private String name;

@@ -13,7 +13,6 @@ export class ClubManagerGuard implements CanActivate {
               private toastr: ToastrService) {}
 
   canActivate(): boolean {
-    console.log(this.authService.isLoggedIn());
     if (this.authService.isLoggedIn() &&
         (this.authService.getUserRole() === 'CLUB_MANAGER'
           || this.authService.getUserRole() === 'TOURNAMENT_MANAGER')) {

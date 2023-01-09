@@ -1,15 +1,10 @@
 package at.ac.tuwien.sepm.groupphase.backend.validation;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
-import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
-import java.util.function.Function;
 
 @Component
 public class ClubManagerTeamImportDtoValidator extends Validator<ClubManagerTeamImportDto> {

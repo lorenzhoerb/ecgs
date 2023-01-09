@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { CompetitionListViewFilterComponent } from './competition-list-view-filter.component';
+import {CompetitionListViewFilterComponent} from './competition-list-view-filter.component';
 
 describe('CompetitionListViewFilterComponent', () => {
   let component: CompetitionListViewFilterComponent;

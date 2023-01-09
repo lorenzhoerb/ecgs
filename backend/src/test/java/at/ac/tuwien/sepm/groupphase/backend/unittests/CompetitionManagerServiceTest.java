@@ -2,7 +2,6 @@ package at.ac.tuwien.sepm.groupphase.backend.unittests;
 
 import at.ac.tuwien.sepm.groupphase.backend.basetest.TestDataProvider;
 import at.ac.tuwien.sepm.groupphase.backend.datagenerator.CalendarViewDataGenerator;
-import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.help.CalendarViewHelp;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
@@ -15,8 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import javax.transaction.Transactional;
 
 import static at.ac.tuwien.sepm.groupphase.backend.help.CalendarViewHelp.CURRENT_WEEK_NUMBER;
 import static at.ac.tuwien.sepm.groupphase.backend.help.CalendarViewHelp.CURRENT_YEAR;
@@ -61,7 +58,6 @@ public class CompetitionManagerServiceTest extends TestDataProvider {
                 (t -> t.getEndOfCompetition().toLocalDate().toString()),
                 Competition::getDescription, Competition::getPicturePath, Competition::getPublic, Competition::getDraft,
                 Competition::getEmail, Competition::getPhone)
-            // @TODO: are the checking dates computed correctly because this competition is not in the given week
             .contains(CalendarViewHelp.generateTupleOfCompetition(CalendarViewDataGenerator.testCompetitions.get(0)))
             .contains(CalendarViewHelp.generateTupleOfCompetition(CalendarViewDataGenerator.testCompetitions.get(2)));
     }

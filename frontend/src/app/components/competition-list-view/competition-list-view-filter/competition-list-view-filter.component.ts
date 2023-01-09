@@ -1,8 +1,8 @@
-import { formatDate } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { debounceTime, Subject } from 'rxjs';
-import { CompetitionSearchDto } from 'src/app/dtos/competitionSearchDto';
-import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
+import {formatDate} from '@angular/common';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Subject} from 'rxjs';
+import {CompetitionSearchDto} from 'src/app/dtos/competitionSearchDto';
+import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
 
 @Component({
   selector: 'app-competition-list-view-filter',

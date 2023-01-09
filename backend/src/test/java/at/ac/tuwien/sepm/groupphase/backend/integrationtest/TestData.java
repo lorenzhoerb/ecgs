@@ -1,13 +1,12 @@
 package at.ac.tuwien.sepm.groupphase.backend.integrationtest;
 
-import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public interface TestData {
 
+    static final String TEST_USER_COMPETITION_MANAGER_EMAIL = "comp.manager@email.com";
 
     Long ID = 1L;
     String TEST_NEWS_TITLE = "Title";
@@ -27,6 +26,7 @@ public interface TestData {
 
     final String ACCOUNT_LOGIN_URI = BASE_URI + "/authentication";
 
+
     String ADMIN_USER = "admin@email.com";
     List<String> ADMIN_ROLES = new ArrayList<>() {
         {
@@ -45,6 +45,7 @@ public interface TestData {
             add("ROLE_PARTICIPANT");
         }
     };
+
 
 
 }

@@ -1,5 +1,5 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service' ;
+import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
 import {AuthService} from '../../services/auth.service';
 
 @Component({

@@ -3,7 +3,7 @@ import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {AuthService} from '../../services/auth.service';
 import {AuthRequest} from '../../dtos/auth-request';
-import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
+import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
 
 
 @Component({
@@ -51,10 +51,8 @@ export class LoginComponent implements OnInit {
    * @param authRequest authentication data from the user login form
    */
   authenticateUser(authRequest: AuthRequest) {
-    console.log('Try to authenticate user: ' + authRequest.email);
     this.authService.loginUser(authRequest).subscribe({
       next: () => {
-        console.log('Successfully logged in user: ' + authRequest.email);
         this.router.navigate(['/']);
       },
       error: error => {

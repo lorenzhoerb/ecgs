@@ -1,6 +1,6 @@
-import { German } from './de';
-import { Englisch } from './en';
-import { LocalizationKeys, SupportedLanguages, ILanguage } from './language';
+import {German} from './de';
+import {Englisch} from './en';
+import {ILanguage, LocalizationKeys, SupportedLanguages} from './language';
 
 export class LocalizeService extends LocalizationKeys {
     private language: SupportedLanguages;

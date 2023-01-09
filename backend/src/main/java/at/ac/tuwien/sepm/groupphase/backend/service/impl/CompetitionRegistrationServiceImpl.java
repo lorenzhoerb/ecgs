@@ -7,7 +7,6 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.GradingGroup;
 import at.ac.tuwien.sepm.groupphase.backend.entity.RegisterTo;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
-import at.ac.tuwien.sepm.groupphase.backend.exception.UnauthorizedException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
@@ -97,7 +96,7 @@ public class CompetitionRegistrationServiceImpl implements CompetitionRegistrati
         LOGGER.debug("registerToOrElseFetch({}, {}, {})", competition, user, group);
         return registerToRepository
             .findByGradingGroupCompetitionIdAndParticipantId(competition.getId(), user.getId())
-            .orElseGet(() -> registerToRepository.save(new RegisterTo(user, group, true))); //TODO: set accepted to false
+            .orElseGet(() -> registerToRepository.save(new RegisterTo(user, group, false)));
     }
 
     private GradingGroup getPreferenceOrDefaultGradingGroup(Long competitionId, Long groupPreference) {

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {CanActivate, Router} from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
+import {ToastrService} from 'ngx-toastr';
 import {AuthService} from '../services/auth.service';
 
 @Injectable({
@@ -13,7 +13,6 @@ export class TournamentManagerGuard implements CanActivate {
               private router: Router) {}
 
   canActivate(): boolean {
-    console.log(this.authService.isLoggedIn());
     if (this.authService.isLoggedIn() && this.authService.getUserRole() === 'TOURNAMENT_MANAGER') {
       return true;
     } else {

@@ -9,6 +9,7 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
+import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,11 +23,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -70,8 +68,8 @@ public class AccountEndpointTest implements TestData {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
-    private ApplicationUser user;
+    @Autowired
+    private SessionUtils sessionUtils;
 
 
     @BeforeEach
@@ -224,13 +222,24 @@ public class AccountEndpointTest implements TestData {
 
         assertEquals(HttpStatus.CREATED.value(), response.getStatus());
 
+        UserLoginDto userLoginDto = UserLoginDto.UserLoginDtoBuilder.anUserLoginDto().withEmail(userRegisterDto.getEmail()).withPassword(userRegisterDto.getPassword()).build();
+
+        body = objectMapper.writeValueAsString(userLoginDto);
+
+        mvcResult = mockMvc.perform(post(ACCOUNT_LOGIN_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+            .andDo(print())
+            .andReturn();
+        response = mvcResult.getResponse();
+
         UserCredentialUpdateDto userCredentialUpdateDto = new UserCredentialUpdateDto();
         userCredentialUpdateDto.setPassword("pass1234!");
         userCredentialUpdateDto.setEmail("hans.meyer@gmail.com");
 
         body = objectMapper.writeValueAsString(userCredentialUpdateDto);
         mvcResult = mockMvc.perform(post(ACCOUNT_CHANGE_PASSWORD_URI)
-                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES))
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken("hans.meyer@gmail.com", ADMIN_ROLES))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body))
             .andDo(print())

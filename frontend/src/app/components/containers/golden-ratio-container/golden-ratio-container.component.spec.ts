@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { GoldenRatioContainerComponent } from './golden-ratio-container.component';
+import {GoldenRatioContainerComponent} from './golden-ratio-container.component';
 
 describe('GoldenRatioContainerComponent', () => {
   let component: GoldenRatioContainerComponent;

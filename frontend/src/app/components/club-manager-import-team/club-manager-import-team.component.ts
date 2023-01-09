@@ -1,9 +1,9 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { NgxCsvParser, NgxCSVParserError } from 'ngx-csv-parser';
-import { ToastrService } from 'ngx-toastr';
-import { ClubManagerTeamImportDto, ClubManagerTeamMemberImportDto } from 'src/app/dtos/club-manager-team';
-import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
-import { UserService } from 'src/app/services/user.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {NgxCsvParser, NgxCSVParserError} from 'ngx-csv-parser';
+import {ToastrService} from 'ngx-toastr';
+import {ClubManagerTeamImportDto, ClubManagerTeamMemberImportDto} from 'src/app/dtos/club-manager-team';
+import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
+import {UserService} from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-club-manager-import-team',
@@ -87,21 +87,11 @@ export class ClubManagerImportTeamComponent implements OnInit {
   }
 
   public onFileSelect(event: any): void {
-    console.log(123123);
     const file: File = event.target.files[0];
 
     this.ngxCsvParser.parse(file, { header: true, delimiter: ',', encoding: 'utf8' })
       .pipe().subscribe({
         next: (result: ClubManagerTeamMemberImportDto[]): void => {
-          // TODO: Can we trust result? What if some error happens that error: ()... does not
-          // catch??? Because by default `result = any[] | NgxCSVParserError`
-          // MAYBE/TODO: csv parse case insensitive.
-          // this.teamMembers = result.map(function(teamMember) {
-          //   ClubManagerImportTeamComponent.csvHeaders.forEach(header => {
-          //     teamMember[Object.keys(teamMember).find(key => key.toLowerCase() === header.toLowerCase)]
-          //   });
-          // });
-          // this.teamMembers = [...result, ...this.teamMembers];
           this.teamMembers = result;
           this.notificiation.success(`Imported ${result.length} members.`);
         },
@@ -123,7 +113,8 @@ export class ClubManagerImportTeamComponent implements OnInit {
     this.userService.importTeam(team).subscribe(
       {
         next: (resp) => {
-          this.notificiation.success(resp.message);
+          this.notificiation.success(`Team ${this.teamName} received ${resp.newParticipantsCount} new
+          participants (${resp.oldParticipantsCount} were already present/duplicates)`);
         },
         error: (err) => {
           console.log(err);

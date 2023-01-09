@@ -2,9 +2,9 @@ import {Component, OnInit} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../services/auth.service';
 import {Router} from '@angular/router';
-import {AuthRequest, RegisterRequest} from '../../dtos/auth-request';
+import {RegisterRequest} from '../../dtos/auth-request';
 import {ToastrService} from 'ngx-toastr';
-import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
+import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
 
 @Component({
   selector: 'app-register',
@@ -61,10 +61,8 @@ export class RegisterComponent implements OnInit {
    * @param registerRequest register data from the user register form
    */
   sendUserRegistration(registerRequest: RegisterRequest) {
-    console.log('RegisterRequest gets send', registerRequest);
     this.authService.registerUser(registerRequest).subscribe({
       next: () => {
-        console.log('Successfully registered');
         this.notification.success('Successfully registered!');
         this.router.navigate(['/login']);
       },

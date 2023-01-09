@@ -25,6 +25,8 @@ public class CompetitionDetailDto {
     @Size(max = 4095)
     @NotBlank(message = "Name must be given")
     private String name;
+
+    @Size(max = 8191)
     private String description;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -52,7 +54,8 @@ public class CompetitionDetailDto {
     @NotNull(message = "draft must be given")
     private boolean draft;
 
-    @Email(message = "Invalid email")
+    @Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,63}",
+        flags = Pattern.Flag.CASE_INSENSITIVE)
     private String email;
 
     @Pattern(regexp = "^[\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6}$", message = "Invalid phone number")

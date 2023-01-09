@@ -19,20 +19,9 @@ public class SessionUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final ApplicationUserRepository applicationUserRepository;
-    private String dummyUserEmail;
 
     public SessionUtils(ApplicationUserRepository applicationUserRepository) {
         this.applicationUserRepository = applicationUserRepository;
-    }
-
-    /**
-     * Only to be used in DataGenerator.java and tests.
-     *
-     * @param email Email of dummy user
-     */
-    public void setSessionUserEmail(String email) {
-        LOGGER.debug("setSessionUserEmail {}", email);
-        this.dummyUserEmail = email;
     }
 
     private Object getSessionUserDetails() {
@@ -45,10 +34,6 @@ public class SessionUtils {
 
     private String getSessionUserEmail() {
         LOGGER.debug("getSessionUserEmail");
-        if (dummyUserEmail != null) {
-            return this.dummyUserEmail;
-        }
-
         Object user = this.getSessionUserDetails();
         if (user instanceof UserDetails) {
             return ((UserDetails) user).getUsername();

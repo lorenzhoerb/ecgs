@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import {CompetitionComponent} from './competition.component';
 import {HttpClientTestingModule} from '@angular/common/http/testing';

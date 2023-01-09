@@ -2,14 +2,11 @@ package at.ac.tuwien.sepm.groupphase.backend.validation;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
-import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import org.springframework.stereotype.Component;
 
-import javax.validation.ConstraintViolation;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 @Component
 public class RegistrationValidator extends Validator<UserRegisterDto> {
@@ -23,7 +20,6 @@ public class RegistrationValidator extends Validator<UserRegisterDto> {
         validateEnums(toValidate);
     }
 
-    //TODO SHOW IN RESPONSE
     private void validateEnums(UserRegisterDto toValidate) {
         List<String> errMsgs = new LinkedList<>();
         if (toValidate.getType() == null) {

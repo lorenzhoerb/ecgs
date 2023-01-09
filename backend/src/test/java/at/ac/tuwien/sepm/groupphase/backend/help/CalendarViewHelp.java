@@ -1,9 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.help;
 
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
-import org.junit.jupiter.api.BeforeEach;
 
-import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.temporal.WeekFields;
 import java.util.Locale;

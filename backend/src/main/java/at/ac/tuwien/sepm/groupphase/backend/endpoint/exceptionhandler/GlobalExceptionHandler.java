@@ -12,11 +12,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -123,5 +122,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         LOGGER.info("Terminating request processing with status 403 due to {}: {}", e.getClass().getSimpleName(), e.getMessage());
         return handleExceptionInternal(e, new ErrorListRestDto("Forbidden",
             List.of(e.getMessage())), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
+    }
+
+    /**
+     * Handles UsernameNotFound Exception.
+     */
+    @ExceptionHandler(value = {UsernameNotFoundException.class})
+    public ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException e, WebRequest request) {
+        LOGGER.info("Terminating request processing with status 401 due to {}: {}", e.getClass().getSimpleName(), e.getMessage());
+        return handleExceptionInternal(e, new ErrorListRestDto("Unauthorized",
+            List.of(e.getMessage())), new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
     }
 }

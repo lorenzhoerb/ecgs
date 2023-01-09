@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { CreateCompetitionComponent } from './create-competition.component';
+import {CreateCompetitionComponent} from './create-competition.component';
 
 describe('CreateCompetitionComponent', () => {
   let component: CreateCompetitionComponent;

@@ -1,6 +1,5 @@
 package at.ac.tuwien.sepm.groupphase.backend.validation;
 
-import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

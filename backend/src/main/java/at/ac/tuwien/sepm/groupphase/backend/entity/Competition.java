@@ -1,19 +1,17 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Column;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.ManyToMany;
 import javax.persistence.JoinTable;
-import javax.persistence.CascadeType;
-import javax.transaction.Transactional;
-
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -27,21 +25,19 @@ public class Competition {
     @Column(nullable = false, length = 4095)
     private String name;
 
-    // @TODO: change name in the ER-Diagram to match end
     @Column(nullable = false)
     private LocalDateTime beginOfRegistration;
 
     @Column(nullable = false)
     private LocalDateTime endOfRegistration;
 
-    // @TODO: change name in the ER-Diagram as end is a keyword in h2
     @Column(nullable = false)
     private LocalDateTime endOfCompetition;
 
     @Column(nullable = false)
     private LocalDateTime beginOfCompetition;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(length = 8191)
     private String description;
 
     @Column(length = 4095)
@@ -70,7 +66,6 @@ public class Competition {
         this.judges = judges;
     }
 
-    //ToDO: cascadeType: delete
     @ManyToOne()
     @JoinColumn(referencedColumnName = "id")
     private ApplicationUser creator;

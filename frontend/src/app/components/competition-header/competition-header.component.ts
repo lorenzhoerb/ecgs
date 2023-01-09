@@ -1,7 +1,5 @@
 import {AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service' ;
-import {RegisterModalComponent} from '../competition/register-modal/register-modal.component';
-import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
 
 @Component({
   selector: 'app-competition-header',

@@ -1,5 +1,14 @@
 package at.ac.tuwien.sepm.groupphase.backend.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
@@ -8,15 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * ServletFilter to log every request.

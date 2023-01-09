@@ -102,6 +102,11 @@ p {
     margin-bottom: 4px;
 }
 
+.remove-holder {
+    position: relative;
+    height: 0;
+}
+
 .items.empty.borcol {
     border: 3px dashed var(--space-cadet);
 }
@@ -130,13 +135,13 @@ p {
 }
 
 .symbol {
-    position: relative;
+    //position: relative;
 }
 
 .remove-btn {
     position: absolute;
-    top: -0.5rem;
-    right: -0.5rem;
+    top: -0.75rem;
+    right: -0.75rem;
     border-radius: 50%;
     width: 1em;
     height: 1em;
@@ -147,7 +152,7 @@ p {
     display: none;
 }
 
-.symbol:hover > .remove-btn {
+.symbol:hover .remove-btn {
     display: block;
 }
 

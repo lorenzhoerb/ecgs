@@ -6,12 +6,9 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
-import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.SecurityUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
-import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import at.ac.tuwien.sepm.groupphase.backend.service.impl.CustomUserDetailService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,14 +18,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest

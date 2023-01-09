@@ -2,10 +2,9 @@ package at.ac.tuwien.sepm.groupphase.backend.integrationtest.userendpoint;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.UserEndpoint;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
-import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public interface TestData extends at.ac.tuwien.sepm.groupphase.backend.integrationtest.TestData {
     String BASE_CALENDAR_URI = UserEndpoint.BASE_URI + "/calendar";

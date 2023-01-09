@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
@@ -98,20 +97,5 @@ public class SessionUtilsTest extends TestDataProvider {
         assertFalse(sessionUtils.isCompetitionManager());
         assertFalse(sessionUtils.isClubManager());
         assertFalse(sessionUtils.isParticipant());
-    }
-
-    @Test
-    public void testSetSessionUserEmail() {
-        sessionUtils.setSessionUserEmail(TEST_USER_COMPETITION_MANAGER_EMAIL);
-        UserRegisterDto userRegisterDto = getValidRegistrationDtoForCompetitionManager();
-        setUpCompetitionUser();
-        assertAll(
-            () -> assertNotNull(sessionUtils.getSessionUser()),
-            () -> assertEquals(ApplicationUser.Role.TOURNAMENT_MANAGER, sessionUtils.getApplicationUserRole()),
-            () -> assertEquals(sessionUtils.getSessionUser().getFirstName(), userRegisterDto.getFirstName()),
-            () -> assertEquals(sessionUtils.getSessionUser().getLastName(), userRegisterDto.getLastName()),
-            () -> assertEquals(sessionUtils.getSessionUser().getUser().getEmail(), userRegisterDto.getEmail())
-        );
-        sessionUtils.setSessionUserEmail(null);
     }
 }

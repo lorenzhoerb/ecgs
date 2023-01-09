@@ -1,16 +1,15 @@
 import {ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren} from '@angular/core';
-import {AbstractControl, FormControl, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
+import {AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {UserService} from '../../../services/user.service';
 import {CompetitionService} from '../../../services/competition.service';
 import {CompetitionDetail} from '../../../dtos/competition-detail';
 import {ListError} from '../../../dtos/list-error';
-import { GradingGroupDetail } from 'src/app/dtos/gradingGroupDetail';
-import { cloneDeep } from 'lodash';
-import { ToastrService } from 'ngx-toastr';
+import {cloneDeep} from 'lodash';
+import {ToastrService} from 'ngx-toastr';
 import {UserDetail} from '../../../dtos/user-detail';
 import {of} from 'rxjs';
-import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
+import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
 
 @Component({
   selector: 'app-create-competition',
@@ -158,7 +157,6 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
         next: value => {
           this.toastr.success('Turnier erfolgreich erstellt!');
           this.router.navigate(['/competition',value.id]);
-          //ToDO: Integrate with dashboard
         },
         error: err => {
           console.log(err.error.errors);

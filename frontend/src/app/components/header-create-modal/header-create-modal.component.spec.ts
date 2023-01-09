@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { HeaderCreateModalComponent } from './header-create-modal.component';
+import {HeaderCreateModalComponent} from './header-create-modal.component';
 
 describe('HeaderModalComponent', () => {
   let component: HeaderCreateModalComponent;

@@ -21,6 +21,8 @@ export class Englisch implements ILanguage {
     forgotPassword: 'Forgot Password',
     sendResetLink: 'Send reset link',
 
+    edit: 'Edit',
+
     datesAndContacts: 'Dates & Contacts',
     description: 'Description',
     until: 'until',

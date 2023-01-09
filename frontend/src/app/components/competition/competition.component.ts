@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {CompetitionService} from '../../services/competition.service';
 import {Competition} from '../../dtos/competition';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {SupportedLanguages} from '../../services/localization/language';
 import LocalizationService, {LocalizeService} from '../../services/localization/localization.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -25,8 +25,10 @@ export class CompetitionComponent implements OnInit {
   canRegister = false;
   participants: UserDetail[];
   groups: SimpleGradingGroup[];
+  isCreator = false;
 
   constructor(private service: CompetitionService,
+              private router: Router,
               private route: ActivatedRoute,
               private modalService: NgbModal,
               private userService: UserService,
@@ -59,6 +61,12 @@ export class CompetitionComponent implements OnInit {
           },
           error: error => {
             this.toastr.error(error, 'Error fetching competition information');
+          }
+        });
+
+        this.service.getCompetitionByIdDetail(this.id).subscribe({
+          next: () => {
+            this.isCreator = true;
           }
         });
       }
@@ -105,6 +113,9 @@ export class CompetitionComponent implements OnInit {
     });
   }
 
+  onEdit() {
+    this.router.navigate(['/competition/edit', this.id]);
+  }
 
   fetchParticipants() {
     this.service.getParticipants(this.id).subscribe({

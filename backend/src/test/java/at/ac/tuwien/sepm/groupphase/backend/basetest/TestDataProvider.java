@@ -4,6 +4,7 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingSystemDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
@@ -31,6 +32,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
@@ -130,6 +132,24 @@ public abstract class TestDataProvider {
     }
 
 
+    protected void setUpCompetitionUserWithEMail(String email) {
+        String password = "12345678";
+
+        UserRegisterDto userRegisterDto = new UserRegisterDto(
+            email,
+            password,
+            "firstNameTest",
+            "lastNameTest",
+            ApplicationUser.Gender.FEMALE,
+            new Date(),
+            ApplicationUser.Role.TOURNAMENT_MANAGER);
+
+        customUserDetailService.registerUser(userRegisterDto);
+        UserLoginDto userLoginDto = new UserLoginDto();
+        userLoginDto.setPassword(password);
+        userLoginDto.setEmail(email);
+        customUserDetailService.login(userLoginDto);
+    }
 
     protected void setUpCompetitionUser() {
         customUserDetailService.registerUser(getValidRegistrationDtoForCompetitionManager());

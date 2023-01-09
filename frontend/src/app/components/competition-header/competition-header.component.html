@@ -4,6 +4,9 @@
     <button class="secondary-btn flex-center align-items-center" style="gap: 4px;" [disabled]="isRegistered" (click)="onRegisterClick()" *ngIf="canRegister">
       <mat-icon *ngIf="isRegistered">done</mat-icon>{{isRegistered ? localize.registered : localize.register}}
     </button>
+    <button class="secondary-btn flex-center align-items-center" style="gap: 4px;" (click)="onEditClick()" *ngIf="canEdit">
+      {{localize.edit}}
+    </button>
 </div>
 
 <div #header id="header" class="turnier-header" *ngIf="isEdit">

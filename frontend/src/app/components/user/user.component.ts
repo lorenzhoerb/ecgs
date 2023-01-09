@@ -14,7 +14,7 @@ export class UserComponent implements OnInit {
   @Output() showMenu = new EventEmitter();
   public loggedIn = false;
   public user?: UserInfoDto;
-
+  public language: string;
 
   constructor(public authService: AuthService, public userService: UserService, private router: Router) { }
 
@@ -23,6 +23,7 @@ export class UserComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.language = this.localize.getLanguage();
     this.loggedIn = this.authService.isLoggedIn();
     if(this.loggedIn) {
       this.userService.getUserInfo().subscribe({

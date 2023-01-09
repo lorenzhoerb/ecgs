@@ -24,6 +24,8 @@ export class LocalizationKeys {
   forgotPassword: string;
   sendResetLink: string;
 
+  edit: string;
+
   datesAndContacts: string;
   description: string;
   until: string;

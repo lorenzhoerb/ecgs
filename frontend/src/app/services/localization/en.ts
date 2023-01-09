@@ -47,7 +47,17 @@ export class Englisch implements ILanguage {
 
     logout: 'Logout',
     importCSV: 'New Team Members',
+    member: 'Member',
+    clearAll: 'Clear all',
+    genderMan: 'Man',
+    genderWoman: 'Woman',
+    genderOther: 'Other',
+    importCSVButton: 'Import as CSV',
+    exportCSVButton: 'Export as CSV',
+    teamName: 'Team name',
+    page: 'Page',
     createTournament: 'New Competition',
+
 
     username: 'Username / Email',
     firstname: 'Firstname',

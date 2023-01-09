@@ -28,12 +28,13 @@ export class CompetitionListViewComponent implements OnInit {
           this.competitions = data;
         },
         error: (err) => {
-          console.log(err);
-          if (err.status === 401 || err.status === 403) {
+          if (err.status === 0) {
+            this.notification.error('Could not reach server', 'Connection error');
+          } else if (err.status === 401 || err.status === 403) {
             this.notification.error('Unauthenticated!', 'Error');
-            return;
+          } else {
+            this.notification.error(err.message, 'Error');
           }
-          this.notification.error(err.message, 'Error');
         }
       }
     );

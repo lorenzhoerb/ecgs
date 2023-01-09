@@ -215,10 +215,11 @@ public class CustomUserDetailService implements UserService {
     }
 
     @Override
-    public ClubManagerTeamImportResults importTeam(ApplicationUser clubManager, ClubManagerTeamImportDto clubManagerTeamImportDto) {
+    public ClubManagerTeamImportResults importTeam(ClubManagerTeamImportDto clubManagerTeamImportDto) {
         if (clubManagerTeamImportDto == null) {
             throw new ValidationException("Team is empty!");
         }
+        ApplicationUser clubManager = sessionUtils.getSessionUser();
 
         int addedParticipants = 0;
         int alreadyManagedParticipants = 0;
@@ -233,8 +234,10 @@ public class CustomUserDetailService implements UserService {
             Optional<ApplicationUser> existingParticipantOpt = userRepository.findApplicationUserByUserEmail(clubManagerTeamMemberImportDto.email());
             if (existingParticipantOpt.isPresent()) {
                 teamMember = existingParticipantOpt.get();
-                if (managedByRepository.findByManagerAndMember(clubManager, teamMember).isPresent()) {
+                var foundManagedBy = managedByRepository.findByManagerAndMember(clubManager, teamMember);
+                if (foundManagedBy.isPresent()) {
                     alreadyManagedParticipants++;
+                    foundManagedBy.get().setTeamName(clubManagerTeamImportDto.teamName());
                     continue;
                 }
             } else {

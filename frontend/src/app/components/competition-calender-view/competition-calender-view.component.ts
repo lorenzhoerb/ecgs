@@ -4,6 +4,7 @@ import {formatDate} from '@angular/common';
 import {ExtendedWeekInfo, WeekInfo} from 'src/app/interfaces/CompetitionCalendarView/WeekInfo';
 import {UserService} from 'src/app/services/user.service';
 import {ToastrService} from 'ngx-toastr';
+import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
 
 @Component({
   selector: 'app-competition-calender-view',
@@ -25,6 +26,11 @@ export class CompetitionCalenderViewComponent implements OnInit {
     private userService: UserService,
     private notification: ToastrService
   ) { }
+
+  public get localize(): LocalizeService {
+    return LocalizationService;
+  }
+
 
   ngOnInit(): void {
     this.setupDefaultSelectedWeekInfo();
@@ -58,7 +64,7 @@ export class CompetitionCalenderViewComponent implements OnInit {
     const dayToShow = new Date(this.selectedExtendedWeekInfo.start);
     dayToShow.setDate(dayToShow.getDate() + dayNumber - 1);
 
-    return formatDate(dayToShow, 'EEE\ndd.MM', 'en-US').toString();
+    return formatDate(dayToShow, 'EEE\ndd.MM', this.localize.getLanguage()).toString();
   }
 
   onWeekPickerChange(week: string) {

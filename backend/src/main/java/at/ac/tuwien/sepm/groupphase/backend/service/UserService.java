@@ -105,7 +105,7 @@ public interface UserService extends UserDetailsService {
      * @param weekNumber the week number of @param{year} to fetch calendar for
      * @return set of competitions attached to user for that @param{year} and @param{weekNumber}
      */
-    Set<Competition> getCompetitionsForCalendar(ApplicationUser competitionManager, int year, int weekNumber);
+    Set<Competition> getCompetitionsForCalendar(int year, int weekNumber);
 
     /**
      * Import a team as a club manager.

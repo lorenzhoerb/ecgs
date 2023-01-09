@@ -19,7 +19,11 @@ export class UserService {
   }
 
   public getCompetitionsForCalender(year: number, weekNumber: number): Observable<CalendarViewCompetition[]> {
-    return this.httpClient.get<CalendarViewCompetition[]>(`${this.userBaseUri}/calendar/${year}/${weekNumber}`);
+    const params = new HttpParams()
+    .set('year', year)
+    .set('weekNumber', weekNumber);
+
+    return this.httpClient.get<CalendarViewCompetition[]>(`${this.userBaseUri}/calendar`, {params});
   }
 
   public importTeam(clubManagerTeam: ClubManagerTeamImportDto): Observable<ClubManagerTeamImportResults> {

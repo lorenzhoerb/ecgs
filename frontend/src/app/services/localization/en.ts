@@ -47,6 +47,7 @@ export class Englisch implements ILanguage {
 
     logout: 'Logout',
     importCSV: 'New Team Members',
+    page: 'Page',
     member: 'Member',
     clearAll: 'Clear all',
     genderMan: 'Man',
@@ -55,7 +56,6 @@ export class Englisch implements ILanguage {
     importCSVButton: 'Import as CSV',
     exportCSVButton: 'Export as CSV',
     teamName: 'Team name',
-    page: 'Page',
     createTournament: 'New Competition',
 
 

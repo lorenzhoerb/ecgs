@@ -50,11 +50,11 @@ export class LocalizationKeys {
 
   logout: string;
   importCSV: string;
+  page: string;
   exportCSVButton: string;
   teamName: string;
   member: string;
   importCSVButton: string;
-  page: string;
   clearAll: string;
   genderMan: string;
   genderWoman: string;

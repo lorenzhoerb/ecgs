@@ -80,7 +80,7 @@ public class ApplicationUser {
     public ApplicationUser() {
     }
 
-    @ManyToMany(cascade = CascadeType.MERGE, mappedBy = "judges")
+    @ManyToMany(cascade = {}, mappedBy = "judges")
     private Set<Competition> judging;
 
     public ApplicationUser(Role type, String firstName, String lastName, Gender gender,

@@ -28,6 +28,7 @@ public class UserRegisterDto {
 
     @Size(min = 2, max = 32, message = "lastName must be between 2 and 32 characters long")
     @Pattern(regexp = "^[a-zA-Z_.\\-]+$", message = "lastName can only contain letters and .-_ ")
+
     private String lastName;
 
     @NotNull(message = "Gender must not be null")

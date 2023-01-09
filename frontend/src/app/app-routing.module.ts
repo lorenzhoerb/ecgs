@@ -29,7 +29,8 @@ const routbuilding: Routes = [
   {path: 'competition', children:[
       {path: 'list', component: CompetitionListViewComponent},
       {path: 'create', canActivate: [TournamentManagerGuard], component: CreateCompetitionComponent},
-      {path: ':id', component: CompetitionComponent}
+      {path: ':id', component: CompetitionComponent},
+      {path: 'edit/:id', canActivate: [TournamentManagerGuard], component: CreateCompetitionComponent}
     ]
   },
   {path: 'user', children: [

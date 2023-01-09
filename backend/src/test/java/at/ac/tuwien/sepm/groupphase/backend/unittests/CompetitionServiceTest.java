@@ -1,11 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.unittests;
 
 import at.ac.tuwien.sepm.groupphase.backend.basetest.TestDataProvider;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.*;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
@@ -228,12 +224,13 @@ public class CompetitionServiceTest extends TestDataProvider {
         });
     }
 
+    @Test
     public void findExistingCompetitionById() {
         competitionRepository.save(competition);
-        Competition result = competitionService.findOne(competition.getId());
+        CompetitionViewDto result = competitionService.findOne(competition.getId());
 
         assertNotNull(result);
-        assertNotNull(result.getId());
+        assertNotNull(result.id());
     }
 
     @Test

@@ -1,6 +1,6 @@
 import {ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren} from '@angular/core';
-import {AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
-import {Router} from '@angular/router';
+import {AbstractControl, FormControl, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
+import {ActivatedRoute, Router} from '@angular/router';
 import {UserService} from '../../../services/user.service';
 import {CompetitionService} from '../../../services/competition.service';
 import {CompetitionDetail} from '../../../dtos/competition-detail';
@@ -20,6 +20,7 @@ export class CreateCompetitionComponent implements OnInit {
 
   @ViewChildren('inputVariables') inputVariables: QueryList<ElementRef>;
 
+  id: number = null;
   gradingGroups: any[] = [];
   judges: UserDetail[] = [];
   currentJudge: UserDetail;
@@ -38,10 +39,12 @@ export class CreateCompetitionComponent implements OnInit {
   constructor(
     private formBuilder: UntypedFormBuilder,
     private router: Router,
+    private route: ActivatedRoute,
     private toastr: ToastrService,
     private changeDetectorRef: ChangeDetectorRef,
     private competitionService: CompetitionService,
     private userService: UserService) {
+
     this.competitionForm = this.formBuilder.group({
       name: ['', [Validators.required]],
       description: ['', []],
@@ -61,6 +64,65 @@ export class CreateCompetitionComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.route.params.subscribe(params => {
+      if(params.id) {
+        this.id = parseInt(params.id, 10);
+
+        this.competitionService.getCompetitionByIdDetail(this.id).subscribe({
+          next: data => {
+            this.competitionForm.controls['name'].setValue(data.name);
+            this.competitionForm.controls['description'].setValue(data.description);
+            this.competitionForm.controls['email'].setValue(data.email);
+            this.competitionForm.controls['phone'].setValue(data.phone);
+            this.competitionForm.controls['beginOfRegistration'].setValue(this.formatDate(data.beginOfRegistration));
+            this.competitionForm.controls['endOfRegistration'].setValue(this.formatDate(data.endOfRegistration));
+            this.competitionForm.controls['beginOfCompetition'].setValue(this.formatDate(data.beginOfCompetition));
+            this.competitionForm.controls['endOfCompetition'].setValue(this.formatDate(data.endOfCompetition));
+            this.competitionForm.controls['public'].setValue(data.public ? 'TRUE' : 'FALSE');
+            this.competitionForm.controls['draft'].setValue(data.draft ? 'TRUE' : 'FALSE');
+
+            if(data.gradingGroups !== null && data.gradingGroups !== undefined) {
+              this.gradingGroups = data.gradingGroups;
+
+              for(const gradingGroup of this.gradingGroups) {
+                const gradingSystem = JSON.parse(gradingGroup.gradingSystemDto.formula);
+                gradingGroup.stations = gradingSystem.stations.map(station => ({
+                    title: station.displayName,
+                    variables: station.variables.map(variable => ({
+                      name: variable.displayName,
+                      type: 'variable',
+                      typeHint: 'variableRef',
+                      value: variable.id
+                    })),
+                    formula: {
+                      valid: true,
+                      data: station.formula
+                    }
+                }));
+                gradingGroup.formula = ({
+                  valid: true,
+                  data: gradingSystem.formula
+                });
+                gradingGroup.stationVariables = gradingSystem.stations.map(station => ({
+                  name: station.displayName,
+                  value: station.id,
+                  type: 'variable',
+                  typeHint: 'variableRef'
+                }));
+              }
+            }
+
+            if(data.judges !== null && data.judges !== undefined) {
+              this.judges = data.judges;
+            }
+          },
+          error: error => {
+            console.error('Error fetching competition information', error);
+            this.toastr.error('Der Wettkampf den Sie bearbeiten wollen wurde nicht gefunden.', 'Wettkampf nicht gefunden');
+          }
+        });
+      }
+    });
   }
 
   createCompetition() {
@@ -116,6 +178,9 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
 
     const competition = new CompetitionDetail();
     Object.assign(competition, this.competitionForm.value);
+    if(this.id !== null) {
+      competition.id = this.id;
+    }
     if (competition.phone === '') {
       competition.phone = null;
     }
@@ -155,7 +220,11 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
     this.competitionService.createCompetition(competition)
       .subscribe({
         next: value => {
-          this.toastr.success('Turnier erfolgreich erstellt!');
+          if(this.id !== null) {
+            this.toastr.success('Turnier erfolgreich bearbeitet!');
+          } else {
+            this.toastr.success('Turnier erfolgreich erstellt!');
+          }
           this.router.navigate(['/competition',value.id]);
         },
         error: err => {
@@ -300,6 +369,13 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
       // eslint-disable-next-line @typescript-eslint/naming-convention
       'is-invalid': (!input.valid && !input.pristine) || (this.submitted && input.pristine && input.invalid),
     };
+  }
+
+  public formatDate(date: Date): string {
+    if (date === null || date === undefined) {
+      return '';
+    }
+    return date.toISOString().split('.')[0];
   }
 
   formatJudge(judge: UserDetail) {

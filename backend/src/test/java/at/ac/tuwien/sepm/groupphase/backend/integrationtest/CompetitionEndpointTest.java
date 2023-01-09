@@ -16,6 +16,8 @@ import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
+import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
+import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -75,6 +78,12 @@ public class CompetitionEndpointTest extends TestDataProvider {
 
     @Autowired
     private JwtTokenizer jwtTokenizer;
+
+    @Autowired
+    private CompetitionService competitionService;
+
+    @Autowired
+    private UserService userService;
 
     @BeforeEach
     public void beforeEach() {
@@ -355,6 +364,99 @@ public class CompetitionEndpointTest extends TestDataProvider {
         assertEquals(30,allByBeginOfCompetitionAfterAndNameStartingWithAndDescriptionContainingIgnoreCase.size());
     }
 
+    @Test
+    public void testFindDetail_competitionNotFound_shouldThrowNotFoundException_404() throws Exception {
+        setUpCompetitionUser();
+        Long id = -1L;
+
+        MvcResult mvcResult = this.mockMvc.perform(get(COMPETITION_BASE_URI + "/{id}/detail", id)
+                .header(
+                    securityProperties.getAuthHeader(),
+                    jwtTokenizer.getAuthToken(
+                        TEST_USER_COMPETITION_MANAGER_EMAIL,
+                        List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
+                    ))
+                .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void testFindDetail_validInput_shouldReturnCompetitionDetailDto_200() throws Exception {
+        setUpCompetitionUser();
+
+        CompetitionDetailDto expectedCompetition = getValidCompetitionDetailDto();
+        expectedCompetition = competitionService.create(expectedCompetition);
+        Long id = expectedCompetition.getId();
+
+        MvcResult mvcResult = this.mockMvc.perform(get(COMPETITION_BASE_URI + "/{id}/detail", id)
+                .header(
+                    securityProperties.getAuthHeader(),
+                    jwtTokenizer.getAuthToken(
+                        TEST_USER_COMPETITION_MANAGER_EMAIL,
+                        List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
+                    ))
+                .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        CompetitionDetailDto actualCompetitionDetailDto = objectMapper.readerFor(CompetitionDetailDto.class)
+            .readValue(response.getContentAsByteArray());
+
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertEquals(expectedCompetition.getName(), actualCompetitionDetailDto.getName());
+        assertEquals(expectedCompetition.getBeginOfCompetition(), actualCompetitionDetailDto.getBeginOfCompetition());
+        assertEquals(expectedCompetition.getEndOfCompetition(), actualCompetitionDetailDto.getEndOfCompetition());
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void testFindDetail_sessionUserDoesNotHaveEditingAccess_shouldThrowForbiddenException_403() throws Exception {
+        setUpCompetitionUser();
+
+        CompetitionDetailDto expectedCompetition = getValidCompetitionDetailDto();
+        expectedCompetition = competitionService.create(expectedCompetition);
+        Long id = expectedCompetition.getId();
+
+        String email = "notcreator@notcreator.com";
+        setUpCompetitionUserWithEMail(email);
+
+        MvcResult mvcResult = this.mockMvc.perform(get(COMPETITION_BASE_URI + "/{id}/detail", id)
+                .header(
+                    securityProperties.getAuthHeader(),
+                    jwtTokenizer.getAuthToken(
+                        email,
+                        List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
+                    ))
+                .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void testFindDetail_unauthorizedUser_shouldThrowForbiddenException_403() throws Exception {
+        setUpCompetitionUser();
+
+        CompetitionDetailDto expectedCompetition = getValidCompetitionDetailDto();
+        expectedCompetition = competitionService.create(expectedCompetition);
+        Long id = expectedCompetition.getId();
+
+        MvcResult mvcResult = this.mockMvc.perform(get(COMPETITION_BASE_URI + "/{id}/detail", id)
+                .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
+    }
 
     public Competition createCompetition() {
         compId++;

@@ -55,21 +55,18 @@ public class CompetitionEndpoint {
 
     @PermitAll
     @GetMapping(value = "/{id}")
-    @Operation(summary = "Get detailed information about a specific competition", security = @SecurityRequirement(name = "apiKey"))
+    @Operation(summary = "Get information about a specific competition", security = @SecurityRequirement(name = "apiKey"))
     public CompetitionViewDto find(@PathVariable Long id) {
         LOGGER.info("GET /api/v1/messages/{}", id);
+        return competitionService.findOne(id);
+    }
 
-        Competition competition = competitionService.findOne(id);
-        CompetitionViewDto result =
-            mapper.competitionToCompetitionViewDto(competition);
-
-        if (!result.draft()
-            || (this.sessionUtils.getSessionUser() != null
-                && competition.getCreator().getId().equals(this.sessionUtils.getSessionUser().getId()))) {
-            return result;
-        } else {
-            throw new NotFoundException("competition not public or in draft!");
-        }
+    @Secured("ROLE_TOURNAMENT_MANAGER")
+    @GetMapping(value = "/{id}/detail")
+    @Operation(summary = "Get detailed information about a specific competition", security = @SecurityRequirement(name = "apiKey"))
+    public CompetitionDetailDto findDetail(@PathVariable Long id) {
+        LOGGER.info("GET /api/v1/messages/{}", id);
+        return competitionService.findOneDetail(id);
     }
 
     @Secured("ROLE_TOURNAMENT_MANAGER")

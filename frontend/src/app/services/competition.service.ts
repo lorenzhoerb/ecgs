@@ -39,6 +39,26 @@ export class CompetitionService {
       );
   }
 
+  /**
+   * Loads specific competition from the backend with more detailed information.
+   * Special access rights needed.
+   *
+   * @param id of competition to load
+   */
+  getCompetitionByIdDetail(id: number): Observable<Competition> {
+    console.log('Load competition details for ' + id);
+    return this.httpClient.get<Competition>(this.competitionBaseUri + '/' + id + '/detail')
+      .pipe(
+        map((data: Competition) => {
+          data.beginOfRegistration = new Date(data.beginOfRegistration);
+          data.endOfRegistration = new Date(data.endOfRegistration);
+          data.endOfCompetition = new Date(data.endOfCompetition);
+          data.beginOfCompetition = new Date(data.beginOfCompetition);
+          return data;
+        })
+      );
+  }
+
   /*
    * Create a competition.
    *

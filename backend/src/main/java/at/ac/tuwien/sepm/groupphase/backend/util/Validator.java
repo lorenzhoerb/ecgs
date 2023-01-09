@@ -22,6 +22,7 @@ public class Validator {
         LOGGER.trace("validateRegistration {}", toValidate);
         validateName(toValidate.getFirstName());
         validateName(toValidate.getLastName());
+        //TODO: fix
         //validateEmail(toValidate.getUser().getEmail());
         //validatePassword(toValidate.getUser().getPassword());
         validateGender(toValidate.getGender());

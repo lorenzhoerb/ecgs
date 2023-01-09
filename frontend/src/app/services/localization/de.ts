@@ -21,6 +21,8 @@ export class German implements ILanguage {
     forgotPassword: 'Passwort vergessen',
     sendResetLink: 'Sende Link zum zurücksetzen',
 
+    edit: 'Bearbeiten',
+
     datesAndContacts:'Daten und Kontakt',
     description:'Beschreibung',
     until:'bis',

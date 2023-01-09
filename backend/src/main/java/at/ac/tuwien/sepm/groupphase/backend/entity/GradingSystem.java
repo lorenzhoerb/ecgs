@@ -29,7 +29,7 @@ public class GradingSystem {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String formula;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "gradingSystem", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.MERGE, mappedBy = "gradingSystem", fetch = FetchType.EAGER)
     private Set<GradingGroup> gradingGroups;
 
     public GradingSystem() {

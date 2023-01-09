@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { CompetitionCalenderViewComponent } from './competition-calender-view.component';
+import {CompetitionCalenderViewComponent} from './competition-calender-view.component';
 
 describe('CompetitionCalenderViewComponent', () => {
   let component: CompetitionCalenderViewComponent;

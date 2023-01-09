@@ -30,7 +30,9 @@
                         [cdkDropListEnterPredicate]="onlyOnePredicate">
                         <div [class]="[item.type, 'symbol', color]" *ngFor="let item of list;" cdkDrag
                             [cdkDragData]="item">
-                            <mat-icon class="remove-btn" (click)="removeFrom(i)">close</mat-icon>
+                            <div class="remove-holder">
+                                <mat-icon class="remove-btn" (click)="removeFrom(i)">close</mat-icon>
+                            </div>
                             <div>
                                 {{item.name}}
                             </div>

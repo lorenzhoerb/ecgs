@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { ILanguage, LocalizationKeys, SupportedLanguages } from './language';
+import {ILanguage, LocalizationKeys, SupportedLanguages} from './language';
 
 export class Englisch implements ILanguage {
   language = SupportedLanguages.English;

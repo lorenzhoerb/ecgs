@@ -191,7 +191,7 @@ public class CompetitionRegistrationServiceTest extends TestDataProvider {
             .findByGradingGroupCompetitionIdAndParticipantId(cc.getId(), sessionUser.getId());
         assertTrue(oRegTo.isPresent());
         RegisterTo regTo = oRegTo.get();
-        //TODO assertFalse(regTo.getAccepted());
+        assertFalse(regTo.getAccepted());
         assertEquals(defaultGroup, regTo.getGradingGroup().getId());
     }
 
@@ -233,7 +233,7 @@ public class CompetitionRegistrationServiceTest extends TestDataProvider {
             .findByGradingGroupCompetitionIdAndParticipantId(cc.getId(), sessionUser.getId());
         assertTrue(oRegTo.isPresent());
         RegisterTo regTo = oRegTo.get();
-        //TODO assertFalse(regTo.getAccepted());
+        assertFalse(regTo.getAccepted());
         assertEquals(notDefaultGroup, regTo.getGradingGroup().getId());
     }
 

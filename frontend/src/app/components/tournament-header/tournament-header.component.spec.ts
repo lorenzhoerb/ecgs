@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { TournamentHeaderComponent } from './tournament-header.component';
+import {TournamentHeaderComponent} from './tournament-header.component';
 
 describe('TournamentHeaderComponent', () => {
   let component: TournamentHeaderComponent;

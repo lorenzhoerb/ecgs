@@ -1,22 +1,22 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {HomeComponent} from './components/home/home.component';
 import {LoginComponent} from './components/login/login.component';
 import {AuthGuard} from './guards/auth.guard';
-import { TournamentManagerGuard } from './guards/tournamentManager.guard';
-import { ClubManagerGuard } from './guards/clubManager.guard';
+import {TournamentManagerGuard} from './guards/tournamentManager.guard';
+import {ClubManagerGuard} from './guards/clubManager.guard';
 import {CompetitionComponent} from './components/competition/competition.component';
-import { UidemoComponent } from './components/uidemo/uidemo.component';
-import { environment } from 'src/environments/environment';
+import {UidemoComponent} from './components/uidemo/uidemo.component';
+import {environment} from 'src/environments/environment';
 import {RegisterComponent} from './components/register/register.component';
-import { ClubManagerImportTeamComponent } from './components/club-manager-import-team/club-manager-import-team.component';
-import { CompetitionCalenderViewComponent } from './components/competition-calender-view/competition-calender-view.component';
+import {ClubManagerImportTeamComponent} from './components/club-manager-import-team/club-manager-import-team.component';
+import {
+  CompetitionCalenderViewComponent
+} from './components/competition-calender-view/competition-calender-view.component';
 import {ForgotPasswordComponent} from './components/forgot-password/forgot-password.component';
 import {ResetPasswordComponent} from './components/reset-password/reset-password.component';
 import {ChangePasswordComponent} from './components/change-password/change-password.component';
 import {CreateCompetitionComponent} from './components/competition/create-competition/create-competition.component';
-import {ViewParticipantsComponent} from './components/competition/view-participants/view-participants.component';
-import { CompetitionListViewComponent } from './components/competition-list-view/competition-list-view.component';
+import {CompetitionListViewComponent} from './components/competition-list-view/competition-list-view.component';
 
 
 const routbuilding: Routes = [

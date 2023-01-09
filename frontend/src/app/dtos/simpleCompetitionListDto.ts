@@ -1,3 +1,3 @@
-import { SimpleCompetitionListEntryDto } from './simpleCompetitionListEntryDto';
+import {SimpleCompetitionListEntryDto} from './simpleCompetitionListEntryDto';
 
 export type SimpleCompetitionListDto = SimpleCompetitionListEntryDto[];

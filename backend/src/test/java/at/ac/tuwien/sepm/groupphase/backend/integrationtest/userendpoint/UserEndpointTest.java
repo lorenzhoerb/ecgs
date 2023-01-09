@@ -8,16 +8,16 @@ import at.ac.tuwien.sepm.groupphase.backend.datagenerator.DataCleaner;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamMemberImportDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ErrorListRestDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GeneralResponseDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import at.ac.tuwien.sepm.groupphase.backend.help.CalendarViewHelp;
-import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
+import at.ac.tuwien.sepm.groupphase.backend.service.helprecords.ClubManagerTeamImportResults;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -30,7 +30,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -39,7 +38,8 @@ import java.util.List;
 import static at.ac.tuwien.sepm.groupphase.backend.help.CalendarViewHelp.CURRENT_WEEK_NUMBER;
 import static at.ac.tuwien.sepm.groupphase.backend.help.CalendarViewHelp.CURRENT_YEAR;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -50,7 +50,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserEndpointTest implements TestData {
     private final ObjectMapper objectMapper;
     private final JwtTokenizer jwtTokenizer;
@@ -82,7 +81,6 @@ public class UserEndpointTest implements TestData {
     }
 
     @Test
-    @Order(0)
     public void competitionManagerDefaultCalendar() throws Exception {
         MvcResult mvcResult = this.mockMvc.perform(get(BASE_CALENDAR_URI + String.format("/%d/%d", 2022, 38))
             .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken("test@test.test", CALENDAR_TEST_ROLES))
@@ -97,7 +95,6 @@ public class UserEndpointTest implements TestData {
         List<Competition> managedCompetitions = Arrays.asList(objectMapper.readValue(response.getContentAsString(),
             Competition[].class));
 
-        // @TODO: this test fails for me locally
         assertEquals(2, managedCompetitions.size());
         assertThat(managedCompetitions)
             .map(Competition::getName,
@@ -133,7 +130,6 @@ public class UserEndpointTest implements TestData {
     }
 
     @Test
-    @Order(1)
     public void importValidTeam() throws Exception {
         String body = objectMapper.writeValueAsString(ClubManagerTeamImportGeneratorHelper.testTeams.get(0));
 
@@ -147,21 +143,19 @@ public class UserEndpointTest implements TestData {
             .andDo(print())
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
-        GeneralResponseDto generalResponseDto = objectMapper.readValue(response.getContentAsString(),
-            GeneralResponseDto.class);
 
-        assertThat(generalResponseDto.message()).contains("4");
-        assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+
+        ClubManagerTeamImportResults result = objectMapper.readValue(response.getContentAsString(),
+            ClubManagerTeamImportResults.class);
+
+        int teamSize = ClubManagerTeamImportGeneratorHelper.testTeams.get(0).teamMembers().size();
+
+        assertEquals(teamSize, result.newParticipantsCount());
+        assertEquals(0, result.oldParticipantsCount());
     }
 
     @Test
-    @Order(2)
-    public void importSameValidTeam() throws Exception {
-        importValidTeam();
-    }
-
-    @Test
-    @Order(3)
     public void importTeam_withInvalidTeamMembers() throws Exception {
         String body = objectMapper.writeValueAsString(ClubManagerTeamImportGeneratorHelper.testTeams_withInvalidMembers.get(0));
 
@@ -184,7 +178,6 @@ public class UserEndpointTest implements TestData {
     }
 
     @Test
-    @Order(4)
     public void importTeam_withInvalidTeamName() throws Exception {
         String body = objectMapper.writeValueAsString(ClubManagerTeamImportGeneratorHelper.testTeams_withInvalidTeamName.get(0));
 
@@ -207,7 +200,6 @@ public class UserEndpointTest implements TestData {
     }
 
     @Test
-    @Order(5)
     public void importTeam_withFewInvalidMembers() throws Exception {
         String body = objectMapper.writeValueAsString(new ClubManagerTeamImportDto(
             "teamnamee",

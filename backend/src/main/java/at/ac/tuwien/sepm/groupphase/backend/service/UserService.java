@@ -1,10 +1,16 @@
 package at.ac.tuwien.sepm.groupphase.backend.service;
 
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantSelfRegistrationDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseParticipantRegistrationDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserCredentialUpdateDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserInfoDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserPasswordResetDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserPasswordResetRequestDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.entity.SecurityUser;
@@ -12,9 +18,9 @@ import at.ac.tuwien.sepm.groupphase.backend.service.helprecords.ClubManagerTeamI
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Optional;
-
 import java.util.Set;
 
 public interface UserService extends UserDetailsService {
@@ -92,8 +98,21 @@ public interface UserService extends UserDetailsService {
      */
     Optional<SecurityUser> findSecurityUserByEmail(String email);
 
+    /**
+     * Get competitions attached to current session user, for given year and week number.
+     *
+     * @param year the year to fetch calendar for
+     * @param weekNumber the week number of @param{year} to fetch calendar for
+     * @return set of competitions attached to user for that @param{year} and @param{weekNumber}
+     */
     Set<Competition> getCompetitionsForCalendar(ApplicationUser competitionManager, int year, int weekNumber);
 
+    /**
+     * Import a team as a club manager.
+     *
+     * @param clubManagerTeamImportDto a dto for club manager's team.
+     * @return Dto that has a number of new participants added to the team and a number of already present ones. (present == managed by you)
+     */
     ClubManagerTeamImportResults importTeam(ApplicationUser clubManager, ClubManagerTeamImportDto clubManagerTeamImportDto);
 
     /**
@@ -103,4 +122,45 @@ public interface UserService extends UserDetailsService {
      * @return Users matching the name
      */
     Set<UserDetailDto> findByUserName(UserSearchDto searchDto);
+
+    /**
+     * Prepares the reset password mail and sends it afterwards.
+     *
+     * @param userPasswordResetRequestDto The data containing the account to the send reset mail for.
+     * @return the success message
+     */
+    String prepareAndSendPasswordResetMail(UserPasswordResetRequestDto userPasswordResetRequestDto);
+
+    /**
+     * Resets the password by the provided token and password.
+     *
+     * @param userPasswordResetDto the data containing the token and password to reset.
+     * @return the success message
+     */
+    String resetPassword(UserPasswordResetDto userPasswordResetDto);
+
+    /**
+     * Changes the password of the logged in user.
+     *
+     * @param userCredentialUpdateDto the email and password of the user who wants to change them
+     * @return the success message
+     */
+    String changePassword(@RequestBody UserCredentialUpdateDto userCredentialUpdateDto);
+
+    /**
+     * Registers the authenticated user to the competition by its id.
+     *
+     * @param id the id of the competitition to sign up to.
+     * @param groupPreference the ParticipantSelfRegistrationDto groupPreference
+     * @return the ResponseParticipantRegistrationDto of the registration
+     */
+    ResponseParticipantRegistrationDto registerToCompetition(Long id, ParticipantSelfRegistrationDto groupPreference);
+
+
+    /**
+     * Get current session user.
+     *
+     * @return the current session user
+     */
+    UserInfoDto getUser();
 }

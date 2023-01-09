@@ -4,11 +4,10 @@ import {map, Observable} from 'rxjs';
 import {UserInfoDto} from '../dtos/userInfoDto';
 import {Globals} from '../global/globals';
 import {ResponseParticipantRegistrationDto} from '../dtos/responseParticipantRegistrationDto';
-import {CompetitionDetail} from '../dtos/competition-detail';
-import { ClubManagerTeamImportDto } from '../dtos/club-manager-team';
-import { CalendarViewCompetition } from '../dtos/competition';
-import { GeneralResponseDto } from '../dtos/general-response';
+import {ClubManagerTeamImportDto} from '../dtos/club-manager-team';
+import {CalendarViewCompetition} from '../dtos/competition';
 import {UserDetail} from '../dtos/user-detail';
+import {ClubManagerTeamImportResults} from '../dtos/club-manager-team-import-results';
 
 @Injectable({
   providedIn: 'root'
@@ -23,8 +22,8 @@ export class UserService {
     return this.httpClient.get<CalendarViewCompetition[]>(`${this.userBaseUri}/calendar/${year}/${weekNumber}`);
   }
 
-  public importTeam(clubManagerTeam: ClubManagerTeamImportDto): Observable<GeneralResponseDto> {
-    return this.httpClient.post<GeneralResponseDto>(`${this.userBaseUri}/import-team`, clubManagerTeam);
+  public importTeam(clubManagerTeam: ClubManagerTeamImportDto): Observable<ClubManagerTeamImportResults> {
+    return this.httpClient.post<ClubManagerTeamImportResults>(`${this.userBaseUri}/import-team`, clubManagerTeam);
   };
 
 

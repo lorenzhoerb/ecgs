@@ -1,10 +1,10 @@
-import {Component, OnInit, SecurityContext} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../services/auth.service';
 import {UserCredentialUpdate} from '../../dtos/userCredentialUpdate';
 import {Router} from '@angular/router';
 import {ToastrService} from 'ngx-toastr';
-import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
+import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
 
 @Component({
   selector: 'app-change-password',
@@ -42,7 +42,6 @@ export class ChangePasswordComponent implements OnInit {
           this.changePasswordForm.controls.passwordOne.value);
         this.authService.changePassword(userCredentialUpdate).subscribe({
           next: () => {
-            console.log('Password successfully changed');
             this.notification.success('Password successfully changed');
             this.router.navigate(['']);
           },

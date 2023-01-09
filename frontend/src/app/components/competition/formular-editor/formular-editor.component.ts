@@ -1,6 +1,6 @@
-import { Component, Input, OnInit, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
-import { CdkDragDrop, moveItemInArray, transferArrayItem, CdkDrag, CdkDropList, copyArrayItem } from '@angular/cdk/drag-drop';
-import { cloneDeep } from 'lodash';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
+import {CdkDrag, CdkDropList, copyArrayItem, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
+import {cloneDeep} from 'lodash';
 
 @Component({
   selector: 'app-formular-editor',
@@ -48,7 +48,6 @@ export class FormularEditorComponent implements OnInit, OnChanges {
   constructor() { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log(changes.vars);
     this.variables = cloneDeep(this.vars);
 
     if(changes.vars.previousValue === undefined) {
@@ -152,8 +151,6 @@ export class FormularEditorComponent implements OnInit, OnChanges {
       this.formula.data = {};
     }
 
-    console.log(JSON.stringify(this.formula, null, 4));
-    console.log(this.formula);
     this.formulaChange.emit(this.formula);
   }
 

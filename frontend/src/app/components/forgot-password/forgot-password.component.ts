@@ -3,7 +3,7 @@ import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../services/auth.service';
 import {Router} from '@angular/router';
 import {ToastrService} from 'ngx-toastr';
-import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
+import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -34,7 +34,6 @@ export class ForgotPasswordComponent implements OnInit {
     if (this.forgotPasswordForm.valid) {
       this.authService.requestPasswordReset(this.forgotPasswordForm.controls.email.value).subscribe({
         next: () => {
-          console.log('Password reset link has been sent');
           this.notification.success('Password reset link has been sent');
           this.router.navigate(['/login']);
         },

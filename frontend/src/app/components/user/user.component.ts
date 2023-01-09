@@ -1,9 +1,9 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { Router } from '@angular/router';
-import { UserInfoDto } from 'src/app/dtos/userInfoDto';
-import { AuthService } from 'src/app/services/auth.service';
-import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service' ;
-import { UserService } from 'src/app/services/user.service';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Router} from '@angular/router';
+import {UserInfoDto} from 'src/app/dtos/userInfoDto';
+import {AuthService} from 'src/app/services/auth.service';
+import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
+import {UserService} from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-user',
@@ -28,12 +28,10 @@ export class UserComponent implements OnInit {
       this.userService.getUserInfo().subscribe({
         next: data => {
           this.user = data;
-          console.log(data);
         },
         error: error => {
-          console.error('Error fetching competition information', error);
+          console.error('Error fetching user information', error);
           this.loggedIn = false;
-          // @TODO: route to home or throw exception
         }
       });
     }
@@ -48,12 +46,10 @@ export class UserComponent implements OnInit {
         this.userService.getUserInfo().subscribe({
           next: data => {
             this.user = data;
-            console.log(data);
           },
           error: error => {
             console.error('Error fetching competition information', error);
             this.loggedIn = false;
-            // @TODO: route to home or throw exception
           }
         });
       }

@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../services/auth.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {UserPasswordReset} from '../../dtos/userPasswordReset';
-import {ToastrService} from'ngx-toastr';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-reset-password',
@@ -45,7 +45,6 @@ export class ResetPasswordComponent implements OnInit {
         const userPasswordReset: UserPasswordReset = new UserPasswordReset(this.token, this.resetPasswordForm.controls.passwordOne.value);
         this.authService.resetPassword(userPasswordReset).subscribe({
           next: () => {
-            console.log('Password successfully reset');
             this.notification.success('Password successfully reset');
             this.router.navigate(['/login']);
           },

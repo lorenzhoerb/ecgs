@@ -7,7 +7,6 @@ import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Operation;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.micrometer.core.instrument.config.validate.Validated;
 
 import java.util.Arrays;
 import java.util.List;

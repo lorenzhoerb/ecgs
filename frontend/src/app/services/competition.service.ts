@@ -3,12 +3,12 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {UserDetail} from '../dtos/user-detail';
 import {Competition} from '../dtos/competition';
 import {CompetitionDetail} from '../dtos/competition-detail';
-import {Observable, map} from 'rxjs';
+import {map, Observable} from 'rxjs';
 import {Globals} from '../global/globals';
 import {SimpleGradingGroup} from '../dtos/simple-grading-group';
 
-import { SimpleCompetitionListDto } from '../dtos/simpleCompetitionListDto';
-import { CompetitionSearchDto } from '../dtos/competitionSearchDto';
+import {SimpleCompetitionListDto} from '../dtos/simpleCompetitionListDto';
+import {CompetitionSearchDto} from '../dtos/competitionSearchDto';
 
 @Injectable({
   providedIn: 'root'

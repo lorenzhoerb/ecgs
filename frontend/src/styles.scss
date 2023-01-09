@@ -1,5 +1,4 @@
 /* Checkout variables.scss for default colors, margins and more */
-// TODO: maybe remove Bootstrap for f*cking with my styles
 @import '../node_modules/bootstrap/scss/bootstrap';
 @import './variables.scss';
 @import '~ngx-toastr/toastr';
@@ -52,6 +51,7 @@ body {
   color: $font-color;
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
 }
 
 ////////////////////////////////////
@@ -173,7 +173,7 @@ main>* {
 /////////// Header
 
 .header {
-  width: 100vw;
+  //width: 100vw;
   height: 4rem;
   background-color: var(--ming);
   color: white;
@@ -299,8 +299,6 @@ h3 {
   top: 0;
   height: 5rem;
 }
-
-///////// Table (unfinished TODO: create consistent Table style)
 
 table {
   width: 100%;

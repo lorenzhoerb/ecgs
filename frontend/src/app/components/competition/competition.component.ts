@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {ContentCardComponent} from '../content-card/content-card.component';
 import {CompetitionService} from '../../services/competition.service';
 import {Competition} from '../../dtos/competition';
 import {ActivatedRoute} from '@angular/router';
@@ -8,10 +7,9 @@ import LocalizationService, {LocalizeService} from '../../services/localization/
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {RegisterModalComponent} from './register-modal/register-modal.component';
 import {UserService} from '../../services/user.service';
-import {cloneDeep} from 'lodash';
 import {UserDetail} from '../../dtos/user-detail';
-import { SimpleGradingGroup } from 'src/app/dtos/simple-grading-group';
-import { ToastrService } from 'ngx-toastr';
+import {SimpleGradingGroup} from 'src/app/dtos/simple-grading-group';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-competition-view',
@@ -33,7 +31,6 @@ export class CompetitionComponent implements OnInit {
               private modalService: NgbModal,
               private userService: UserService,
               private toastr: ToastrService) {
-    console.log('init');
     this.localize.changeLanguage(this.currentLanguage);
   }
 
@@ -90,7 +87,6 @@ export class CompetitionComponent implements OnInit {
     const now = new Date();
     this.canRegister = now >= this.competition.beginOfRegistration && now <= this.competition.endOfRegistration;
     this.canRegister = this.canRegister && this.groups.length > 0;
-    console.log(this.canRegister);
   }
 
   pictureEmpty() {
@@ -114,7 +110,6 @@ export class CompetitionComponent implements OnInit {
     this.service.getParticipants(this.id).subscribe({
       next: data => {
         this.participants = data;
-        console.log(data);
         this.error = null;
       },
       error: error => {

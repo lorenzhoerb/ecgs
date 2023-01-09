@@ -1,7 +1,7 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthService } from 'src/app/services/auth.service';
-import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Router} from '@angular/router';
+import {AuthService} from 'src/app/services/auth.service';
+import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
 
 @Component({
   selector: 'app-header-modal',
@@ -36,6 +36,5 @@ export class HeaderModalComponent implements OnInit {
   hide() {
     this.showMenu = !this.showMenu;
     this.showMenuChange.emit(this.showMenu);
-    console.log(this.showMenu);
   }
 }

@@ -1,17 +1,14 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantSelfRegistrationDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CalenderViewCompetitionDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GeneralResponseDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserInfoDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantSelfRegistrationDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserInfoDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserSearchDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.helptypes.StatusText;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.CompetitionMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
-import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionRegistrationService;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepm.groupphase.backend.service.helprecords.ClubManagerTeamImportResults;
@@ -74,33 +71,18 @@ public class UserEndpoint {
     }
 
     @Secured({"ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER"})
-    // @PermitAll
     @PostMapping("/import-team")
-    public GeneralResponseDto importTeam(@RequestBody ClubManagerTeamImportDto clubManagerTeamImportDto) {
+    @ResponseStatus(code = HttpStatus.OK)
+    public ClubManagerTeamImportResults importTeam(@RequestBody ClubManagerTeamImportDto clubManagerTeamImportDto) {
         logger.info("POST {}", BASE_URI + "/import-team");
-
-        ClubManagerTeamImportResults addedParticipants = userService.importTeam(sessionUtils.getSessionUser(), clubManagerTeamImportDto);
-
-        return new GeneralResponseDto(
-            StatusText.OK,
-            String.format(
-                "Team %s received %d new participant (%d from the list were already present).",
-                clubManagerTeamImportDto.teamName(),
-                addedParticipants.newParticipantsCount(),
-                addedParticipants.oldParticipantsCount())
-        );
+        return userService.importTeam(sessionUtils.getSessionUser(), clubManagerTeamImportDto);
     }
 
     @Secured({"ROLE_PARTICIPANT", "ROLE_TOURNAMENT_MANAGER", "ROLE_CLUB_MANAGER"})
     @GetMapping
     public UserInfoDto getUser() {
-        ApplicationUser user = sessionUtils.getSessionUser();
-
-        return UserInfoDto.builder()
-            .firstName(user.getFirstName())
-            .lastName(user.getLastName())
-            .role(user.getType())
-            .build();
+        logger.info("GET {}\n", BASE_PATH);
+        return userService.getUser();
     }
 
     @Secured({"ROLE_PARTICIPANT", "ROLE_TOURNAMENT_MANAGER", "ROLE_CLUB_MANAGER"})
@@ -111,10 +93,7 @@ public class UserEndpoint {
         @PathVariable Long id,
         @RequestBody(required = false) ParticipantSelfRegistrationDto groupPreference) {
         logger.info("POST {}/competitions/{}\n{}", BASE_PATH, id, groupPreference);
-        if (groupPreference == null) {
-            return competitionRegistrationService.selfRegisterParticipant(id, null);
-        }
-        return competitionRegistrationService.selfRegisterParticipant(id, groupPreference.getGroupPreference());
+        return userService.registerToCompetition(id, groupPreference);
     }
 
     @Secured({"ROLE_PARTICIPANT", "ROLE_TOURNAMENT_MANAGER", "ROLE_CLUB_MANAGER"})
@@ -122,16 +101,14 @@ public class UserEndpoint {
     @Operation(summary = "Checks if the authenticated user is registered to the competition.", security = @SecurityRequirement(name = "apiKey"))
     public ResponseEntity<Void> authenticatedUserIsRegisteredToCompetition(@PathVariable Long id) {
         logger.info("GET {}/competitions/{}", BASE_PATH, id);
-        boolean isRegistered = competitionRegistrationService.isRegisteredTo(id);
-        if (isRegistered) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return competitionRegistrationService.isRegisteredTo(id)
+            ? new ResponseEntity<>(HttpStatus.NO_CONTENT) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @Secured({"ROLE_TOURNAMENT_MANAGER"})
     @GetMapping("search")
     public Set<UserDetailDto> getUserByName(UserSearchDto searchDto) {
+        logger.info("GET {}/search", BASE_PATH);
         return userService.findByUserName(searchDto);
     }
 

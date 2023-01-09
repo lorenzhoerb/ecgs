@@ -2,16 +2,21 @@ package at.ac.tuwien.sepm.groupphase.backend.unittests;
 
 import at.ac.tuwien.sepm.groupphase.backend.basetest.TestDataProvider;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingSystemDetailDto;
-import at.ac.tuwien.sepm.groupphase.backend.entity.GradingGroup;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
-import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.StrategyException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
-import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.*;
+import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Add;
+import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Constant;
+import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Divide;
+import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Mean;
+import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Multiply;
+import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Operation;
+import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Sub;
+import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.VariableRef;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.strategys.Equal;
+import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.structural.GradingSystem;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.structural.Station;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.structural.Variable;
-import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.structural.GradingSystem;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingSystemRepository;
@@ -25,7 +30,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -265,7 +272,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
 
     @Test
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
-    public void givenInvalidFormulaToLong() throws JsonProcessingException {
+    public void givenInvalidFormulaToLong() {
         GradingSystemDetailDto gradingSystemDetailDto2 = new GradingSystemDetailDto(
             "name",
             "desc",
@@ -281,7 +288,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
 
     @Test
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
-    public void givenInvalidFormulaEmpty() throws JsonProcessingException {
+    public void givenInvalidFormulaEmpty() {
         GradingSystemDetailDto gradingSystemDetailDto2 = new GradingSystemDetailDto(
             "name",
             "desc",
@@ -297,7 +304,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
 
     @Test
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
-    public void givenInvalidFormulaNull() throws JsonProcessingException {
+    public void givenInvalidFormulaNull() {
         GradingSystemDetailDto gradingSystemDetailDto2 = new GradingSystemDetailDto(
             "name",
             "description",
@@ -313,7 +320,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
 
     @Test
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
-    public void givenInvalidFormulaIdsNotUniqueOnStationVars() throws Exception,JsonProcessingException {
+    public void givenInvalidFormulaIdsNotUniqueOnStationVars() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
 
         GradingSystem system = new GradingSystem();
@@ -340,7 +347,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
 
     @Test
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
-    public void givenInvalidFormulaIdsNotUniqueOnStations() throws Exception,JsonProcessingException {
+    public void givenInvalidFormulaIdsNotUniqueOnStations() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
 
         GradingSystem system = new GradingSystem();
@@ -368,7 +375,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
     }
 
     @Test
-    public void givenNotLoggedInUser_thenForbiddenException() throws JsonProcessingException{
+    public void givenNotLoggedInUser_thenForbiddenException() {
         assertThrows(ForbiddenException.class, () -> {
             gradingSystemService.createGradingSystem(getValidGradingSystemDetailDto());
         });

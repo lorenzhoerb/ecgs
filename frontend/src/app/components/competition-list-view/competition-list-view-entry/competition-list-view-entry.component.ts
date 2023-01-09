@@ -1,7 +1,6 @@
-import { formatDate } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
-import { SimpleCompetitionListEntryDto } from 'src/app/dtos/simpleCompetitionListEntryDto';
-import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {SimpleCompetitionListEntryDto} from 'src/app/dtos/simpleCompetitionListEntryDto';
+import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
 
 @Component({
   selector: 'app-competition-list-view-entry',

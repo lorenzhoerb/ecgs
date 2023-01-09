@@ -1,16 +1,16 @@
-import { Component, Input, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
-import { CalendarViewCompetition, CalendarWeek } from 'src/app/dtos/competition';
-import { formatDate } from '@angular/common';
-import { ExtendedWeekInfo, WeekInfo } from 'src/app/interfaces/CompetitionCalendarView/WeekInfo';
-import { UserService } from 'src/app/services/user.service';
-import { ToastrService } from 'ngx-toastr';
+import {Component, Input, OnInit} from '@angular/core';
+import {CalendarViewCompetition} from 'src/app/dtos/competition';
+import {formatDate} from '@angular/common';
+import {ExtendedWeekInfo, WeekInfo} from 'src/app/interfaces/CompetitionCalendarView/WeekInfo';
+import {UserService} from 'src/app/services/user.service';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-competition-calender-view',
   templateUrl: './competition-calender-view.component.html',
   styleUrls: ['./competition-calender-view.component.scss']
 })
-// @TODO: height depends on amount of competitions
+
 export class CompetitionCalenderViewComponent implements OnInit {
   @Input()
   defaultWeekToShow: string;
@@ -93,8 +93,6 @@ export class CompetitionCalenderViewComponent implements OnInit {
       start: startOfThatWeek,
       end: endOfThatWeek
     };
-
-    console.log(JSON.stringify(this.selectedExtendedWeekInfo));
 
     this.fetchCompetitions();
   }

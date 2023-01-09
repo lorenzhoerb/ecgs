@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { FormularEditorComponent } from './formular-editor.component';
+import {FormularEditorComponent} from './formular-editor.component';
 
 describe('FormularEditorComponent', () => {
   let component: FormularEditorComponent;

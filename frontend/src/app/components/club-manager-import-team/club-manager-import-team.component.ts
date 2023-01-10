@@ -1,10 +1,10 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {NgxCsvParser, NgxCSVParserError} from 'ngx-csv-parser';
-import {ToastrService} from 'ngx-toastr';
-import {ClubManagerTeamImportDto, ClubManagerTeamMemberImportDto} from 'src/app/dtos/club-manager-team';
+import { Component, Input, OnInit } from '@angular/core';
+import { NgxCsvParser, NgxCSVParserError } from 'ngx-csv-parser';
+import { ToastrService } from 'ngx-toastr';
+import { ClubManagerTeamImportDto, ClubManagerTeamMemberImportDto } from 'src/app/dtos/club-manager-team';
 import { SupportedLanguages } from 'src/app/services/localization/language';
-import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
-import {UserService} from 'src/app/services/user.service';
+import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-club-manager-import-team',
@@ -22,7 +22,7 @@ export class ClubManagerImportTeamComponent implements OnInit {
 
   membersPerPage = 25;
   csvHeaders = {
-    forCsv: ['firstName', 'lastName', 'email', 'gender', 'dateOfBirth'],
+    forCsv: ['firstName', 'lastName', 'email', 'gender', 'dateOfBirth', 'flag'],
     forTableHeader: ['First name', 'Last name', 'Email', 'Gender', 'Date of birth'],
   };
 
@@ -111,40 +111,41 @@ export class ClubManagerImportTeamComponent implements OnInit {
   }
 
   public onSaveClicked(): void {
-  const team: ClubManagerTeamImportDto = {
-      teamName: this.teamName,
-      teamMembers: this.teamMembers,
-    };
-    this.userService.importTeam(team).subscribe(
-      {
-        next: (resp) => {
-          this.notificiation.success(`Team ${this.teamName} received ${resp.newParticipantsCount} new
-          participants (${resp.oldParticipantsCount} were already present/duplicates)`);
-        },
-        error: (err) => {
-          console.log(err);
-          const errorObj = err.error;
-          if (err.status === 0) {
-            this.notificiation.error('Could not connect to remote server!', 'Connection error');
-          } else if (err.status === 401) {
-            this.notificiation.error('Either you are not authenticated or your session has expired', 'Authentication error');
-          } else if (err.status === 403) {
-            this.notificiation.error('You don\'t have enought permissions', 'Authorization error');
-          } else if (!errorObj.message && !errorObj.errors) {
-            this.notificiation.error(err.message ?? '', 'Unexpected error occured.');
-          } else {
-            if (this.violationNotificationLimit < errorObj.errors.length) {
-              this.notificiation.error(`There are ${errorObj.errors.length - this.violationNotificationLimit} more violations...`,
-                errorObj.message);
-            }
-            for (let i = 0; i < this.violationNotificationLimit && i < errorObj.errors.length; i++) {
-              this.notificiation.error(errorObj.errors[i], errorObj.message ?? 'Error', );
+    const team: ClubManagerTeamImportDto = {
+        teamName: this.teamName,
+        teamMembers: this.teamMembers,
+      };
+      this.userService.importTeam(team).subscribe(
+        {
+          next: (resp) => {
+            this.notificiation.success(`Team ${this.teamName} received ${resp.newParticipantsCount} new
+            participants (${resp.oldParticipantsCount} were already present/duplicates)`);
+          },
+          error: (err) => {
+            console.log(err);
+            const errorObj = err.error;
+            if (err.status === 0) {
+              this.notificiation.error('Could not connect to remote server!', 'Connection error');
+            } else if (err.status === 401) {
+              this.notificiation.error('Either you are not authenticated or your session has expired', 'Authentication error');
+            } else if (err.status === 403) {
+              this.notificiation.error('You don\'t have enought permissions', 'Authorization error');
+            } else if (!errorObj.message && !errorObj.errors) {
+              this.notificiation.error(err.message ?? '', 'Unexpected error occured.');
+            } else {
+              if (this.violationNotificationLimit < errorObj.errors.length) {
+                this.notificiation.error(`There are ${errorObj.errors.length - this.violationNotificationLimit} more violations...`,
+                  errorObj.message);
+              }
+              for (let i = 0; i < this.violationNotificationLimit && i < errorObj.errors.length; i++) {
+                this.notificiation.error(errorObj.errors[i], errorObj.message ?? 'Error', );
+              }
             }
           }
         }
-      }
-    );
-  }
+      );
+    }
+
 
   public onTeamNameChange(newTeamName: string): void {
     this.teamName = newTeamName;
@@ -152,17 +153,6 @@ export class ClubManagerImportTeamComponent implements OnInit {
 
   public onTeamMemberFieldChange(value: any, index: number, header: string) {
     this.teamMembers[index][header] = value;
-  }
-
-  public getInputTypeForHeader(header: string): string {
-    switch(header) {
-      case 'dateOfBirth': {
-        return 'date';
-      }
-      default: {
-        return 'text';
-      }
-    }
   }
 
   public onPageChangeClick(change: number) {
@@ -212,4 +202,5 @@ export class ClubManagerImportTeamComponent implements OnInit {
 
     return `${headerPart}\n${dataPart}`;
   }
+
 }

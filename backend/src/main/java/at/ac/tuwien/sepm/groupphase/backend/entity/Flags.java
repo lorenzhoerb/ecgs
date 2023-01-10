@@ -3,6 +3,7 @@ package at.ac.tuwien.sepm.groupphase.backend.entity;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -34,6 +35,11 @@ public class Flags {
 
     public Flags(String name) {
         this.name = name;
+    }
+
+    public Flags(String name, Set<ManagedBy> clubs) {
+        this.name = name;
+        this.clubs = clubs;
     }
 
     public Long getId() {

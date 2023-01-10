@@ -60,6 +60,10 @@ export class Englisch implements ILanguage {
     teamName: 'Team name',
     createTournament: 'New Competition',
 
+    importFlags: 'Assign flags',
+    flag: 'Flag',
+    optional: 'optional',
+
 
     username: 'Username / Email',
     firstname: 'Firstname',

@@ -47,6 +47,7 @@ import {
 import {CompetitionHeaderComponent} from './components/competition-header/competition-header.component';
 import {AutocompleteComponent} from './components/autocomplete/autocomplete.component';
 import {HeaderCreateModalComponent} from './components/header-create-modal/header-create-modal.component';
+import { ImportFlagsComponent } from './components/import-flags/import-flags.component';
 
 @NgModule({
   declarations: [
@@ -81,6 +82,7 @@ import {HeaderCreateModalComponent} from './components/header-create-modal/heade
     CompetitionHeaderComponent,
     AutocompleteComponent,
     HeaderCreateModalComponent,
+    ImportFlagsComponent,
   ],
   imports: [
     BrowserModule,

@@ -9,6 +9,8 @@ import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepm.groupphase.backend.service.helprecords.ClubManagerTeamImportResults;
 import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
+import org.junit.jupiter.api.*;
+import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
@@ -63,8 +65,8 @@ public class ClubManagerServiceTest {
             relevantTestTeam
         );
         long laterUserCount = userRepository.count();
-        assertThat(results.newParticipantsCount()).isEqualTo(4);
-        assertThat(results.oldParticipantsCount()).isEqualTo(0);
+        assertThat(results.getNewParticipantsCount()).isEqualTo(4);
+        assertThat(results.getOldParticipantsCount()).isEqualTo(0);
         assertThat(laterUserCount).isEqualTo(initUserCount + 4L);
         var mapToAssert = assertThat(userRepository.findAll())
             .map(ApplicationUser::getFirstName, ApplicationUser::getLastName,
@@ -90,8 +92,8 @@ public class ClubManagerServiceTest {
             relevantTestTeam
         );
         long laterUserCount = userRepository.count();
-        assertThat(results.newParticipantsCount()).isEqualTo(1);
-        assertThat(results.oldParticipantsCount()).isEqualTo(1);
+        assertThat(results.getNewParticipantsCount()).isEqualTo(1);
+        assertThat(results.getOldParticipantsCount()).isEqualTo(1);
         assertThat(laterUserCount).isNotEqualTo(initUserCount + 2L);
         var memberToTest = relevantTestTeam.teamMembers().get(1);
         assertThat(userRepository.findAll())

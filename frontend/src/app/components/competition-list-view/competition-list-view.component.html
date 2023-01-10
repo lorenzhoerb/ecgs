@@ -32,7 +32,7 @@
     </app-competition-list-view-entry>
                 <div style="display: flex;align-items: baseline; justify-content: space-between; padding-bottom: 30px;">
                 <div></div>
-                <div style="font-size: 30px;">
+                <div style="font-size: 30px;" *ngIf="this.competitions.length !== 0">
                     <button 
                     style="margin-right: 15px;" 
                     (click)="onPageChangeClick(-1)"

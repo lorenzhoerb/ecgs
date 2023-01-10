@@ -17,6 +17,7 @@ import {ResetPasswordComponent} from './components/reset-password/reset-password
 import {ChangePasswordComponent} from './components/change-password/change-password.component';
 import {CreateCompetitionComponent} from './components/competition/create-competition/create-competition.component';
 import {CompetitionListViewComponent} from './components/competition-list-view/competition-list-view.component';
+import { ImportFlagsComponent } from './components/import-flags/import-flags.component';
 
 
 const routbuilding: Routes = [
@@ -35,7 +36,8 @@ const routbuilding: Routes = [
   },
   {path: 'user', children: [
       {path: 'calendar', component: CompetitionCalenderViewComponent},
-      {path: 'import-team', canActivate: [ClubManagerGuard], component: ClubManagerImportTeamComponent}
+      {path: 'import-team', canActivate: [ClubManagerGuard], component: ClubManagerImportTeamComponent},
+      {path: 'flags', canActivate: [ClubManagerGuard], component: ImportFlagsComponent}
     ]
   },
   {path: '**', component: CompetitionListViewComponent},

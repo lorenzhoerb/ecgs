@@ -66,7 +66,7 @@ public class Competition {
         this.judges = judges;
     }
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(referencedColumnName = "id")
     private ApplicationUser creator;
 

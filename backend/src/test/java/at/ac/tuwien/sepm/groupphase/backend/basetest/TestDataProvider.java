@@ -3,13 +3,16 @@ package at.ac.tuwien.sepm.groupphase.backend.basetest;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingSystemDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlag;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.FlagsMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.entity.GradingGroup;
+import at.ac.tuwien.sepm.groupphase.backend.entity.ManagedBy;
 import at.ac.tuwien.sepm.groupphase.backend.entity.RegisterTo;
 import at.ac.tuwien.sepm.groupphase.backend.entity.SecurityUser;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Add;
@@ -24,7 +27,9 @@ import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.structural.Station;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.structural.Variable;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.FlagsRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.ManagedByRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.SecurityUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.impl.CustomUserDetailService;
@@ -38,9 +43,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Date;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -50,7 +53,16 @@ public abstract class TestDataProvider {
     private CustomUserDetailService customUserDetailService;
 
     @Autowired
+    private ManagedByRepository managedByRepository;
+
+    @Autowired
+    private FlagsRepository flagsRepository;
+
+    @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private FlagsMapper flagsMapper;
 
     protected static final String BASE_URI = "/api/v1";
     protected static final String COMPETITION_URI = "/competitions";
@@ -98,19 +110,19 @@ public abstract class TestDataProvider {
             .setDraft(true);
     }
 
-    protected GradingGroupDto[] getValidGradingGroupDtos() throws JsonProcessingException{
-        return new GradingGroupDto[] {
+    protected GradingGroupDto[] getValidGradingGroupDtos() throws JsonProcessingException {
+        return new GradingGroupDto[]{
             new GradingGroupDto().withTitle("Group 1")
                 .withGradingSystemDto(getValidGradingSystemDetailDto()),
             new GradingGroupDto().withTitle("Group 2")
-            .withGradingSystemDto(getValidGradingSystemDetailDto()),
-        new GradingGroupDto().withTitle("Group 3")
+                .withGradingSystemDto(getValidGradingSystemDetailDto()),
+            new GradingGroupDto().withTitle("Group 3")
                 .withGradingSystemDto(getValidGradingSystemDetailDto()),
         };
     }
 
     protected GradingGroupDto[] getGradingGroupDtosWithNameDuplicates() throws JsonProcessingException {
-        return new GradingGroupDto[] {
+        return new GradingGroupDto[]{
             new GradingGroupDto().withTitle("Group 1")
                 .withGradingSystemDto(getValidGradingSystemDetailDto()),
             new GradingGroupDto().withTitle("Group 1")
@@ -120,8 +132,8 @@ public abstract class TestDataProvider {
         };
     }
 
-    protected GradingGroupDto[] getGradingGroupDtosWithEmptyNames() throws JsonProcessingException{
-        return new GradingGroupDto[] {
+    protected GradingGroupDto[] getGradingGroupDtosWithEmptyNames() throws JsonProcessingException {
+        return new GradingGroupDto[]{
             new GradingGroupDto().withTitle("Group 1")
                 .withGradingSystemDto(getValidGradingSystemDetailDto()),
             new GradingGroupDto().withTitle("")
@@ -217,7 +229,7 @@ public abstract class TestDataProvider {
         ObjectMapper mapper = new ObjectMapper();
 
         GradingSystem system = new GradingSystem();
-        system.stations = new Station[] {
+        system.stations = new Station[]{
             new Station(1L, "Station", new Variable[]{
             }, Op)
         };
@@ -230,7 +242,7 @@ public abstract class TestDataProvider {
         ObjectMapper mapper = new ObjectMapper();
 
         GradingSystem system = new GradingSystem();
-        system.stations = new Station[] {
+        system.stations = new Station[]{
             new Station(1L, "Station", new Variable[]{
                 new Variable(1L, "Var1"),
                 new Variable(2L, "Var2")
@@ -245,7 +257,7 @@ public abstract class TestDataProvider {
         ObjectMapper mapper = new ObjectMapper();
 
         GradingSystem system = new GradingSystem();
-        system.stations = new Station[] {
+        system.stations = new Station[]{
             new Station(1L, "Station", new Variable[]{
                 new Variable(1L, "Var1", minJudgeCount, strat),
             }, new VariableRef(1L))
@@ -258,8 +270,8 @@ public abstract class TestDataProvider {
     protected String getGradingSystemFormula() throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         GradingSystem system = new GradingSystem();
-        system.stations = new Station[] {
-            new Station(1L, "Station 1", new Variable[] {
+        system.stations = new Station[]{
+            new Station(1L, "Station 1", new Variable[]{
                 new Variable(1L, "Var 1", 2L, new Mean()),
                 new Variable(2L, "Var 2", 1L, new Mean()),
             }, new Add(new VariableRef(1L), new VariableRef(2L))),
@@ -316,7 +328,7 @@ public abstract class TestDataProvider {
         securityUserRepository.save(securityUser);
         applicationUserRepository.save(applicationUser);
 
-        return new UserDetailDto[] {
+        return new UserDetailDto[]{
             userMapper.applicationUserToUserDetailDto(applicationUser),
             userMapper.applicationUserToUserDetailDto(applicationUser)
         };
@@ -353,7 +365,7 @@ public abstract class TestDataProvider {
         securityUserRepository.save(securityUser2);
         applicationUserRepository.save(applicationUser2);
 
-        return new UserDetailDto[] {
+        return new UserDetailDto[]{
             userMapper.applicationUserToUserDetailDto(applicationUser1),
             userMapper.applicationUserToUserDetailDto(applicationUser2)
         };
@@ -405,8 +417,8 @@ public abstract class TestDataProvider {
                 firstName, lastName,
                 genders[random.nextInt(genders.length)],
                 new Date(random.nextInt(100) + 1920,
-                    random.nextInt(12)+1,
-                    random.nextInt(27)+1),
+                    random.nextInt(12) + 1,
+                    random.nextInt(27) + 1),
                 ""
             );
             applicationUser.setUser(securityUser);
@@ -417,5 +429,157 @@ public abstract class TestDataProvider {
         }
     }
 
+    protected List<ImportFlag> flagsImport_setupTestFlags() {
+        var managedByes = flagsImport_setupTestManagedBy();
+
+        return new ArrayList<ImportFlag>() {
+            {
+                add(new ImportFlag(
+                    "part1@test.test",
+                    "cool"
+                ));
+                add(new ImportFlag(
+                    "part2@test.test",
+                    "cool"
+                ));
+                add(new ImportFlag(
+                    "part3@test.test",
+                    "cool"
+                ));
+            }
+        };
+    }
+
+    protected List<ImportFlag> flagsImport_setupTestFlags2() {
+        var managedByes = flagsImport_setupTestManagedBy();
+
+        return new ArrayList<ImportFlag>() {
+            {
+                add(new ImportFlag(
+                    "part1@test.test",
+                    "cool"
+                ));
+                add(new ImportFlag(
+                    "part2@test.test",
+                    "cool"
+                ));
+                add(new ImportFlag(
+                    "part3@test.test",
+                    "cool"
+                ));
+            }
+        };
+    }
+    protected List<ApplicationUser> flagsImport_setupTestParticipants(){
+        var part1 = customUserDetailService.registerUser(new UserRegisterDto(
+        "part1@test.test",
+        "rootroot",
+        "fnOne",
+        "lnOne",
+        ApplicationUser.Gender.MALE,
+        new Date(1041697924000L),
+        ApplicationUser.Role.PARTICIPANT
+        ));
+        var part2 = customUserDetailService.registerUser(new UserRegisterDto(
+            "part2@test.test",
+            "rootroot",
+            "fnSec",
+            "lnSec",
+            ApplicationUser.Gender.MALE,
+            new Date(1041697924000L),
+            ApplicationUser.Role.PARTICIPANT
+        ));
+        var part3 = customUserDetailService.registerUser(new UserRegisterDto(
+            "part3@test.test",
+            "rootroot",
+            "fnThi",
+            "lnThi",
+            ApplicationUser.Gender.MALE,
+            new Date(1041697924000L),
+            ApplicationUser.Role.PARTICIPANT
+        ));
+        var part4 = customUserDetailService.registerUser(new UserRegisterDto(
+            "part4@test.test",
+            "rootroot",
+            "fnFou",
+            "lnFou",
+            ApplicationUser.Gender.MALE,
+            new Date(1041697924000L),
+            ApplicationUser.Role.PARTICIPANT
+        ));
+
+        var part5 = customUserDetailService.registerUser(new UserRegisterDto(
+            "part5@test.test",
+            "rootroot",
+            "fnFif",
+            "lnFif",
+            ApplicationUser.Gender.MALE,
+            new Date(1041697924000L),
+            ApplicationUser.Role.PARTICIPANT
+        ));
+
+        return new ArrayList<>() {
+            {
+                add(part1);
+                add(part2);
+                add(part3);
+                add(part4);
+                add(part5);
+            }
+        };
+    }
+    protected List<ApplicationUser> flagsImport_setupTestClubManagers() {
+        var cm1 = customUserDetailService.registerUser(new UserRegisterDto(
+            "cm_1@test.test",
+            "rootroot",
+            "fnnn",
+            "lnnn",
+            ApplicationUser.Gender.MALE,
+            new Date(1041697924000L),
+            ApplicationUser.Role.CLUB_MANAGER
+        ));
+
+        return new ArrayList<>() {
+            {
+                add(cm1);
+            }
+        };
+    }
+    protected List<ManagedBy> flagsImport_setupTestManagedBy() {
+        var cms = flagsImport_setupTestClubManagers();
+        var parts = flagsImport_setupTestParticipants();
+
+        var ret = new ArrayList<ManagedBy>();
+        ret.add(managedByRepository.save(
+            new ManagedBy(
+                cms.get(0),
+                parts.get(0),
+                "Kekus"
+            )
+        ));
+        ret.add(managedByRepository.save(
+            new ManagedBy(
+                cms.get(0),
+                parts.get(1),
+                "Kekus"
+            )
+        ));
+        ret.add(managedByRepository.save(
+            new ManagedBy(
+                cms.get(0),
+                parts.get(2),
+                "Kekus"
+            )
+        ));
+        ret.add(managedByRepository.save(
+            new ManagedBy(
+                cms.get(0),
+                parts.get(3),
+                "Kekus"
+            )
+        ));
+
+        return ret;
+    }
 
 }

@@ -1,7 +1,10 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint;
 
+
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CalenderViewCompetitionDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlag;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlagsResultDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantSelfRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
@@ -31,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -79,6 +83,15 @@ public class UserEndpoint {
         return userService.importTeam(clubManagerTeamImportDto);
     }
 
+    @Secured({"ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER"})
+    @PostMapping("/flags")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ImportFlagsResultDto importFlags(@RequestBody List<ImportFlag> flags) {
+        logger.info("POST {}\n{}", BASE_URI + "/flags", flags);
+
+        return userService.importFlags(flags);
+    }
+
     @Secured({"ROLE_PARTICIPANT", "ROLE_TOURNAMENT_MANAGER", "ROLE_CLUB_MANAGER"})
     @GetMapping
     public UserInfoDto getUser() {
@@ -112,5 +125,7 @@ public class UserEndpoint {
         logger.info("GET {}/search", BASE_PATH);
         return userService.findByUserName(searchDto);
     }
+
+
 
 }

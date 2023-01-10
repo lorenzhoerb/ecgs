@@ -60,6 +60,10 @@ export class German implements ILanguage {
     exportCSVButton: 'Exportieren als CSV',
     createTournament: 'Neuer Wettkampf',
 
+    importFlags: 'Flags zuweisen',
+    flag: 'Flag',
+    optional: 'optional',
+
     username: 'Benutzername / Email',
     firstname: 'Vorname',
     lastname: 'Nachname',

@@ -1,0 +1,127 @@
+<app-content-card [title]="localize.importFlags" class="main-menu">
+    
+    <div class="top-bar">
+        <div class="buttons">
+            <button class="save-button" (click)="onSaveClicked()">{{localize.save}}</button>
+        </div>
+    </div>
+    <div class="team-content">
+        <div style="margin-top:50px;display: flex; align-items: baseline; justify-content: space-between;">
+            <div style="display: flex; width: 50%;">
+
+            </div>
+            <div class="page-section">
+                <button 
+                    style="margin-right: 15px;" 
+                    (click)="onPageChangeClick(-1)"
+                    class="navigation-button"
+                    >
+                    &lt;
+                </button> 
+                {{localize.page}} {{this.currentPage}} 
+                <button 
+                    style="margin-left: 15px;"
+                    (click)="onPageChangeClick(1)"
+                    class="navigation-button"
+                    >
+                    &gt;
+                </button>
+            </div>
+        </div>
+        <div style="display: flex;">
+            <div style="max-width: 10%; display: flex; flex-direction: column; margin-top: 50px;">
+                <button (click)="onAddNewFlagClick()" class="add-new-member-btn" style="font-size: 80%;">+ {{localize.flag}}</button>
+                    <input 
+                        style="display: none" 
+                        type="file" 
+                        (change)="onFileSelect($event)" 
+                        (click)="onFileClick($event)"
+                        #hiddenfileinput>
+                    <button (click)="hiddenfileinput.click()" class="import-as-csv-button csv-button" style="font-size: 80%;margin-top: 10%;">
+                        <img src="/assets/team-import/import.png" class="csv-button-img">
+                        <br>
+                        {{localize.importCSVButton}}</button>
+                    <button (click)="exportAsCSV()" class="export-as-csv-button" style="font-size: 80%;margin-top: 10%;">
+                        <img src="/assets/team-import/export.png" class="csv-button-img csv-button">
+                        <br>
+                        {{localize.exportCSVButton}}</button>
+                <button (click)="onClearClicked()" class="clear-members-btn" style="font-size: 80%;margin-top: 30%;">{{localize.clearAll}}</button>
+            </div>
+                <table class="participants">
+                    <thead class="table-head">
+                        <tr>
+                            <th>#</th>
+                            <th>Email</th>
+                            <th>Flag</th>
+                        </tr>
+                    </thead>
+                    <hr />
+                    <tbody>
+                        <tr *ngFor="let flag of getFlagsForCurrentPage(); let i = index">
+                                <td>{{i + 1 + (this.currentPage - 1) * this.flagsPerPage}}</td>
+                                <td style="width: 45%;">
+                                    <input 
+                                        size="1"
+                                        style="width: 85%;"
+                                        type="text" 
+                                        value="{{flag.email}}" 
+                                        class="form-control member-field-input " 
+                                        (input)="onFlagFieldChange($event.target.value, i, 'email')"
+                                    >
+                                </td>
+                                <td style="width: 45%;">
+                                    <input 
+                                        size="1"
+                                        style="width: 85%;"
+                                        type="text" 
+                                        value="{{flag.flag}}" 
+                                        class="form-control member-field-input" 
+                                        (input)="onFlagFieldChange($event.target.value, i, 'flag')"
+                                    >
+                                </td>
+                                <td>
+                                    <mat-icon (click)="onRemoveFlagClick(i)" style="cursor: pointer; color: hsla(349, 73%, 44%, 1);" _ngcontent-xam-c83="" role="img" class="mat-icon notranslate material-icons mat-ligature-font mat-icon-no-color ng-star-inserted" aria-hidden="true" data-mat-icon-type="font">delete</mat-icon>
+                                </td>
+                                
+                                <!-- <td style="width: 20%;"></td>
+                                <td style="width: 50%;"></td>
+                                <td style="width: 20%;"></td>
+                                <td style="width: 20%;"></td>
+                                <td *ngFor="let header of csvHeaders.forCsv" [style.width]="header === 'email' ? '50%' : '20%'">
+                                    <input 
+                                        size="1"
+                                        style="width: 85%;"
+                                        *ngIf="header !== 'gender'"
+                                        type="{{header !== 'dateOfBirth' ? 'text' : 'date'}}" 
+                                        value="{{teamMember[header]}}" 
+                                        class="member-field-input" 
+                                        (input)="onTeamMemberFieldChange($event.target.value, i, header)"
+                                    >
+                                </td> -->
+                            </tr>
+                    </tbody>
+                </table>
+        </div>
+        <div style="display: flex; align-items: baseline; justify-content: space-between; padding-top: 20px;">
+            <div>
+            </div>
+            <div class="page-section">
+                <button 
+                    style="margin-right: 15px;" 
+                    (click)="onPageChangeClick(-1)"
+                    class="navigation-button"
+                    >
+                    &lt;
+                </button> 
+                {{localize.page}} {{this.currentPage}} 
+                <button 
+                    style="margin-left: 15px;"
+                    (click)="onPageChangeClick(1)"
+                    class="navigation-button"
+                    >
+                    &gt;
+                </button>
+            </div>
+        </div>
+    </div>
+</app-content-card>

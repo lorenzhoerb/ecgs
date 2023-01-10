@@ -64,6 +64,10 @@ export class LocalizationKeys {
 
   createTournament: string;
 
+  importFlags: string;
+  flag: string;
+  optional: string;
+
   username: string;
   firstname: string;
   lastname: string;

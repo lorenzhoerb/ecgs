@@ -7,6 +7,9 @@ import {ResponseParticipantRegistrationDto} from '../dtos/responseParticipantReg
 import {ClubManagerTeamImportDto} from '../dtos/club-manager-team';
 import {CalendarViewCompetition} from '../dtos/competition';
 import {UserDetail} from '../dtos/user-detail';
+import { ImportFlag } from '../dtos/import-flag';
+import { ImportFlagsComponent } from '../components/import-flags/import-flags.component';
+import { ImportFlagsResultDto } from '../dtos/import-flags-result-dto';
 import {ClubManagerTeamImportResults} from '../dtos/club-manager-team-import-results';
 
 @Injectable({
@@ -30,6 +33,9 @@ export class UserService {
     return this.httpClient.post<ClubManagerTeamImportResults>(`${this.userBaseUri}/import-team`, clubManagerTeam);
   };
 
+  public importFlags(flags: ImportFlag[]): Observable<ImportFlagsResultDto> {
+    return this.httpClient.post<ImportFlagsResultDto>(`${this.userBaseUri}/flags`, flags);
+  }
 
   getUserInfo(): Observable<UserInfoDto> {
     console.log('Load user info');

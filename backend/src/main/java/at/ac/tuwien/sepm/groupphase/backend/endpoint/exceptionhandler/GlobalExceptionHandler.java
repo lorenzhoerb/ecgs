@@ -1,12 +1,14 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.exceptionhandler;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ErrorListRestDto;
-import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
-import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
+
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.UnauthorizedException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenListException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -132,5 +134,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         LOGGER.info("Terminating request processing with status 401 due to {}: {}", e.getClass().getSimpleName(), e.getMessage());
         return handleExceptionInternal(e, new ErrorListRestDto("Unauthorized",
             List.of(e.getMessage())), new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
+    }
+
+    @ExceptionHandler(value = {ForbiddenListException.class})
+    public ResponseEntity<Object> handleForbiddenListException(ForbiddenListException e, WebRequest request) {
+        LOGGER.warn("Terminating request processing with status 403 due to {}: {}", e.getClass().getSimpleName(), e.getMessage());
+        ErrorListRestDto errorDto = new ErrorListRestDto(e.summary(), e.errors());
+        return handleExceptionInternal(e, errorDto, new HttpHeaders(), HttpStatus.FORBIDDEN, request);
     }
 }

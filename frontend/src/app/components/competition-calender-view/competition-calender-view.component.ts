@@ -33,6 +33,7 @@ export class CompetitionCalenderViewComponent implements OnInit {
 
 
   ngOnInit(): void {
+    console.log(this.competitions.length);
     this.setupDefaultSelectedWeekInfo();
     this.setupDefaultWeekToShow();
     this.fetchCompetitions();
@@ -73,20 +74,23 @@ export class CompetitionCalenderViewComponent implements OnInit {
     const weekNumber = Number.parseInt(weekSplit[1].substring(1), 10);
 
     if (weekNumber > 52 || weekNumber < 1) {
-      this.interactionText = 'Failed: Invalid date requested\nNumber of the week should be from 1 up to 52';
+      this.notification.error('Failed: Invalid date requested\nNumber of the week should be from 1 up to 52');
       return;
     }
 
     const year = Number.parseInt(weekSplit[0], 10);
 
-    const startOfThatYear = new Date(year, 0, 1);
-    const firstMondayOfThatYear = new Date(startOfThatYear);
+    // 4th day of january is the day that 1st week of that year contains.
+    const fourthJanuaryOfThatYear = new Date(year, 0, 4);
+    const firstMondayOfThatYear = new Date(fourthJanuaryOfThatYear);
     while(firstMondayOfThatYear.getDay() !== 1) {
-      firstMondayOfThatYear.setDate(firstMondayOfThatYear.getDate() + 1);
+      firstMondayOfThatYear.setDate(firstMondayOfThatYear.getDate() - 1);
     }
 
     const startOfThatWeek = new Date(firstMondayOfThatYear);
     startOfThatWeek.setDate(startOfThatWeek.getDate() + 7 * (weekNumber - 1));
+
+    console.log('frst monday of year', firstMondayOfThatYear);
 
     const endOfThatWeek = new Date(startOfThatWeek);
     endOfThatWeek.setDate(endOfThatWeek.getDate() + 6);
@@ -172,11 +176,11 @@ export class CompetitionCalenderViewComponent implements OnInit {
       columnEnd = 1 + (dayNumber === 0 ? 7 : dayNumber);
     }
 
-    return `${(80 + (columnEnd - columnStart)*20)}%`;
+    return `${(80 + (columnEnd - columnStart)*20 - Math.min(40, this.competitions.length))}%`;
   }
 
   getDayBodyGridArea(index: number): string {
-    return `1 / ${index} / ${this.competitions.length*3 + 6} / ${index+1}`;
+    return `1 / ${index} / ${this.competitions.length*6 + 6} / ${index+1}`;
   }
 
   // Rest related

@@ -12,7 +12,7 @@
                 </div>
                 <input type="text" class="form-control ng-pristine ng-invalid ng-touched" (input)="onTeamNameChange($event.target.value)">
             </div>
-            <div class="page-section">
+            <div class="page-section" *ngIf="this.teamMembers.length > this.membersPerPage">
                 <button
                     style="margin-right: 15px;"
                     (click)="onPageChangeClick(-1)"
@@ -70,7 +70,7 @@
                     <hr />
                     <tbody>
                         <tr *ngFor="let teamMember of getTeamMembersForCurrentPage(); let i = index">
-                                <td>{{i + 1 + (this.currentPage - 1) * this.membersPerPage}}</td>
+                                <td>{{getGlobalTeamMemberIndex(i)+1}}</td>
                                 <td style="width: 15%;">
                                     <input
                                         size="1"
@@ -78,7 +78,7 @@
                                         type="text"
                                         value="{{teamMember.firstName}}"
                                         class="form-control member-field-input "
-                                        (input)="onTeamMemberFieldChange($event.target.value, i, 'firstName')"
+                                        (input)="onTeamMemberFieldChange($event.target.value, getGlobalTeamMemberIndex(i), 'firstName')"
                                     >
                                 </td>
                                 <td style="width: 15%;">
@@ -88,7 +88,7 @@
                                         type="text"
                                         value="{{teamMember.lastName}}"
                                         class="form-control member-field-input"
-                                        (input)="onTeamMemberFieldChange($event.target.value, i, 'lastName')"
+                                        (input)="onTeamMemberFieldChange($event.target.value, getGlobalTeamMemberIndex(i), 'lastName')"
                                     >
                                 </td>
                                 <td style="width: 30%;">
@@ -98,14 +98,14 @@
                                         type="text"
                                         value="{{teamMember.email}}"
                                         class="form-control member-field-input"
-                                        (input)="onTeamMemberFieldChange($event.target.value, i, 'email')"
+                                        (input)="onTeamMemberFieldChange($event.target.value, getGlobalTeamMemberIndex(i), 'email')"
                                     >
                                 </td>
                                 <td style="width: 8%;">
                                     <select
                                         class="form-control member-field-input"
                                         [value]="teamMember.gender"
-                                        (input)="onTeamMemberFieldChange($event.target.value, i, 'gender')"
+                                        (input)="onTeamMemberFieldChange($event.target.value, getGlobalTeamMemberIndex(i), 'gender')"
                                         #select (change)="select.blur()"
                                         >
                                         <option value="MALE">{{localize.getGender('Male')}}</option>
@@ -120,7 +120,7 @@
                                         type="date"
                                         value="{{teamMember.dateOfBirth}}"
                                         class="form-control member-field-input"
-                                        (input)="onTeamMemberFieldChange($event.target.value, i, 'dateOfBirth')"
+                                        (input)="onTeamMemberFieldChange($event.target.value, getGlobalTeamMemberIndex(i), 'dateOfBirth')"
                                         #date (change)="date.blur()"
                                     >
                                 </td>
@@ -131,11 +131,11 @@
                                         type="text"
                                         value="{{teamMember.flag}}"
                                         class="form-control member-field-input"
-                                        (input)="onTeamMemberFieldChange($event.target.value, i, 'flag')"
+                                        (input)="onTeamMemberFieldChange($event.target.value, getGlobalTeamMemberIndex(i), 'flag')"
                                     >
                                 </td>
                                 <td>
-                                    <mat-icon (click)="onRemoveMemberClick(i)" style="cursor: pointer; color: hsla(349, 73%, 44%, 1);" _ngcontent-xam-c83="" role="img" class="mat-icon notranslate material-icons mat-ligature-font mat-icon-no-color ng-star-inserted" aria-hidden="true" data-mat-icon-type="font">delete</mat-icon>
+                                    <mat-icon (click)="onRemoveMemberClick(getGlobalTeamMemberIndex(i))" style="cursor: pointer; color: hsla(349, 73%, 44%, 1);" _ngcontent-xam-c83="" role="img" class="mat-icon notranslate material-icons mat-ligature-font mat-icon-no-color ng-star-inserted" aria-hidden="true" data-mat-icon-type="font">delete</mat-icon>
                                 </td>
 
                                 <!-- <td style="width: 20%;"></td>
@@ -160,7 +160,7 @@
         <div style="display: flex; align-items: baseline; justify-content: space-between; padding-top: 20px;">
             <div>
             </div>
-            <div class="page-section">
+            <div class="page-section" *ngIf="this.teamMembers.length > this.membersPerPage">
                 <button
                     style="margin-right: 15px;"
                     (click)="onPageChangeClick(-1)"

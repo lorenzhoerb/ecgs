@@ -61,6 +61,11 @@ export class ImportFlagsComponent implements OnInit {
 
   public onClearClicked() {
     this.flags = [];
+    this.currentPage = 1;
+  }
+
+  public getGlobalFlagIndex(index: number) {
+    return index + (this.currentPage - 1) * this.flagsPerPage;
   }
 
   public onSaveClicked(): void {
@@ -136,6 +141,9 @@ export class ImportFlagsComponent implements OnInit {
 
   public onRemoveFlagClick(index: number) {
     this.flags.splice(index, 1);
+    if (this.flags.length <= (this.currentPage-1) * this.flagsPerPage) {
+      this.currentPage--;
+    }
   }
 
   public exportAsCSV() {

@@ -85,6 +85,7 @@ export class ClubManagerImportTeamComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
   }
 
   public onFileSelect(event: any): void {
@@ -108,6 +109,7 @@ export class ClubManagerImportTeamComponent implements OnInit {
 
   public onClearClicked() {
     this.teamMembers = [];
+    this.currentPage = 1;
   }
 
   public onSaveClicked(): void {
@@ -184,6 +186,13 @@ export class ClubManagerImportTeamComponent implements OnInit {
 
   public onRemoveMemberClick(index: number) {
     this.teamMembers.splice(index, 1);
+    if (this.teamMembers.length <= (this.currentPage-1) * this.membersPerPage) {
+      this.currentPage--;
+    }
+  }
+
+  public getGlobalTeamMemberIndex(index: number) {
+    return index + (this.currentPage - 1) * this.membersPerPage;
   }
 
   public exportAsCSV() {

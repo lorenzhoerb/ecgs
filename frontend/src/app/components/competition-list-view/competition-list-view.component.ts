@@ -12,7 +12,7 @@ import LocalizationService, { LocalizeService } from 'src/app/services/localizat
 })
 export class CompetitionListViewComponent implements OnInit {
   competitions: SimpleCompetitionListDto = [];
-  competitionPerPage = 5;
+  competitionsPerPage = 5;
   currentPage = 1;
 
   constructor(
@@ -30,7 +30,7 @@ export class CompetitionListViewComponent implements OnInit {
   }
 
   public onPageChangeClick(change: number) {
-    if (change > 0 && Math.ceil(this.competitions.length / this.competitionPerPage) - this.currentPage <= 0) {
+    if (change > 0 && Math.ceil(this.competitions.length / this.competitionsPerPage) - this.currentPage <= 0) {
       return;
     }
     if (change < 0 && this.currentPage + change <= 0) {
@@ -60,8 +60,8 @@ export class CompetitionListViewComponent implements OnInit {
   }
 
   public getCompetitionsForCurrentPage(): SimpleCompetitionListDto {
-    const lowerBound = (this.currentPage - 1) * this.competitionPerPage;
-    const upperBound = lowerBound + this.competitionPerPage;
+    const lowerBound = (this.currentPage - 1) * this.competitionsPerPage;
+    const upperBound = lowerBound + this.competitionsPerPage;
 
     return this.competitions.slice(lowerBound, upperBound);
   }

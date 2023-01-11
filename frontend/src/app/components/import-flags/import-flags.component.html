@@ -10,7 +10,7 @@
             <div style="display: flex; width: 50%;">
 
             </div>
-            <div class="page-section">
+            <div class="page-section" *ngIf="this.flags.length > this.flagsPerPage">
                 <button 
                     style="margin-right: 15px;" 
                     (click)="onPageChangeClick(-1)"
@@ -58,7 +58,7 @@
                     <hr />
                     <tbody>
                         <tr *ngFor="let flag of getFlagsForCurrentPage(); let i = index">
-                                <td>{{i + 1 + (this.currentPage - 1) * this.flagsPerPage}}</td>
+                                <td>{{getGlobalFlagIndex(i) + 1}}</td>
                                 <td style="width: 45%;">
                                     <input 
                                         size="1"
@@ -66,7 +66,7 @@
                                         type="text" 
                                         value="{{flag.email}}" 
                                         class="form-control member-field-input " 
-                                        (input)="onFlagFieldChange($event.target.value, i, 'email')"
+                                        (input)="onFlagFieldChange($event.target.value, getGlobalFlagIndex(i), 'email')"
                                     >
                                 </td>
                                 <td style="width: 45%;">
@@ -76,11 +76,11 @@
                                         type="text" 
                                         value="{{flag.flag}}" 
                                         class="form-control member-field-input" 
-                                        (input)="onFlagFieldChange($event.target.value, i, 'flag')"
+                                        (input)="onFlagFieldChange($event.target.value, getGlobalFlagIndex(i), 'flag')"
                                     >
                                 </td>
                                 <td>
-                                    <mat-icon (click)="onRemoveFlagClick(i)" style="cursor: pointer; color: hsla(349, 73%, 44%, 1);" _ngcontent-xam-c83="" role="img" class="mat-icon notranslate material-icons mat-ligature-font mat-icon-no-color ng-star-inserted" aria-hidden="true" data-mat-icon-type="font">delete</mat-icon>
+                                    <mat-icon (click)="onRemoveFlagClick(getGlobalFlagIndex(i))" style="cursor: pointer; color: hsla(349, 73%, 44%, 1);" _ngcontent-xam-c83="" role="img" class="mat-icon notranslate material-icons mat-ligature-font mat-icon-no-color ng-star-inserted" aria-hidden="true" data-mat-icon-type="font">delete</mat-icon>
                                 </td>
                                 
                                 <!-- <td style="width: 20%;"></td>
@@ -105,7 +105,7 @@
         <div style="display: flex; align-items: baseline; justify-content: space-between; padding-top: 20px;">
             <div>
             </div>
-            <div class="page-section">
+            <div class="page-section" *ngIf="this.flags.length > this.flagsPerPage">
                 <button 
                     style="margin-right: 15px;" 
                     (click)="onPageChangeClick(-1)"

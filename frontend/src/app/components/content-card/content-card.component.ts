@@ -1,4 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import { TemplateAction, TemplateState } from 'src/app/datatypes/templateAction';
 
 @Component({
   selector: 'app-content-card',
@@ -11,12 +12,16 @@ export class ContentCardComponent implements OnInit {
   @Input() color = 'bc-space';
   @Input() isEdit = false;
   @Input() actions = [];
+  @Input() templateState = TemplateState.none;
 
   @Output() titleChange = new EventEmitter<string>();
 
   @Output() duplicate = new EventEmitter();
   @Output() delete = new EventEmitter();
   @Output() collapsed = new EventEmitter<boolean>();
+  @Output() templateAction = new EventEmitter<TemplateAction>();
+
+  public tState = TemplateState;
 
 
   _collapsed = false;
@@ -42,6 +47,9 @@ export class ContentCardComponent implements OnInit {
   collapse() {
     this._collapsed = !this._collapsed;
     this.collapsed.emit(this._collapsed);
+  }
+  templateClicked() {
+    this.templateAction.emit(TemplateAction.saveNew);
   }
 
 }

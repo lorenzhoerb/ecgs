@@ -8,8 +8,10 @@ import org.mapstruct.Mapping;
 @Mapper
 public interface GradingSystemMapper {
     @Mapping(source = "isPublic", target = "public")
+    @Mapping(source = "isTemplate", target = "template")
     GradingSystem gradingSystemDetailDtoToGradingSystem(GradingSystemDetailDto gradingSystemDetailDto);
 
     @Mapping(source = "public", target = "isPublic")
+    @Mapping(source = "template", target = "isTemplate")
     GradingSystemDetailDto gradingSystemToGradingSystemDetailDto(GradingSystem gradingSystem);
 }

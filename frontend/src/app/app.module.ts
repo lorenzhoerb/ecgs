@@ -25,6 +25,8 @@ import {ResetPasswordComponent} from './components/reset-password/reset-password
 import {ChangePasswordComponent} from './components/change-password/change-password.component';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import { MatDialogModule } from '@angular/material/dialog';
 import {ViewParticipantsComponent} from './components/competition/view-participants/view-participants.component';
 import {ErrorComponent} from './components/error/error.component';
 import {ToastrModule} from 'ngx-toastr';
@@ -33,6 +35,7 @@ import {FormularEditorComponent} from './components/competition/formular-editor/
 import {RegisterModalComponent} from './components/competition/register-modal/register-modal.component';
 import {HeaderModalComponent} from './components/header-modal/header-modal.component';
 import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
 import {CompetitionListViewComponent} from './components/competition-list-view/competition-list-view.component';
 import {
   CompetitionListViewEntryComponent
@@ -48,6 +51,7 @@ import {CompetitionHeaderComponent} from './components/competition-header/compet
 import {AutocompleteComponent} from './components/autocomplete/autocomplete.component';
 import {HeaderCreateModalComponent} from './components/header-create-modal/header-create-modal.component';
 import { ImportFlagsComponent } from './components/import-flags/import-flags.component';
+import { TemplateDialogComponent } from './components/competition/template-dialog/template-dialog.component';
 
 @NgModule({
   declarations: [
@@ -83,6 +87,7 @@ import { ImportFlagsComponent } from './components/import-flags/import-flags.com
     AutocompleteComponent,
     HeaderCreateModalComponent,
     ImportFlagsComponent,
+    TemplateDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -94,9 +99,12 @@ import { ImportFlagsComponent } from './components/import-flags/import-flags.com
     FormsModule,
     MatIconModule,
     MatButtonToggleModule,
+    MatTooltipModule,
+    MatDialogModule,
     ToastrModule.forRoot(),
     DragDropModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    MatInputModule
   ],
   providers: [httpInterceptorProviders],
   bootstrap: [AppComponent]

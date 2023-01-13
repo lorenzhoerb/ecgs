@@ -39,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -67,6 +68,7 @@ public abstract class TestDataProvider {
     protected static final String BASE_URI = "/api/v1";
     protected static final String COMPETITION_URI = "/competitions";
     protected static final String COMPETITION_BASE_URI = BASE_URI + COMPETITION_URI;
+    protected static final String GRADING_GROUP_BASE_URI = BASE_URI + "/grading-systems";
     protected static final String USER_URI = "/user";
     protected static final String USER_BASE_URI = BASE_URI + USER_URI;
     protected static final String COMPETITION_SELF_REGISTRATION_BASE_URI = USER_BASE_URI + "/competitions/";
@@ -163,8 +165,9 @@ public abstract class TestDataProvider {
         customUserDetailService.login(userLoginDto);
     }
 
-    protected void setUpCompetitionUser() {
-        customUserDetailService.registerUser(getValidRegistrationDtoForCompetitionManager());
+    protected ApplicationUser setUpCompetitionUser() {
+        return customUserDetailService
+            .registerUser(getValidRegistrationDtoForCompetitionManager());
     }
 
     protected void setUpParticipantUser() {
@@ -304,6 +307,7 @@ public abstract class TestDataProvider {
         return new GradingSystemDetailDto(
             "Grading System 1",
             "Test grading system for testing",
+            false,
             false,
             getGradingSystemFormula()
         );

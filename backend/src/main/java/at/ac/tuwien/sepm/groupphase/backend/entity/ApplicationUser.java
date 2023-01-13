@@ -83,6 +83,9 @@ public class ApplicationUser {
     @ManyToMany(cascade = {}, mappedBy = "judges")
     private Set<Competition> judging;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator")
+    private Set<GradingSystem> gradingSystems;
+
     public ApplicationUser(Role type, String firstName, String lastName, Gender gender,
                            Date dateOfBirth, String picturePath) {
         this.type = type;
@@ -195,6 +198,22 @@ public class ApplicationUser {
 
     public void setRegistrations(Set<RegisterTo> registrations) {
         this.registrations = registrations;
+    }
+
+    public Set<Competition> getJudging() {
+        return judging;
+    }
+
+    public void setJudging(Set<Competition> judging) {
+        this.judging = judging;
+    }
+
+    public Set<GradingSystem> getGradingSystems() {
+        return gradingSystems;
+    }
+
+    public void setGradingSystems(Set<GradingSystem> gradingSystems) {
+        this.gradingSystems = gradingSystems;
     }
 
     @Override

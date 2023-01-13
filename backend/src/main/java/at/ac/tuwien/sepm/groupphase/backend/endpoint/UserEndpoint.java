@@ -95,7 +95,7 @@ public class UserEndpoint {
     @Secured({"ROLE_PARTICIPANT", "ROLE_TOURNAMENT_MANAGER", "ROLE_CLUB_MANAGER"})
     @GetMapping
     public UserInfoDto getUser() {
-        logger.info("GET {}\n", BASE_PATH);
+        logger.info("GET {}", BASE_PATH);
         return userService.getUser();
     }
 

@@ -32,14 +32,17 @@ export class FormularEditorComponent implements OnInit, OnChanges {
 
   variables = cloneDeep(this.vars);
 
+  tempConst = 0.0;
+
   functions: any[] = [
     { name: '+', value: 'add', typeHint: 'add', type: 'function', spaces: 2, priority: 2 },
     { name: '-', value: 'subt',typeHint: 'subt', type: 'function', spaces: 2, priority: 2 },
     { name: '*', value: 'mult',typeHint: 'mult', type: 'function', spaces: 2, priority: 3 },
     { name: '/', value: 'div', typeHint: 'div', type: 'function', spaces: 2, priority: 3 },
     //{ name: "mean", type: "function", spaces: 'n', priority: 4 },
-    //{ name: "x", type: "constant", spaces: 1, priority: 0},
   ];
+
+  constants: any[] = [];
 
   calculation: any[][] = [
     []
@@ -72,6 +75,10 @@ export class FormularEditorComponent implements OnInit, OnChanges {
       this.calculationsFromTree(this.formula.data);
       this.listRebuild();
     }
+  }
+
+  addConstant() {
+    this.constants.push({ name: `${this.tempConst}`, value: this.tempConst, typeHint: 'const', type: 'constant', spaces: 0, priority: 0},);
   }
 
   calculationsFromTree(t) {
@@ -233,24 +240,26 @@ export class FormularEditorComponent implements OnInit, OnChanges {
     const inbetween =
       this.calculation.length > i + 1
       && this.calculation[i+1].length > 0
-      && this.calculation[i+1][0].type === 'variable'
+      && ['constant','variable'].includes(this.calculation[i+1][0].type)
       && i > 0 && this.calculation[i-1].length > 0
-      && this.calculation[i-1][0].type === 'variable';
+      && ['constant','variable'].includes(this.calculation[i-1][0].type);
 
     const inb = this.calculation[i].length === 0
         && (
             (this.calculation.length > i + 1
               && this.calculation[i+1].length > 0
-              && this.calculation[i+1][0].type === 'variable')
+              && ['constant','variable'].includes(this.calculation[i+1][0].type))
           || (i > 0 && this.calculation[i-1].length > 0
-              && this.calculation[i-1][0].type === 'variable')
+              && ['constant','variable'].includes(this.calculation[i-1][0].type))
           )
         && !inbetween;
 
     const opempty = this.calculation[i].length === 0 && !inb
           && (
-            (i > 0 && this.calculation[i-1].length > 0 && this.calculation[i-1][0].type === 'variable')
-            || ( i < this.calculation.length -1 && this.calculation[i+1].length > 0 && this.calculation[i+1][0].type === 'variable'));
+            (i > 0 && this.calculation[i-1].length > 0
+              && ['constant','variable'].includes(this.calculation[i-1][0].type))
+            || ( i < this.calculation.length -1 && this.calculation[i+1].length > 0
+              && ['constant','variable'].includes(this.calculation[i+1][0].type)));
 
     return {
       items: true,

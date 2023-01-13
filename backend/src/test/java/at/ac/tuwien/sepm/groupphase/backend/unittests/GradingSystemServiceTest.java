@@ -2,6 +2,7 @@ package at.ac.tuwien.sepm.groupphase.backend.unittests;
 
 import at.ac.tuwien.sepm.groupphase.backend.basetest.TestDataProvider;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingSystemDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.StrategyException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
@@ -30,9 +31,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -49,12 +53,14 @@ public class GradingSystemServiceTest extends TestDataProvider {
     @Autowired
     private ApplicationUserRepository applicationUserRepository;
 
+    private ApplicationUser user;
+
     @BeforeEach
     public void beforeEach() {
         gradingSystemRepository.deleteAll();
         gradingGroupRepository.deleteAll();
         applicationUserRepository.deleteAll();
-        setUpCompetitionUser();
+        user = setUpCompetitionUser();
     }
 
     @Test
@@ -168,10 +174,16 @@ public class GradingSystemServiceTest extends TestDataProvider {
     @Test
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
     public void givenValidGradingSystem_createGradingSystem() throws JsonProcessingException  {
+        GradingSystemDetailDto gradingSystem = getValidGradingSystemDetailDto().withIsTemplate(true);
         GradingSystemDetailDto result =
-            gradingSystemService.createGradingSystem(getValidGradingSystemDetailDto());
+            gradingSystemService.createGradingSystem(gradingSystem);
         assertNotNull(result);
         assertNotNull(result.name());
+        Optional<at.ac.tuwien.sepm.groupphase.backend.entity.GradingSystem>
+            entity =  gradingSystemRepository.findFirstByNameAndCreatorAndIsTemplateIsTrue(gradingSystem.name(), user);
+
+        assertTrue(entity.isPresent());
+        assertEquals(user.getId(), entity.get().getCreator().getId());
     }
 
     @Test
@@ -181,6 +193,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
             "A".repeat(257),
             "desc",
             true,
+            false,
             getGradingSystemFormula()
         );
 
@@ -197,6 +210,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
             null,
             "desc",
             true,
+            false,
             getGradingSystemFormula()
         );
 
@@ -213,6 +227,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
             "",
             "desc",
             true,
+            false,
             getGradingSystemFormula()
         );
 
@@ -229,6 +244,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
             "name",
             "A".repeat(4097),
             true,
+            false,
             getGradingSystemFormula()
         );
 
@@ -245,6 +261,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
             "name",
             null,
             true,
+            false,
             getGradingSystemFormula()
         );
 
@@ -261,6 +278,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
             "name",
             "",
             true,
+            false,
             getGradingSystemFormula()
         );
 
@@ -277,6 +295,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
             "name",
             "desc",
             true,
+            false,
             "A".repeat(65537)
         );
 
@@ -293,6 +312,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
             "name",
             "desc",
             true,
+            false,
             ""
         );
 
@@ -309,6 +329,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
             "name",
             "description",
             true,
+           false,
            null
         );
 
@@ -336,6 +357,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
             "name",
             "description",
             true,
+            false,
             mapper.writeValueAsString(system)
         );
 
@@ -365,6 +387,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
             "name",
             "description",
             true,
+            false,
             mapper.writeValueAsString(system)
         );
 

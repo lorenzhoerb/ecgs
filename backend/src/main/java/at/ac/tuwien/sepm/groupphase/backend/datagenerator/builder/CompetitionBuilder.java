@@ -183,6 +183,7 @@ public class CompetitionBuilder {
             "Test",
             "Test",
             true,
+            false,
             getGradingSystemFormula(),
             null
         );

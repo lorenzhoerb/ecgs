@@ -6,6 +6,13 @@
             <ng-content select="[mini]"></ng-content>
         </div>
         <div class="action-container">
+            <mat-icon 
+                *ngIf="actions.includes('template') && templateState ===  tState.saved" 
+                data-toggle="tooltip" title="Als Vorlage gespeichert">bookmark</mat-icon>
+            <mat-icon 
+                *ngIf="actions.includes('template') && templateState === tState.none" 
+                data-toggle="tooltip" title="Als Vorlage speichern"
+                (click)="templateClicked()">bookmark_outline</mat-icon>
             <mat-icon *ngIf="actions.includes('delete')" (click)="deleteClicked()">delete</mat-icon>
             <mat-icon *ngIf="actions.includes('duplicate')" (click)="duplicateClicked()">content_copy</mat-icon>
             <mat-icon *ngIf="actions.includes('collapse') && !_collapsed" (click)="collapse()">expand_less</mat-icon>

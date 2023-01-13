@@ -14,8 +14,22 @@
             <div class="functions copy" cdkDropList [cdkDropListData]="functions" cdkDropListSortingDisabled
                 (cdkDropListDropped)="drop($event)" (cdkDropListExited)="exitedFuns($event)"
                 (cdkDropListEntered)="entered()" [cdkDropListEnterPredicate]="noEnterPredicate">
-                <div class="function" *ngFor="let item of functions;" cdkDrag [cdkDragData]="item">
+                <div [class]="item.type" *ngFor="let item of functions;" cdkDrag [cdkDragData]="item">
                     {{item.name}}
+                </div>
+            </div>
+            <div class="constants copy" cdkDropList [cdkDropListData]="constants" cdkDropListSortingDisabled
+                (cdkDropListDropped)="drop($event)" (cdkDropListExited)="exitedFuns($event)"
+                (cdkDropListEntered)="entered()" [cdkDropListEnterPredicate]="noEnterPredicate">
+                <div [class]="item.type" *ngFor="let item of constants;" cdkDrag [cdkDragData]="item">
+                    {{item.name}}
+                </div>
+            </div>
+
+            <div class="add-note flex-center flex-end-100">
+                <input type="number" [(ngModel)]="tempConst">
+                <div class="add-note flex-center" (click)="addConstant()">
+                    <mat-icon>add_circle_outline</mat-icon> Konstante
                 </div>
             </div>
         </div>

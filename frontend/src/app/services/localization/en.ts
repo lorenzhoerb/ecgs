@@ -20,6 +20,7 @@ export class Englisch implements ILanguage {
     noPreference: 'No Preference',
     forgotPassword: 'Forgot Password',
     sendResetLink: 'Send reset link',
+    gradingGroup: 'Grading Group',
 
     edit: 'Edit',
 
@@ -46,6 +47,16 @@ export class Englisch implements ILanguage {
     beginAtOrAfter: 'Begins at / after',
     registrationNotDone: 'Registration not closed',
     search: 'Search',
+    all: 'All',
+    accepted: 'Accepted',
+    outstanding: 'Outstanding',
+    status: 'Status',
+    action: 'Action',
+    editStatus: 'Edit Status',
+    editGradingGroup: 'Edit Grading Group',
+    manageParticipants: 'Manage Participants',
+    cancel: 'Cancel',
+    oopsSomethingWentWrong: 'Oops, something went wrong.',
 
     logout: 'Logout',
     importCSV: 'New Team Members',
@@ -63,7 +74,6 @@ export class Englisch implements ILanguage {
     importFlags: 'Assign flags',
     flag: 'Flag',
     optional: 'optional',
-
 
     username: 'Username / Email',
     firstname: 'Firstname',

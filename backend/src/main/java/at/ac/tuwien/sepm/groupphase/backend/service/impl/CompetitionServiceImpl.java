@@ -1,12 +1,14 @@
 package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionViewDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionViewDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.PageableDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantFilterDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.CompetitionMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.GradingGroupMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.GradingSystemMapper;
@@ -14,23 +16,29 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.entity.GradingGroup;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.GradingSystem;
 import at.ac.tuwien.sepm.groupphase.backend.entity.RegisterTo;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingSystemRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import at.ac.tuwien.sepm.groupphase.backend.service.GradingSystemService;
+import at.ac.tuwien.sepm.groupphase.backend.specification.ApplicationUserSpecs;
 import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
 import at.ac.tuwien.sepm.groupphase.backend.validation.CompetitionValidator;
 import at.ac.tuwien.sepm.groupphase.backend.validation.GradingSystemValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -58,6 +66,8 @@ public class CompetitionServiceImpl implements CompetitionService {
     private final CompetitionValidator competitionValidator;
     private final GradingSystemService gradingSystemService;
     private final SessionUtils sessionUtils;
+    private final ApplicationUserRepository applicationUserRepository;
+    private final RegisterToRepository registerToRepository;
 
     public CompetitionServiceImpl(CompetitionRepository competitionRepository, CompetitionMapper competitionMapper,
                                   CompetitionValidator competitionValidator, UserMapper userMapper,
@@ -66,7 +76,9 @@ public class CompetitionServiceImpl implements CompetitionService {
                                   GradingSystemRepository gradingSystemRepository,
                                   GradingSystemMapper gradingSystemMapper,
                                   GradingSystemValidator gradingSystemValidator,
-                                  GradingGroupMapper gradingGroupMapper) {
+                                  GradingGroupMapper gradingGroupMapper,
+                                  ApplicationUserRepository applicationUserRepository,
+                                  RegisterToRepository registerToRepository) {
         this.competitionRepository = competitionRepository;
         this.competitionMapper = competitionMapper;
         this.userMapper = userMapper;
@@ -76,8 +88,10 @@ public class CompetitionServiceImpl implements CompetitionService {
         this.gradingGroupRepository = gradingGroupRepository;
         this.gradingSystemService = gradingSystemService;
         this.gradingSystemRepository = gradingSystemRepository;
-        this.gradingSystemMapper     = gradingSystemMapper;
+        this.gradingSystemMapper = gradingSystemMapper;
         this.gradingSystemValidator = gradingSystemValidator;
+        this.applicationUserRepository = applicationUserRepository;
+        this.registerToRepository = registerToRepository;
     }
 
     private void verifyCreator(Long id) {
@@ -183,6 +197,16 @@ public class CompetitionServiceImpl implements CompetitionService {
             .setJudges(judgeDtos);
     }
 
+    private int compare(Object o1, Object o2) {
+        ApplicationUser p1 = (ApplicationUser) o1;
+        ApplicationUser p2 = (ApplicationUser) o2;
+        int res = p1.getLastName().compareToIgnoreCase(p2.getLastName());
+        if (res != 0) {
+            return res;
+        }
+        return p1.getFirstName().compareToIgnoreCase(p2.getFirstName());
+    }
+
     @Override
     public Set<UserDetailDto> getParticipants(Long id) {
         LOGGER.debug("List participants for competition {}", id);
@@ -214,6 +238,41 @@ public class CompetitionServiceImpl implements CompetitionService {
             registerTos.stream().map(RegisterTo::getParticipant).collect(Collectors.toSet());
 
         return userMapper.applicationUserSetToUserDetailDtoSet(participants);
+    }
+
+    @Override
+    public Page<ParticipantRegDetailDto> getParticipantsRegistrationDetails(PageableDto<ParticipantFilterDto> filter) {
+        LOGGER.debug("getParticipantsRegistrationDetails({})", filter);
+        if (!sessionUtils.isCompetitionManager()) {
+            throw new ForbiddenException("No permission to get participant registration details");
+        }
+
+        //User owns competition
+        Competition competition = competitionRepository
+            .findByIdAndCreatorId(filter.filters().getCompetitionId(), sessionUtils.getSessionUser().getId())
+            .orElseThrow(() -> new NotFoundException("No competition found"));
+
+        int page = 0;
+        int size = 10;
+        if (filter.page() != null && filter.page() >= 0) {
+            page = filter.page();
+        }
+
+        if (filter.size() != null && filter.size() >= 0) {
+            size = filter.size();
+        }
+
+        Specification<ApplicationUser> specification = ApplicationUserSpecs.specs(filter.filters());
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ApplicationUser> partPage = applicationUserRepository.findAll(specification, pageable);
+
+        return new PageImpl<>(partPage.getContent()
+            .stream()
+            .map(p -> mapPartRegDetailDto(
+                p,
+                competition.getId())).toList(),
+            pageable,
+            partPage.getTotalElements());
     }
 
     public CompetitionViewDto findOne(Long id) {
@@ -305,5 +364,19 @@ public class CompetitionServiceImpl implements CompetitionService {
             Collectors.toList());
 
         return competitionMapper.competitionListToCompetitionListDtoList(searchResult);
+    }
+
+    private ParticipantRegDetailDto mapPartRegDetailDto(ApplicationUser u, Long compId) {
+        RegisterTo registerTo = registerToRepository
+            .findByGradingGroupCompetitionIdAndParticipantId(compId, u.getId()).get();
+        return new ParticipantRegDetailDto(
+            u.getId(),
+            u.getFirstName(),
+            u.getLastName(),
+            u.getGender(),
+            u.getDateOfBirth(),
+            registerTo.getGradingGroup().getId(),
+            registerTo.getAccepted()
+        );
     }
 }

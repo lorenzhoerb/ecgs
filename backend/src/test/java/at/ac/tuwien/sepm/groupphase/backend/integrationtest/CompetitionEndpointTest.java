@@ -2,6 +2,7 @@ package at.ac.tuwien.sepm.groupphase.backend.integrationtest;
 
 import at.ac.tuwien.sepm.groupphase.backend.basetest.TestDataProvider;
 import at.ac.tuwien.sepm.groupphase.backend.config.properties.SecurityProperties;
+import at.ac.tuwien.sepm.groupphase.backend.datagenerator.builder.CompetitionBuilder;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
@@ -15,6 +16,8 @@ import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.GradingSystemRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.SecurityUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
@@ -34,6 +37,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -41,6 +45,7 @@ import java.util.Set;
 
 import static at.ac.tuwien.sepm.groupphase.backend.integrationtest.TestData.ADMIN_ROLES;
 import static at.ac.tuwien.sepm.groupphase.backend.integrationtest.TestData.ADMIN_USER;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -71,6 +76,12 @@ public class CompetitionEndpointTest extends TestDataProvider {
     private RegisterToRepository registerToRepository;
 
     @Autowired
+    private GradingSystemRepository gradingSystemRepository;
+
+    @Autowired
+    private SecurityUserRepository securityUserRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
@@ -91,6 +102,8 @@ public class CompetitionEndpointTest extends TestDataProvider {
         applicationUserRepository.deleteAll();
         gradingGroupRepository.deleteAll();
         registerToRepository.deleteAll();
+        gradingSystemRepository.deleteAll();
+        securityUserRepository.deleteAll();
     }
 
     @Test
@@ -330,6 +343,52 @@ public class CompetitionEndpointTest extends TestDataProvider {
         MockHttpServletResponse response = mvcResult.getResponse();
         assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
     }
+
+    @Test
+    public void getRegParticipantsManagement_whenNotLoggedIn_expect403() throws Exception {
+        MvcResult mvcResult = this.mockMvc.perform(
+                get(COMPETITION_BASE_URI + "/{id}/participants/registrations",
+                    1L)
+            )
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
+    }
+
+    @Test
+    @Transactional
+    public void searchRegisteredParticipants_withDetailedInformation_expect200() throws Exception {
+        setUpCompetitionUser();
+        ApplicationUser creator = applicationUserRepository.findApplicationUserByUserEmail(TEST_USER_COMPETITION_MANAGER_EMAIL).get();
+        Competition c = new CompetitionBuilder(
+            applicationUserRepository,
+            competitionRepository,
+            gradingGroupRepository,
+            registerToRepository,
+            gradingSystemRepository
+        )
+            .withCreator(creator)
+            .withParticipantsPerGroup(25)
+            .withGradingGroups(Set.of("T1"))
+            .create();
+
+        MvcResult mvcResult = this.mockMvc.perform(
+                get(COMPETITION_BASE_URI + "/{id}/participants/registrations?page=0",
+                    c.getId())
+                    .header(
+                        securityProperties.getAuthHeader(),
+                        jwtTokenizer.getAuthToken(
+                            TEST_USER_COMPETITION_MANAGER_EMAIL,
+                            List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
+                        ))
+            )
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+    }
+
 
     //@Transactional
     @Test

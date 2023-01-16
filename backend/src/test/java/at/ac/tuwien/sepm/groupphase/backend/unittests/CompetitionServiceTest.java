@@ -1,7 +1,16 @@
 package at.ac.tuwien.sepm.groupphase.backend.unittests;
 
 import at.ac.tuwien.sepm.groupphase.backend.basetest.TestDataProvider;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.*;
+import at.ac.tuwien.sepm.groupphase.backend.datagenerator.builder.CompetitionBuilder;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionViewDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.PageableDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantFilterDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
@@ -20,6 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -295,7 +305,7 @@ public class CompetitionServiceTest extends TestDataProvider {
                     LocalDateTime.now(),
                     LocalDateTime.now()));
 
-        assertEquals(2,searchList.size());
+        assertEquals(2, searchList.size());
     }
 
     @Test
@@ -323,7 +333,7 @@ public class CompetitionServiceTest extends TestDataProvider {
             comp.setJudges(new UserDetailDto[] {
                 new UserDetailDto(
                     -1L, "first", "last", ApplicationUser.Gender.MALE,
-                    new Date(2000,1,1),
+                    new Date(2000, 1, 1),
                     ""
                 )
             });
@@ -342,7 +352,7 @@ public class CompetitionServiceTest extends TestDataProvider {
             comp.setJudges(new UserDetailDto[] {
                 new UserDetailDto(
                     null, "first", "last", ApplicationUser.Gender.MALE,
-                    new Date(2000,1,1),
+                    new Date(2000, 1, 1),
                     ""
                 )
             });
@@ -358,7 +368,7 @@ public class CompetitionServiceTest extends TestDataProvider {
         CompetitionDetailDto comp = getValidCompetitionDetailDto();
 
         comp.setJudges(
-            getValidJudges(applicationUserRepository,securityUserRepository)
+            getValidJudges(applicationUserRepository, securityUserRepository)
         );
 
         CompetitionDetailDto result = competitionService.create(comp);
@@ -372,4 +382,138 @@ public class CompetitionServiceTest extends TestDataProvider {
         assertNotNull(result.getJudges()[1].id());
     }
 
+    @Test
+    public void givenUnauthenticatedUser_partRegistrationDetails_participantRegistrationList_expectForbidden() {
+        assertThrows(ForbiddenException.class, () -> {
+            competitionService.getParticipantsRegistrationDetails(null);
+        });
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_PARTICIPANT_EMAIL)
+    public void givenAuthenticatedParticipant_partRegistrationDetails_expectForbidden() {
+        assertThrows(ForbiddenException.class, () -> {
+            competitionService.getParticipantsRegistrationDetails(null);
+        });
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void givenNotOwnerOfCompetition_partRegistrationDetails_expectNotFound() {
+        Competition c = new CompetitionBuilder(
+            applicationUserRepository,
+            competitionRepository,
+            gradingGroupRepository,
+            registerToRepository,
+            gradingSystemRepository
+        ).create();
+
+        assertThrows(NotFoundException.class, () -> {
+            competitionService
+                .getParticipantsRegistrationDetails(
+                    new PageableDto<>(
+                        new ParticipantFilterDto(
+                            c.getId(),
+                            null,
+                            null,
+                            null,
+                            null,
+                            null),
+                        null,
+                        null));
+        });
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void partRegistrationDetails_withNoFilters_expectPage() {
+        ApplicationUser creator = applicationUserRepository.findApplicationUserByUserEmail(TEST_USER_COMPETITION_MANAGER_EMAIL).get();
+        Competition c = new CompetitionBuilder(
+            applicationUserRepository,
+            competitionRepository,
+            gradingGroupRepository,
+            registerToRepository,
+            gradingSystemRepository
+        )
+            .withCreator(creator)
+            .withParticipantsPerGroup(25)
+            .withGradingGroups(Set.of("T1"))
+            .create();
+
+        Page<ParticipantRegDetailDto> result = competitionService.getParticipantsRegistrationDetails(new PageableDto<>(
+            new ParticipantFilterDto(
+                c.getId(),
+                null,
+                null,
+                null,
+                null,
+                null
+            ),null,null));
+
+        assertEquals(25, result.getTotalElements());
+        assertEquals(0, result.getPageable().getPageNumber());
+        assertEquals(10, result.getPageable().getPageSize()); // default size
+        assertEquals(10, result.getContent().size());
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void partRegistrationDetails_withFilter_expectPage() {
+        ApplicationUser creator = applicationUserRepository.findApplicationUserByUserEmail(TEST_USER_COMPETITION_MANAGER_EMAIL).get();
+        Competition c = new CompetitionBuilder(
+            applicationUserRepository,
+            competitionRepository,
+            gradingGroupRepository,
+            registerToRepository,
+            gradingSystemRepository
+        )
+            .withCreator(creator)
+            .withParticipantsPerGroup(25)
+            .withGradingGroups(Set.of("T1"))
+            .create();
+
+        Page<ParticipantRegDetailDto> result = competitionService.getParticipantsRegistrationDetails(new PageableDto<>(
+            new ParticipantFilterDto(
+                c.getId(),
+                false,
+                null,
+                null,
+                null,
+                null
+            ),0,10));
+
+        assertEquals(0, result.getTotalElements());
+        assertEquals(0, result.getPageable().getPageNumber());
+        assertEquals(0, result.getContent().size());
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void partRegistrationDetails_withAllFilter_expectPageWithEmptyContent() {
+        ApplicationUser creator = applicationUserRepository.findApplicationUserByUserEmail(TEST_USER_COMPETITION_MANAGER_EMAIL).get();
+        Competition c = new CompetitionBuilder(
+            applicationUserRepository,
+            competitionRepository,
+            gradingGroupRepository,
+            registerToRepository,
+            gradingSystemRepository
+        )
+            .withCreator(creator)
+            .withParticipantsPerGroup(25)
+            .withGradingGroups(Set.of("T1"))
+            .create();
+
+        Page<ParticipantRegDetailDto> result = competitionService.getParticipantsRegistrationDetails(new PageableDto<>(
+            new ParticipantFilterDto(
+                c.getId(),
+                true,
+                "xxxx",
+                "yyyy",
+                ApplicationUser.Gender.MALE,
+                0L
+            ),0,10));
+
+        assertEquals(0, result.getTotalElements());
+        assertEquals(0, result.getPageable().getPageNumber());
+    }
 }

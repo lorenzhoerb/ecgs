@@ -7,9 +7,9 @@ import LocalizationService, {LocalizeService} from '../../services/localization/
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {RegisterModalComponent} from './register-modal/register-modal.component';
 import {UserService} from '../../services/user.service';
-import {UserDetail} from '../../dtos/user-detail';
-import {SimpleGradingGroup} from 'src/app/dtos/simple-grading-group';
-import {ToastrService} from 'ngx-toastr';
+import {genderMap, UserDetail} from '../../dtos/user-detail';
+import { SimpleGradingGroup } from 'src/app/dtos/simple-grading-group';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-competition-view',
@@ -25,7 +25,8 @@ export class CompetitionComponent implements OnInit {
   canRegister = false;
   participants: UserDetail[];
   groups: SimpleGradingGroup[];
-  isCreator = false;
+  updateCounter = 0;
+  isCreator: boolean;
 
   constructor(private service: CompetitionService,
               private router: Router,
@@ -57,7 +58,7 @@ export class CompetitionComponent implements OnInit {
               error: err => console.log(err)
             });
             this.fetchIsRegistered(this.id);
-            this.fetchParticipants();
+            this.updateParticipants();
           },
           error: error => {
             this.toastr.error(error, 'Error fetching competition information');
@@ -108,7 +109,7 @@ export class CompetitionComponent implements OnInit {
     modalRef.closed.subscribe(registered => {
       if (registered) {
         this.isRegisteredToCompetition = true;
-        this.fetchParticipants();
+        this.updateParticipants();
       }
     });
   }
@@ -117,15 +118,13 @@ export class CompetitionComponent implements OnInit {
     this.router.navigate(['/competition/edit', this.id]);
   }
 
-  fetchParticipants() {
-    this.service.getParticipants(this.id).subscribe({
-      next: data => {
-        this.participants = data;
-        this.error = null;
-      },
-      error: error => {
-        this.toastr.warning('Teilnehmer könnnen nur geladen werden wenn Sie eingeloggt sind.', 'Nicht eingelogt');
-      }
-    });
+  updateParticipants() {
+    this.updateCounter++;
+  }
+
+  fetchParticipants = () => this.service.getParticipants(this.id);
+
+  mapParticipant(p: UserDetail): any[] {
+    return [p.firstName, p.lastName, genderMap.get(p.gender), p.dateOfBirth.toLocaleDateString()];
   }
 }

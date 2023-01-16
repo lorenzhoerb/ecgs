@@ -10,9 +10,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Station {
-    @JsonProperty("id") Long id;
-    @JsonProperty("displayName") String displayName;
-    @JsonProperty("variables") Variable[] variables;
+    @JsonProperty("id")
+    Long id;
+    @JsonProperty("displayName")
+    String displayName;
+    @JsonProperty("variables")
+    Variable[] variables;
     @JsonProperty("formula")
     Operation formula;
 

@@ -1,13 +1,15 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.exceptionhandler;
 
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.BulkErrorListDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ErrorListRestDto;
 
+import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenListException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.UnauthorizedException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationBulkException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
-import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenListException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +76,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         body.put("Validation errors", errors);
 
         return new ResponseEntity<>(body.toString(), headers, status);
-
     }
 
     /**
@@ -84,6 +85,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleValidation(RuntimeException ex, WebRequest request) {
         LOGGER.warn(ex.getMessage());
         return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    /**
+     * Use the @ExceptionHandler annotation to write handler for custom exceptions.
+     */
+    @ExceptionHandler(value = {ValidationBulkException.class})
+    protected ResponseEntity<Object> handleBulkValidation(ValidationBulkException ex, WebRequest request) {
+        LOGGER.warn(ex.getMessage());
+        BulkErrorListDto bulkErrorListDto = new BulkErrorListDto(ex.getMessageSummary(), ex.getBulkErrors());
+        return handleExceptionInternal(ex, bulkErrorListDto, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
     /**

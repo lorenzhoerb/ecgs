@@ -9,6 +9,9 @@ import {SimpleGradingGroup} from '../dtos/simple-grading-group';
 
 import {SimpleCompetitionListDto} from '../dtos/simpleCompetitionListDto';
 import {CompetitionSearchDto} from '../dtos/competitionSearchDto';
+import {PartFilterDto} from '../dtos/part-filter-dto';
+import {ParticipantManageDto} from '../dtos/participant-manage-dto';
+import {Pageable} from '../dtos/pageable';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +29,6 @@ export class CompetitionService {
    * @param id of competition to load
    */
   getCompetitionById(id: number): Observable<Competition> {
-    console.log('Load competition details for ' + id);
     return this.httpClient.get<Competition>(this.competitionBaseUri + '/' + id)
       .pipe(
         map((data: Competition) => {
@@ -79,10 +81,37 @@ export class CompetitionService {
       .get<Array<UserDetail>>(this.competitionBaseUri + '/' + id + '/participants')
       .pipe(
         map((data: Array<UserDetail>) => {
-          console.log(data.length);
           for (const d of data) {
             d.dateOfBirth = new Date(d.dateOfBirth);
-            console.log(d.dateOfBirth);
+          }
+          return data;
+        })
+      );
+  }
+
+  /**
+   * Get participants of competition with details for managing.
+   *
+   * @param id id of competition to get participants for
+   */
+  getManagedParticipants(competitionId: number, filter?: PartFilterDto, page?: number, size?: number): Observable<Pageable<UserDetail>> {
+    let params = {};
+    if (filter) {
+      params = {...params, ...filter};
+    }
+    if (page) {
+      params = {...params, page};
+    }
+    if (size) {
+      params = {...params, pageSize: size};
+    }
+
+    return this.httpClient
+      .get<Pageable<UserDetail>>(`${this.competitionBaseUri}/${competitionId}/participants/registrations`, {params})
+      .pipe(
+        map((data: Pageable<UserDetail>) => {
+          for (const d of data.content) {
+            d.dateOfBirth = new Date(d.dateOfBirth);
           }
           return data;
         })
@@ -92,6 +121,10 @@ export class CompetitionService {
   getGroups(id: number): Observable<Array<SimpleGradingGroup>> {
     return this.httpClient
       .get<Array<SimpleGradingGroup>>(this.competitionBaseUri + '/' + id + '/groups');
+  }
+
+  updateRegisteredParticipants(competitionId: number, update: ParticipantManageDto[]): Observable<Array<ParticipantManageDto>>{
+   return this.httpClient.patch<Array<ParticipantManageDto>>(`${this.competitionBaseUri}/${competitionId}/participants`, update);
   }
 
   /**

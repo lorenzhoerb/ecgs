@@ -18,7 +18,7 @@ import {ChangePasswordComponent} from './components/change-password/change-passw
 import {CreateCompetitionComponent} from './components/competition/create-competition/create-competition.component';
 import {CompetitionListViewComponent} from './components/competition-list-view/competition-list-view.component';
 import { ImportFlagsComponent } from './components/import-flags/import-flags.component';
-
+import {ManageParticipantsComponent} from './components/competition/manage-participants/manage-participants.component';
 
 const routbuilding: Routes = [
   {path: '', component: CompetitionListViewComponent},
@@ -30,8 +30,11 @@ const routbuilding: Routes = [
   {path: 'competition', children:[
       {path: 'list', component: CompetitionListViewComponent},
       {path: 'create', canActivate: [TournamentManagerGuard], component: CreateCompetitionComponent},
-      {path: ':id', component: CompetitionComponent},
-      {path: 'edit/:id', canActivate: [TournamentManagerGuard], component: CreateCompetitionComponent}
+      {path: 'edit/:id', canActivate: [TournamentManagerGuard], component: CreateCompetitionComponent},
+      {path: ':id', children: [
+          {path: '', component: CompetitionComponent},
+          {path: 'participants', canActivate: [TournamentManagerGuard], component: ManageParticipantsComponent}
+        ]}
     ]
   },
   {path: 'user', children: [

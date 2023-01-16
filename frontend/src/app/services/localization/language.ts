@@ -23,6 +23,7 @@ export class LocalizationKeys {
   noPreference: string;
   forgotPassword: string;
   sendResetLink: string;
+  gradingGroup: string;
 
   edit: string;
 
@@ -49,6 +50,17 @@ export class LocalizationKeys {
   beginAtOrAfter: string;
   registrationNotDone: string;
   search: string;
+
+  all: string;
+  accepted: string;
+  outstanding: string;
+  status: string;
+  action: string;
+  editStatus: string;
+  editGradingGroup: string;
+  manageParticipants: string;
+  cancel: string;
+  oopsSomethingWentWrong: string;
 
   logout: string;
   importCSV: string;

@@ -20,6 +20,7 @@ export class German implements ILanguage {
     noPreference: 'keine Preferänz',
     forgotPassword: 'Passwort vergessen',
     sendResetLink: 'Sende Link zum zurücksetzen',
+    gradingGroup: 'Bewertungsgruppe',
 
     edit: 'Bearbeiten',
 
@@ -46,6 +47,17 @@ export class German implements ILanguage {
     beginAtOrAfter: 'Austragungsdatum ab',
     registrationNotDone: 'Registrierung nicht abgeschlossen',
     search: 'Suchen',
+
+    all: 'Alle',
+    accepted: 'Akzeptiert',
+    outstanding: 'Ausstehend',
+    status: 'Status',
+    action: 'Aktion',
+    editStatus: 'Status ändern',
+    editGradingGroup: 'Grading Group ändern',
+    manageParticipants: 'Teilnehmer Verwalten',
+    cancel: 'Abbrechen',
+    oopsSomethingWentWrong: 'Ups, da ist wohl was schief gelaufen.',
 
     logout: 'Abmelden',
     importCSV: 'Neue Teammitglieder',

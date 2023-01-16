@@ -8,6 +8,7 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
 import java.util.Set;
 
 @Mapper
@@ -22,6 +23,8 @@ public interface UserMapper {
     UserDetailDto applicationUserToUserDetailDto(ApplicationUser applicationUser);
 
     Set<UserDetailDto> applicationUserSetToUserDetailDtoSet(Set<ApplicationUser> users);
+
+    List<UserDetailDto> applicationUserListToUserDetailDtoList(List<ApplicationUser> users);
 
     Set<ApplicationUser> userDetailDtoSetToApplicationUserSet(Set<UserDetailDto> users);
 

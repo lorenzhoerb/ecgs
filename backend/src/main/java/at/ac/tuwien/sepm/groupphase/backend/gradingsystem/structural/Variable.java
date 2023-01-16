@@ -8,10 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Variable {
-    @JsonProperty("id") Long id;
-    @JsonProperty("displayName") String displayName;
-    @JsonProperty("minJudgeCount") Long minJudgeCount;
-    @JsonProperty("strategy") Strategy strategy;
+    @JsonProperty("id")
+    Long id;
+    @JsonProperty("displayName")
+    String displayName;
+    @JsonProperty("minJudgeCount")
+    Long minJudgeCount;
+    @JsonProperty("strategy")
+    Strategy strategy;
     List<Double> values;
 
     public Variable(@JsonProperty("id") Long id,

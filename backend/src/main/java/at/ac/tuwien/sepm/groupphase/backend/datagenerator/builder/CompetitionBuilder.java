@@ -76,7 +76,7 @@ public class CompetitionBuilder {
 
         assignParticipants();
 
-        return null;
+        return competition;
     }
 
     private void assignParticipants() {
@@ -104,7 +104,7 @@ public class CompetitionBuilder {
         return this;
     }
 
-    public CompetitionBuilder withParticipants(int amount) {
+    public CompetitionBuilder withParticipantsPerGroup(int amount) {
         participantCount = amount;
         return this;
     }

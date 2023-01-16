@@ -4,11 +4,15 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionViewDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.PageableDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantFilterDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
-import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Set;
+
 
 public interface CompetitionService {
 
@@ -44,6 +48,15 @@ public interface CompetitionService {
      * @return Users registered to competition
      */
     Set<UserDetailDto> getParticipants(Long id);
+
+    /**
+     * Returns a list of participants of a competition with registration details.
+     * Default value of page=0 and size=10.
+     *
+     * @param filter Filter with pagination
+     * @return Paginated list of participants
+     */
+    Page<ParticipantRegDetailDto> getParticipantsRegistrationDetails(PageableDto<ParticipantFilterDto> filter);
 
     List<CompetitionListDto> searchCompetitions(CompetitionSearchDto compoCompetitionSearchDto);
 }

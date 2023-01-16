@@ -4,6 +4,7 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingSystemDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlag;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
@@ -37,9 +38,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -60,6 +59,9 @@ public abstract class TestDataProvider {
     private FlagsRepository flagsRepository;
 
     @Autowired
+    private ApplicationUserRepository applicationUserRepository;
+
+    @Autowired
     private UserMapper userMapper;
 
     @Autowired
@@ -75,6 +77,7 @@ public abstract class TestDataProvider {
 
     protected static final String TEST_USER_BASIC_EMAIL = "basic@email.com";
     protected static final String TEST_USER_COMPETITION_MANAGER_EMAIL = "comp.manager@email.com";
+    protected static final String TEST_USER_CLUB_MANAGER_EMAIL = "club.manager@email.com";
     protected static final String TEST_USER_PARTICIPANT_EMAIL = "participant@email.com";
 
     protected UserRegisterDto getValidRegistrationDtoForCompetitionManager() {
@@ -97,6 +100,17 @@ public abstract class TestDataProvider {
             ApplicationUser.Gender.MALE,
             new Date(),
             ApplicationUser.Role.PARTICIPANT);
+    }
+
+    protected UserRegisterDto getValidRegistrationDtoForClubManager() {
+        return new UserRegisterDto(
+            TEST_USER_CLUB_MANAGER_EMAIL,
+            "12345678",
+            "Firsname",
+            "Lastname",
+            ApplicationUser.Gender.MALE,
+            new Date(),
+            ApplicationUser.Role.CLUB_MANAGER);
     }
 
     protected CompetitionDetailDto getValidCompetitionDetailDto() {
@@ -145,7 +159,6 @@ public abstract class TestDataProvider {
         };
     }
 
-
     protected void setUpCompetitionUserWithEMail(String email) {
         String password = "12345678";
 
@@ -165,6 +178,35 @@ public abstract class TestDataProvider {
         customUserDetailService.login(userLoginDto);
     }
 
+    protected void assignUserToManager(ApplicationUser manager, ApplicationUser user, String team) {
+        ApplicationUser createdUser = applicationUserRepository.save(user);
+        managedByRepository.save(new ManagedBy(manager, createdUser, team));
+    }
+
+    protected List<ParticipantRegistrationDto> getParticipantRegistrationDto(Long managerId) {
+        List<ParticipantRegistrationDto> registrations = new ArrayList<>();
+        List<ManagedBy> managedBy = managedByRepository.findByManagerId(managerId);
+        return managedBy
+            .stream()
+            .map(e -> new ParticipantRegistrationDto(e.getMember().getId(), null))
+            .toList();
+    }
+
+    protected void clubManagerWithManagedUsers(int users) {
+        ApplicationUser clubManager = applicationUserRepository.findApplicationUserByUserEmail(TEST_USER_CLUB_MANAGER_EMAIL).get();
+        for (int i = 0; i < users; i++) {
+            ApplicationUser createdAppUser = applicationUserRepository.save(new ApplicationUser(
+                ApplicationUser.Role.PARTICIPANT,
+                "Lorenz",
+                "Test",
+                ApplicationUser.Gender.MALE,
+                new Date(),
+                null
+            ));
+            assignUserToManager(clubManager, createdAppUser, "Test");
+        }
+    }
+
     protected ApplicationUser setUpCompetitionUser() {
         return customUserDetailService
             .registerUser(getValidRegistrationDtoForCompetitionManager());
@@ -172,6 +214,10 @@ public abstract class TestDataProvider {
 
     protected void setUpParticipantUser() {
         customUserDetailService.registerUser(getValidRegistrationDtoForParticipant());
+    }
+
+    protected void setUpClubManagerUser() {
+        customUserDetailService.registerUser(getValidRegistrationDtoForClubManager());
     }
 
     protected Competition createCompetitionEntity(
@@ -233,7 +279,7 @@ public abstract class TestDataProvider {
 
         GradingSystem system = new GradingSystem();
         system.stations = new Station[]{
-            new Station(1L, "Station", new Variable[]{
+            new Station(1L, "Station", new Variable[] {
             }, Op)
         };
         system.formula = new VariableRef(1L);
@@ -246,7 +292,7 @@ public abstract class TestDataProvider {
 
         GradingSystem system = new GradingSystem();
         system.stations = new Station[]{
-            new Station(1L, "Station", new Variable[]{
+            new Station(1L, "Station", new Variable[] {
                 new Variable(1L, "Var1"),
                 new Variable(2L, "Var2")
             }, op)
@@ -261,7 +307,7 @@ public abstract class TestDataProvider {
 
         GradingSystem system = new GradingSystem();
         system.stations = new Station[]{
-            new Station(1L, "Station", new Variable[]{
+            new Station(1L, "Station", new Variable[] {
                 new Variable(1L, "Var1", minJudgeCount, strat),
             }, new VariableRef(1L))
         };
@@ -278,7 +324,7 @@ public abstract class TestDataProvider {
                 new Variable(1L, "Var 1", 2L, new Mean()),
                 new Variable(2L, "Var 2", 1L, new Mean()),
             }, new Add(new VariableRef(1L), new VariableRef(2L))),
-            new Station(2L, "Station 2", new Variable[]{
+            new Station(2L, "Station 2", new Variable[] {
                 new Variable(1L, "Var 1", 3L, new Mean()),
             }, new Divide(new VariableRef(1L), new Constant(2.0)))
         };

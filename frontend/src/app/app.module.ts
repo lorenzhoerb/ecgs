@@ -49,8 +49,12 @@ import {
 } from './components/competition-calender-view/competition-calender-view.component';
 import {CompetitionHeaderComponent} from './components/competition-header/competition-header.component';
 import {AutocompleteComponent} from './components/autocomplete/autocomplete.component';
-import {HeaderCreateModalComponent} from './components/header-create-modal/header-create-modal.component';
+import { HeaderCreateModalComponent } from './components/header-create-modal/header-create-modal.component';
 import { ImportFlagsComponent } from './components/import-flags/import-flags.component';
+import {BulkEditorComponent} from './components/bulk-editor/bulk-editor.component';
+import { ManageParticipantsComponent } from './components/competition/manage-participants/manage-participants.component';
+import { NavBarComponent } from './components/util/nav-bar/nav-bar.component';
+import { GenderPipe } from './pipes/gender.pipe';
 import { TemplateDialogComponent } from './components/competition/template-dialog/template-dialog.component';
 
 @NgModule({
@@ -86,6 +90,11 @@ import { TemplateDialogComponent } from './components/competition/template-dialo
     CompetitionHeaderComponent,
     AutocompleteComponent,
     HeaderCreateModalComponent,
+    ImportFlagsComponent,
+    BulkEditorComponent,
+    ManageParticipantsComponent,
+    NavBarComponent,
+    GenderPipe,
     ImportFlagsComponent,
     TemplateDialogComponent,
   ],

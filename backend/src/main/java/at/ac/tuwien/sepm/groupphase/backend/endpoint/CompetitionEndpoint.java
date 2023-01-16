@@ -4,11 +4,19 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionViewDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.PageableDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantFilterDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantManageDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegistrationDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseMultiParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleGradingGroupDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.CompetitionMapper;
+import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionRegistrationService;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import at.ac.tuwien.sepm.groupphase.backend.service.GradingGroupService;
 import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
@@ -17,9 +25,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,13 +52,20 @@ public class CompetitionEndpoint {
 
     private final CompetitionService competitionService;
     private final GradingGroupService gradingGroupService;
+    private final CompetitionRegistrationService competitionRegistrationService;
     private final CompetitionMapper mapper;
     private final SessionUtils sessionUtils;
 
     @Autowired
-    public CompetitionEndpoint(CompetitionService service, GradingGroupService gradingGroupService, CompetitionMapper mapper, SessionUtils sessionUtils) {
+    public CompetitionEndpoint(
+        CompetitionService service,
+        GradingGroupService gradingGroupService,
+        CompetitionRegistrationService competitionRegistrationService,
+        CompetitionMapper mapper,
+        SessionUtils sessionUtils) {
         this.competitionService = service;
         this.gradingGroupService = gradingGroupService;
+        this.competitionRegistrationService = competitionRegistrationService;
         this.mapper = mapper;
         this.sessionUtils = sessionUtils;
     }
@@ -107,6 +124,57 @@ public class CompetitionEndpoint {
         return competitionService.getParticipants(id);
     }
 
+    @Secured({"ROLE_TOURNAMENT_MANAGER"})
+    @GetMapping(value = "/{competitionId}/participants/registrations")
+    @Operation(summary = "Get participants of competition with details about registration.", security = @SecurityRequirement(name = "apiKey"))
+    public Page<ParticipantRegDetailDto> getParticipantsRegistrationDetails(
+        @PathVariable Long competitionId,
+        @RequestParam(required = false) Boolean accepted,
+        @RequestParam(required = false) String firstName,
+        @RequestParam(required = false) String lastName,
+        @RequestParam(required = false) ApplicationUser.Gender gender,
+        @RequestParam(required = false) Long gradingGroup,
+        @RequestParam(required = false, defaultValue = "15") Integer pageSize,
+        @RequestParam(required = false, defaultValue = "0") Integer page
+    ) {
+        LOGGER.info("GET {}/{}/participants/registrations", BASE_PATH);
+        return competitionService
+            .getParticipantsRegistrationDetails(new PageableDto<>(
+                new ParticipantFilterDto(
+                    competitionId,
+                    accepted,
+                    firstName,
+                    lastName,
+                    gender,
+                    gradingGroup
+                    ),
+                page,
+                pageSize
+            ));
+    }
+
+    @Secured({"ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER"})
+    @PostMapping(value = "/{id}/participants")
+    @Operation(summary = "Register participants to a competition", security = @SecurityRequirement(name = "apiKey"))
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public ResponseMultiParticipantRegistrationDto registerParticipants(
+        @PathVariable Long id,
+        @RequestBody List<ParticipantRegistrationDto> registrations) {
+        LOGGER.info("POST {}/{}/participants", BASE_PATH, id);
+        return competitionRegistrationService.registerParticipants(id, registrations);
+    }
+
+    @Secured({"ROLE_TOURNAMENT_MANAGER"})
+    @PatchMapping(value = "/{id}/participants")
+    @Operation(summary = "Updates participants", security = @SecurityRequirement(name = "apiKey"))
+    @ResponseStatus(code = HttpStatus.OK)
+    public List<ParticipantManageDto> updateRegisteredParticipants(
+        @PathVariable Long id,
+        @RequestBody List<ParticipantManageDto> participants
+    ) {
+        LOGGER.info("PATCH {}/{}/participants", BASE_PATH, id);
+        return competitionRegistrationService.updateParticipants(id, participants);
+    }
 
     @Secured({"ROLE_PARTICIPANT", "ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER"})
     @GetMapping(value = "/{id}/groups")

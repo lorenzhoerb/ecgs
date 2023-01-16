@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @Transactional
@@ -18,4 +19,6 @@ public interface CompetitionRepository extends CrudRepository<Competition, Long>
         LocalDateTime beginRegistration,
         LocalDateTime endRegistration,
         String name);
+
+    Optional<Competition> findByIdAndCreatorId(Long competitionId, Long creatorId);
 }

@@ -122,7 +122,8 @@ public interface CompetitionGeneratorHelper {
                 false,
                 "example7@example6.com",
                 "6123456789"));
-        }};
+        }
+    };
     List<ApplicationUser> testCompetitionManagers = new ArrayList<>() {
         {
             var au1 = new ApplicationUser(

@@ -41,6 +41,18 @@
 
     <div class="spacer-2"></div>
 
-    <app-view-participants [participants]="participants"></app-view-participants>
+    <app-content-card [title]="localize.participants" >
+      <app-bulk-editor
+        [header]="[localize.firstname,localize.lastname,localize.gender,localize.dateOfBirth]"
+        [recordsPerPage]="25"
+        [enablePagination]="true"
+        [fetchData]="fetchParticipants"
+        [mapRecord]="mapParticipant"
+        [disableCount]="true"
+        [disableCheckBox]="true"
+        [disableDelete]="true"
+        [updateCounter]="this.updateCounter"
+      ></app-bulk-editor>
+    </app-content-card>
   </div>
 </main>

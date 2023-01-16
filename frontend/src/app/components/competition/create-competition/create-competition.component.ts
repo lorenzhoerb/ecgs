@@ -173,7 +173,7 @@ export class CreateCompetitionComponent implements OnInit {
       const invalidErrors = [];
 
       for (const group of this.gradingGroups) {
-        invalidErrors.push(this.checkGradingGroupValid(group));
+        invalidErrors.push(...this.checkGradingGroupValid(group));
       }
 
       if (invalidErrors.length !== 0) {

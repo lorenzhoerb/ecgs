@@ -8,7 +8,6 @@ import {ClubManagerTeamImportDto} from '../dtos/club-manager-team';
 import {CalendarViewCompetition} from '../dtos/competition';
 import {UserDetail} from '../dtos/user-detail';
 import { ImportFlag } from '../dtos/import-flag';
-import { ImportFlagsComponent } from '../components/import-flags/import-flags.component';
 import { ImportFlagsResultDto } from '../dtos/import-flags-result-dto';
 import {ClubManagerTeamImportResults} from '../dtos/club-manager-team-import-results';
 

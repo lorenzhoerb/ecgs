@@ -17,4 +17,6 @@ export class UserDetail {
   gender: Gender;
   dateOfBirth: Date;
   picturePath: string;
+  gradingGroup?: number;
+  active?: boolean;
 }

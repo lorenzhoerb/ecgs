@@ -88,7 +88,6 @@ public class UserEndpoint {
     @ResponseStatus(HttpStatus.CREATED)
     public ImportFlagsResultDto importFlags(@RequestBody List<ImportFlag> flags) {
         logger.info("POST {}\n{}", BASE_URI + "/flags", flags);
-
         return userService.importFlags(flags);
     }
 
@@ -125,7 +124,4 @@ public class UserEndpoint {
         logger.info("GET {}/search", BASE_PATH);
         return userService.findByUserName(searchDto);
     }
-
-
-
 }

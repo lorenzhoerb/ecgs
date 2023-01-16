@@ -35,7 +35,7 @@ public class GradingSystemServiceImpl implements GradingSystemService {
         SessionUtils sessionUtils
     ) {
         this.gradingSystemRepository = gradingSystemRepository;
-        this.gradingSystemMapper     = gradingSystemMapper;
+        this.gradingSystemMapper = gradingSystemMapper;
         this.gradingSystemValidator = gradingSystemValidator;
         this.sessionUtils = sessionUtils;
     }

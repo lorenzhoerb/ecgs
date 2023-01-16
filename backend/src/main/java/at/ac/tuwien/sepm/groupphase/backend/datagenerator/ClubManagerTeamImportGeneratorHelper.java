@@ -26,8 +26,8 @@ public interface ClubManagerTeamImportGeneratorHelper {
     List<SecurityUser> testClubManagersSecUsers = new ArrayList<>() {
         {
             add(new SecurityUser(
-                "cm_test@test.test",
-                "$2a$10$dgJCPt2/G6wpP3lAZPw9oOuC9zufbyJLE6RfoCXvI/Ai0z9UXMmV." // rootroot
+                    "cm_test@test.test",
+                    "$2a$10$dgJCPt2/G6wpP3lAZPw9oOuC9zufbyJLE6RfoCXvI/Ai0z9UXMmV." // rootroot
                 )
             );
         }

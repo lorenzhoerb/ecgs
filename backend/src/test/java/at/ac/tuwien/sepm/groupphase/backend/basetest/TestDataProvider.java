@@ -30,6 +30,7 @@ import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.FlagsRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.GradingSystemRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ManagedByRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.SecurityUserRepository;
@@ -57,6 +58,9 @@ public abstract class TestDataProvider {
 
     @Autowired
     private FlagsRepository flagsRepository;
+
+    @Autowired
+    private GradingSystemRepository gradingSystemRepository;
 
     @Autowired
     private ApplicationUserRepository applicationUserRepository;
@@ -630,6 +634,119 @@ public abstract class TestDataProvider {
         ));
 
         return ret;
+    }
+
+    protected List<at.ac.tuwien.sepm.groupphase.backend.entity.GradingSystem> setupGradingSystems() {
+        var newTM = customUserDetailService.registerUser(new UserRegisterDto(
+            "gs_test_1@test.test",
+            "rootroot",
+            "fff",
+            "sss",
+            ApplicationUser.Gender.MALE,
+            new Date(),
+            ApplicationUser.Role.TOURNAMENT_MANAGER
+        ));
+        var newTM2 = customUserDetailService.registerUser(new UserRegisterDto(
+            "gs_test_2@test.test",
+            "rootroot",
+            "fff",
+            "sss",
+            ApplicationUser.Gender.MALE,
+            new Date(),
+            ApplicationUser.Role.TOURNAMENT_MANAGER
+        ));
+
+        List<at.ac.tuwien.sepm.groupphase.backend.entity.GradingSystem> out = new ArrayList<>();
+        out.add(gradingSystemRepository.save(
+            new at.ac.tuwien.sepm.groupphase.backend.entity.GradingSystem(
+                "GS_NAME1",
+                "GS_DESC1",
+                true,
+                true,
+                "{}",
+                null,
+                newTM
+            ))
+        );
+        out.add(gradingSystemRepository.save(
+            new at.ac.tuwien.sepm.groupphase.backend.entity.GradingSystem(
+                "GS_NAME2",
+                "GS_DESC2",
+                false,
+                true,
+                "{}",
+                null,
+                newTM
+            ))
+        );
+        out.add(gradingSystemRepository.save(
+            new at.ac.tuwien.sepm.groupphase.backend.entity.GradingSystem(
+                "GS_NAME3",
+                "GS_DESC3",
+                true,
+                false,
+                "{}",
+                null,
+                newTM
+            ))
+        );
+        out.add(gradingSystemRepository.save(
+            new at.ac.tuwien.sepm.groupphase.backend.entity.GradingSystem(
+                "GS_NAME4",
+                "GS_DESC4",
+                false,
+                false,
+                "{}",
+                null,
+                newTM
+            ))
+        );
+        out.add(gradingSystemRepository.save(
+            new at.ac.tuwien.sepm.groupphase.backend.entity.GradingSystem(
+                "GS_NAME5",
+                "GS_DESC5",
+                true,
+                true,
+                "{}",
+                null,
+                newTM2
+            ))
+        );
+        out.add(gradingSystemRepository.save(
+            new at.ac.tuwien.sepm.groupphase.backend.entity.GradingSystem(
+                "GS_NAME6",
+                "GS_DESC6",
+                false,
+                true,
+                "{}",
+                null,
+                newTM2
+            ))
+        );
+        out.add(gradingSystemRepository.save(
+            new at.ac.tuwien.sepm.groupphase.backend.entity.GradingSystem(
+                "GS_NAME7",
+                "GS_DESC7",
+                true,
+                false,
+                "{}",
+                null,
+                newTM2
+            ))
+        );
+        out.add(gradingSystemRepository.save(
+            new at.ac.tuwien.sepm.groupphase.backend.entity.GradingSystem(
+                "GS_NAME8",
+                "GS_DESC8",
+                false,
+                false,
+                "{}",
+                null,
+                newTM2
+            ))
+        );
+
+        return out;
     }
 
 }

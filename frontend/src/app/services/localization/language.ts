@@ -76,6 +76,25 @@ export class LocalizationKeys {
 
   createTournament: string;
 
+  close: string;
+  formula: string;
+  chooseGradingGroup: string;
+  importGradingGroup: string;
+  createGradingSystem: string;
+  others: string;
+  publicType: string;
+  publicTypeAll: string;
+  publicTypePrivate: string;
+  publicTypePublic: string;
+  reset: string;
+  onlyEditables: string;
+  yes: string;
+  no: string;
+
+  gradingSystems: string;
+  manageTemplateGradingSystems: string;
+  delete: string;
+
   importFlags: string;
   flag: string;
   optional: string;

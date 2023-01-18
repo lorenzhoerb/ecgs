@@ -20,7 +20,6 @@ export class Englisch implements ILanguage {
     noPreference: 'No Preference',
     forgotPassword: 'Forgot Password',
     sendResetLink: 'Send reset link',
-    gradingGroup: 'Grading Group',
 
     edit: 'Edit',
 
@@ -70,6 +69,25 @@ export class Englisch implements ILanguage {
     exportCSVButton: 'Export as CSV',
     teamName: 'Team name',
     createTournament: 'New Competition',
+
+    close: 'Close',
+    formula: 'Formula',
+    chooseGradingGroup: 'Choose Grading Group',
+    importGradingGroup: 'Choose Grading Group from Templates',
+    createGradingSystem: 'Create Grading System',
+    onlyEditables: 'Only editable',
+    yes: 'Yes',
+    no: 'No',
+    publicTypeAll: 'Public & Private',
+    publicTypePrivate: 'Private',
+    publicTypePublic: 'Public',
+    others: 'Miscellaneous',
+    publicType: 'Type',
+    gradingGroup: 'Grading Group',
+    gradingSystems: 'Grading Systems',
+    manageTemplateGradingSystems: 'Manage Grading Systems',
+    reset: 'Reset changes',
+    delete: 'Delete',
 
     importFlags: 'Assign flags',
     flag: 'Flag',

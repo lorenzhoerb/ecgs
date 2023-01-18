@@ -1,7 +1,8 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Globals} from '../global/globals';
+import { ViewEditGradingGroup, SimpleGradingGroupViewEdit, ViewEditGradingGroupSearch } from '../dtos/grading-group-detail';
 
 @Injectable({
   providedIn: 'root'
@@ -21,5 +22,22 @@ export class GradingSystemService {
   createGradingSystem(gradingSystem: any): Observable<any> {
     return this.httpClient
       .post<any>(this.gradingSystemBaseUri, gradingSystem);
+  }
+
+  public getDraftGradingSystemById(id: number): Observable<ViewEditGradingGroup> {
+    return this.httpClient.get<ViewEditGradingGroup>(`${this.gradingSystemBaseUri}/drafts/${id}`);
+  }
+
+  public getSimpleDraftGradingSystems(): Observable<SimpleGradingGroupViewEdit[]> {
+    return this.httpClient.get<SimpleGradingGroupViewEdit[]>(`${this.gradingSystemBaseUri}/drafts/simple`);
+  }
+
+  // TODO: replace any with type
+  public updateGradingSystem(gradingSystem: any): Observable<any> {
+    return this.httpClient.put<any>(`${this.gradingSystemBaseUri}/drafts`, gradingSystem);
+  }
+
+  public deleteGradingSystem(id: number): Observable<any> {
+    return this.httpClient.delete<any>(`${this.gradingSystemBaseUri}/drafts/${id}`);
   }
 }

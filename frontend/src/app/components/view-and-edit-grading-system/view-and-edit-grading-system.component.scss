@@ -1,0 +1,145 @@
+/* Define the animation */
+// @keyframes fold {
+//     0% { height: 0; }
+//     100% { height: 100%; }
+// }
+
+// /* Apply the animation to the element */
+// .folding-element {
+//     animation: fold 1s forwards;
+// }
+
+.normal-input {
+    color: snow;
+    width: 100%;
+    border-radius: 6px;
+}
+
+.my-heading {
+    margin: 0;
+    padding-right: 1em;
+}
+
+.options-menu {
+    height: 18em;
+    width: 20%;
+    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    margin-right: 3%;
+}
+
+.options-menu-item {
+    display: block; 
+    padding: 3px; 
+    text-decoration: none;
+    color: black; 
+    overflow: hidden; 
+    white-space: nowrap; 
+    text-overflow: ellipsis; 
+    border-radius: 8px;
+    transition: background-color 0.1s linear;
+    cursor: pointer;
+    text-align: center;
+    font-size: 130%;
+}
+
+.options-menu-item-hover:hover {
+    background-color: #ee76213a;
+}
+
+.main-menu-2 {
+    display: block;
+    // padding: 1.5%;
+    // padding-top: 1.5%;
+    // padding-left: 1.5%;    
+    // padding-right: 1.5%; 
+    // background-color: white;
+    border-radius: 8px;
+    margin-left: 2em;
+    margin-right: 2em;
+    margin-top: 2em;
+    margin-bottom: 5em;
+  }
+
+app-tournament-header .form-group {
+    display: flex;
+    gap: 8px;
+}
+
+.form-group {
+    width: 100%;
+}
+
+app-tournament-header input[type="text"] {
+    color: snow;
+    width: 100%;
+    border-radius: 6px;
+    font-size: 1.8rem;
+}
+
+app-tournament-header input[type="text"]:focus {
+    background-color: inherit;
+}
+
+.sticky-heading.heading {
+    display: flex;
+    justify-content: space-between;
+}
+.sticky-heading.heading button {
+    margin-right: 2rem;
+}
+
+.flex-center {
+    gap: 8px;
+    align-items: center;
+}
+
+.add-group {
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.add-group:hover,
+.add-note:hover {
+    color: rgba(13, 110, 253, 0.55);
+}
+
+.minimize {
+    display: flex;
+    gap: 8px;
+}
+
+.station-variables {
+    display: flex;
+    font-size: 1rem;
+    gap: 8px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.variable {
+    border-radius: 4px;
+    width: 8rem;
+}
+
+.add-note.flex-center {
+    padding: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    gap: 8px;
+}
+
+.f-row {
+    display: flex;
+    gap: 16px;
+}
+
+.round-corners {
+    border-radius: 6px;
+}
+
+.turn-header {
+    padding: 0 2rem;
+}

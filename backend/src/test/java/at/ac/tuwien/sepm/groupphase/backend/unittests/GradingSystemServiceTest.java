@@ -1,9 +1,13 @@
 package at.ac.tuwien.sepm.groupphase.backend.unittests;
 
 import at.ac.tuwien.sepm.groupphase.backend.basetest.TestDataProvider;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ErrorListRestDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingSystemDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ViewEditGradingSystemDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.GradingSystemMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.StrategyException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Add;
@@ -22,21 +26,28 @@ import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingSystemRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.GradingSystemService;
+import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -52,6 +63,12 @@ public class GradingSystemServiceTest extends TestDataProvider {
 
     @Autowired
     private ApplicationUserRepository applicationUserRepository;
+
+    @Autowired
+    private GradingSystemMapper gradingSystemMapper;
+
+    @Autowired
+    private UserService userService;
 
     private ApplicationUser user;
 
@@ -402,5 +419,355 @@ public class GradingSystemServiceTest extends TestDataProvider {
         assertThrows(ForbiddenException.class, () -> {
             gradingSystemService.createGradingSystem(getValidGradingSystemDetailDto());
         });
+    }
+
+    @Test
+    @WithMockUser("gs_test_1@test.test")
+    public void getDraftGradingSystemById_withValidId_expectToFindCorrectGradingSystem() throws Exception {
+        var gss = setupGradingSystems();
+        var gs_test = gss.get(0);
+        var gs_test_mapped = gradingSystemMapper.gradingSystemToViewEditGradingSystemDto(gs_test);
+        var user = userService.findApplicationUserByEmail("gs_test_1@test.test");
+
+        var found = this.gradingSystemService.getDraftGradingSystemById(gs_test.getId());
+        assertThat(found).isEqualTo(gs_test_mapped);
+    }
+
+    @Test
+    @WithMockUser("gs_test_1@test.test")
+    public void getDraftGradingSystemById_withIncorrectId_expectToFindIncorrectGradingSystem() throws Exception {
+        var gss = setupGradingSystems();
+        var gs_test = gss.get(0);
+        var gs_test_mapped = gradingSystemMapper.gradingSystemToViewEditGradingSystemDto(gs_test);
+        var user = userService.findApplicationUserByEmail("gs_test_1@test.test");
+
+        var found = this.gradingSystemService.getDraftGradingSystemById(gss.get(1).getId());
+        assertThat(found).isNotEqualTo(gs_test_mapped);
+    }
+
+    @Test
+    @WithMockUser("gs_test_1@test.test")
+    public void getDraftGradingSystemById_withInvalidId_expectToGetNotFoundException() throws Exception {
+        var gss = setupGradingSystems();
+        var gs_test = gss.get(0);
+        var gs_test_mapped = gradingSystemMapper.gradingSystemToViewEditGradingSystemDto(gs_test);
+        var user = userService.findApplicationUserByEmail("gs_test_1@test.test");
+
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            gradingSystemService.getDraftGradingSystemById(-123L);
+        });
+
+        assertThat(exception.getMessage()).contains("No such grading system found");
+    }
+
+    @Test
+    @WithMockUser("gs_test_1@test.test")
+    public void getDraftGradingSystemById_withValidIdButOfDifferentUserWhenNonPublicAndIsDraft_expectToGetNotFoundException() throws Exception {
+        var gss = setupGradingSystems();
+        var gs_test = gss.get(0);
+        var gs_test_mapped = gradingSystemMapper.gradingSystemToViewEditGradingSystemDto(gs_test);
+        var user = userService.findApplicationUserByEmail("gs_test_1@test.test");
+
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            gradingSystemService.getDraftGradingSystemById(gss.get(5).getId());
+        });
+
+        assertThat(exception.getMessage()).contains("No such grading system found");
+    }
+
+    @Test
+    @WithMockUser("gs_test_1@test.test")
+    public void getDraftGradingSystemById_withValidIdButOfDifferentUserWhenPublicAndIsDraft_expectToGetCorrectGradingSystem() throws Exception {
+        var gss = setupGradingSystems();
+        var gs_test = gss.get(4);
+        var gs_test_mapped = gradingSystemMapper.gradingSystemToViewEditGradingSystemDto(gs_test);
+        var user = userService.findApplicationUserByEmail("gs_test_1@test.test");
+
+        var found = this.gradingSystemService.getDraftGradingSystemById(gs_test.getId());
+        assertThat(found).isEqualTo(gs_test_mapped);
+    }
+
+    @Test
+    @WithMockUser("gs_test_1@test.test")
+    public void getSimpleDraftGradingSystemById_expectToGetCorrectGradingSystems() throws Exception {
+        var gss = setupGradingSystems();
+        var user = userService.findApplicationUserByEmail("gs_test_1@test.test");
+
+        var found = this.gradingSystemService.getSimpleDraftGradingSystem();
+        assertThat(found.size()).isEqualTo(3);
+
+        assertThat(found.get(0).getId()).isEqualTo(gss.get(0).getId());
+        assertThat(found.get(0).getName()).isEqualTo(gss.get(0).getName());
+        assertThat(found.get(0).getPublic()).isEqualTo(gss.get(0).getPublic());
+        assertThat(found.get(0).getEditable()).isEqualTo(Objects.equals(gss.get(0).getCreator().getId(), user.getId()));
+
+        assertThat(found.get(1).getId()).isEqualTo(gss.get(1).getId());
+        assertThat(found.get(1).getName()).isEqualTo(gss.get(1).getName());
+        assertThat(found.get(1).getPublic()).isEqualTo(gss.get(1).getPublic());
+        assertThat(found.get(1).getEditable()).isEqualTo(Objects.equals(gss.get(1).getCreator().getId(), user.getId()));
+
+        assertThat(found.get(2).getId()).isEqualTo(gss.get(4).getId());
+        assertThat(found.get(2).getName()).isEqualTo(gss.get(4).getName());
+        assertThat(found.get(2).getPublic()).isEqualTo(gss.get(4).getPublic());
+        assertThat(found.get(2).getEditable()).isEqualTo(Objects.equals(gss.get(4).getCreator().getId(), user.getId()));
+    }
+
+    @Test
+    @WithMockUser("gs_test_1@test.test")
+    public void updateDraftGradingSystem_expectToGetCorrectGradingSystems() throws Exception {
+        var gss = setupGradingSystems();
+        var gs_test = gss.get(0);
+        var testVEGS = new ViewEditGradingSystemDto(
+            gs_test.getId(),
+            "CHANGED_NAME1",
+            "CHANGED_DESC1",
+            !gs_test.getPublic(),
+            "{KEK:\"KEK\"}"
+        );
+
+        var found = this.gradingSystemService.updateDraftGradingSystem(testVEGS);
+        assertThat(found).isEqualTo(testVEGS);
+    }
+
+    @Test
+    @WithMockUser("gs_test_1@test.test")
+    public void updateDraftGradingSystem_withTooLongName_expectToThrowValidationException() throws Exception {
+        var gss = setupGradingSystems();
+        var gs_test = gss.get(0);
+        var testVEGS = new ViewEditGradingSystemDto(
+            gs_test.getId(),
+            "C".repeat(256),
+            "CHANGED_DESC1",
+            !gs_test.getPublic(),
+            "{KEK:\"KEK\"}"
+        );
+        ValidationListException exception = assertThrows(ValidationListException.class, () -> {
+            this.gradingSystemService.updateDraftGradingSystem(testVEGS);
+        });
+
+        assertThat(exception.errors()).contains("name to long");
+    }
+
+    @Test
+    @WithMockUser("gs_test_1@test.test")
+    public void updateDraftGradingSystem_withEmptyName_expectToThrowValidationException() throws Exception {
+        var gss = setupGradingSystems();
+        var gs_test = gss.get(0);
+        var testVEGS = new ViewEditGradingSystemDto(
+            gs_test.getId(),
+            "",
+            "CHANGED_DESC1",
+            !gs_test.getPublic(),
+            "{KEK:\"KEK\"}"
+        );
+
+        ValidationListException exception = assertThrows(ValidationListException.class, () -> {
+            this.gradingSystemService.updateDraftGradingSystem(testVEGS);
+        });
+
+        assertThat(exception.errors()).contains("name can't be empty");
+    }
+
+    @Test
+    @WithMockUser("gs_test_1@test.test")
+    public void updateDraftGradingSystem_withNullName_expectToThrowValidationException() throws Exception {
+        var gss = setupGradingSystems();
+        var gs_test = gss.get(0);
+        var testVEGS = new ViewEditGradingSystemDto(
+            gs_test.getId(),
+            null,
+            "CHANGED_DESC1",
+            !gs_test.getPublic(),
+            "{KEK:\"KEK\"}"
+        );
+
+        ValidationListException exception = assertThrows(ValidationListException.class, () -> {
+            this.gradingSystemService.updateDraftGradingSystem(testVEGS);
+        });
+
+        assertThat(exception.errors()).contains("name can't be empty");
+    }
+
+    @Test
+    @WithMockUser("gs_test_1@test.test")
+    public void updateDraftGradingSystem_withTooLongDescription_expectToThrowValidationException() throws Exception {
+        var gss = setupGradingSystems();
+        var gs_test = gss.get(0);
+        var testVEGS = new ViewEditGradingSystemDto(
+            gs_test.getId(),
+            "CHANGED_NAME1",
+            "C".repeat(4096),
+            !gs_test.getPublic(),
+            "{KEK:\"KEK\"}"
+        );
+
+        ValidationListException exception = assertThrows(ValidationListException.class, () -> {
+            this.gradingSystemService.updateDraftGradingSystem(testVEGS);
+        });
+
+        assertThat(exception.errors()).contains("description to long");
+    }
+
+    @Test
+    @WithMockUser("gs_test_1@test.test")
+    public void updateDraftGradingSystem_withEmptyDescription_expectToThrowValidationException() throws Exception {
+        var gss = setupGradingSystems();
+        var gs_test = gss.get(0);
+        var testVEGS = new ViewEditGradingSystemDto(
+            gs_test.getId(),
+            "CHANGED_DESC1",
+            "",
+            !gs_test.getPublic(),
+            "{KEK:\"KEK\"}"
+        );
+        ValidationListException exception = assertThrows(ValidationListException.class, () -> {
+            this.gradingSystemService.updateDraftGradingSystem(testVEGS);
+        });
+
+        assertThat(exception.errors()).contains("description can't be empty");
+    }
+
+    @Test
+    @WithMockUser("gs_test_1@test.test")
+    public void updateDraftGradingSystem_withNullDescription_expectToThrowValidationException() throws Exception {
+        var gss = setupGradingSystems();
+        var gs_test = gss.get(0);
+        var testVEGS = new ViewEditGradingSystemDto(
+            gs_test.getId(),
+            "CHANGED_DESC1",
+            null,
+            !gs_test.getPublic(),
+            "{KEK:\"KEK\"}"
+        );
+
+        ValidationListException exception = assertThrows(ValidationListException.class, () -> {
+            this.gradingSystemService.updateDraftGradingSystem(testVEGS);
+        });
+
+        assertThat(exception.errors()).contains("description can't be empty");
+    }
+
+    @Test
+    @WithMockUser("gs_test_1@test.test")
+    public void updateDraftGradingSystem_withNullIsPublic_expectToThrowValidationException() throws Exception {
+        var gss = setupGradingSystems();
+        var gs_test = gss.get(0);
+        var testVEGS = new ViewEditGradingSystemDto(
+            gs_test.getId(),
+            "CHANGED_NAME1",
+            "CHANGED_DESC1",
+            null,
+            "{KEK:\"KEK\"}"
+        );
+
+        ValidationListException exception = assertThrows(ValidationListException.class, () -> {
+            this.gradingSystemService.updateDraftGradingSystem(testVEGS);
+        });
+
+        assertThat(exception.errors()).contains("isPublic must be given");
+    }
+
+    @Test
+    @WithMockUser("gs_test_1@test.test")
+    public void updateDraftGradingSystem_withTooLongFormula_expectToThrowValidationException() throws Exception {
+        var gss = setupGradingSystems();
+        var gs_test = gss.get(0);
+        var testVEGS = new ViewEditGradingSystemDto(
+            gs_test.getId(),
+            "CHANGED_NAME1",
+            "CHANGED_DESC1",
+            !gs_test.getPublic(),
+            "f".repeat(65536)
+        );
+
+        ValidationListException exception = assertThrows(ValidationListException.class, () -> {
+            this.gradingSystemService.updateDraftGradingSystem(testVEGS);
+        });
+
+
+        assertThat(exception.errors()).contains("formula to long");
+    }
+
+    @Test
+    @WithMockUser("gs_test_1@test.test")
+    public void updateDraftGradingSystem_withNullFormula_expectToThrowValidationException() throws Exception {
+        var gss = setupGradingSystems();
+        var gs_test = gss.get(0);
+        var testVEGS = new ViewEditGradingSystemDto(
+            gs_test.getId(),
+            "CHANGED_NAME1",
+            "CHANGED_DESC1",
+            !gs_test.getPublic(),
+            null
+        );
+
+        ValidationListException exception = assertThrows(ValidationListException.class, () -> {
+            this.gradingSystemService.updateDraftGradingSystem(testVEGS);
+        });
+
+        assertThat(exception.errors()).contains("formula must be given");
+    }
+
+    @Test
+    @WithMockUser("gs_test_1@test.test")
+    public void updateDraftGradingSystem_withIdBelongingToOtherUserAndIsPrivateTemplate_expectToThrowNotFoundException() throws Exception {
+        var gss = setupGradingSystems();
+        var gs_test = gss.get(5);
+        var testVEGS = new ViewEditGradingSystemDto(
+            gs_test.getId(),
+            "CHANGED_NAME1",
+            "CHANGED_DESC1",
+            !gs_test.getPublic(),
+            "{}"
+        );
+
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            this.gradingSystemService.updateDraftGradingSystem(testVEGS);
+        });
+
+        assertThat(exception.getMessage()).contains("No such grading system found");
+    }
+
+    @Test
+    @WithMockUser("gs_test_1@test.test")
+    public void deleteDraftGradingSystem_withCorrectId_expectToSucceed() throws Exception {
+        var gss = setupGradingSystems();
+        var gs_test = gss.get(0);
+        var toDeleteOpt = gradingSystemRepository.findById(gs_test.getId());
+        if (toDeleteOpt.isEmpty()) {
+            fail("Did not find grading system, that should have been initialized beforehand");
+        }
+        assertThat(toDeleteOpt.get().getId()).isEqualTo(gs_test.getId());
+        this.gradingSystemService.deleteDraftGradingSystem(gs_test.getId());
+
+        assertThat(gradingSystemRepository.findById(gs_test.getId()).isEmpty()).isTrue();
+    }
+
+    @Test
+    @WithMockUser("gs_test_1@test.test")
+    public void deleteDraftGradingSystem_withIncorrectId_expectToThrowNotFoundException() throws Exception {
+        var gss = setupGradingSystems();
+        var gs_test = gss.get(5);
+        var toDeleteOpt = gradingSystemRepository.findById(gs_test.getId());
+        if (toDeleteOpt.isEmpty()) {
+            fail("Did not find grading system, that should have been initialized beforehand");
+        }
+        assertThat(toDeleteOpt.get().getId()).isEqualTo(gs_test.getId());
+        NotFoundException e = assertThrows(NotFoundException.class, () -> {
+            gradingSystemService.deleteDraftGradingSystem(gs_test.getId());
+        });
+
+        assertThat(gradingSystemRepository.findById(gs_test.getId()).isEmpty()).isFalse();
+        assertThat(e.getMessage()).contains("No such grading system found");
+    }
+
+    @Test
+    @WithMockUser("gs_test_1@test.test")
+    public void deleteDraftGradingSystem_withInvalidId_expectToThrowNotFoundException() throws Exception {
+        var gss = setupGradingSystems();
+        NotFoundException e = assertThrows(NotFoundException.class, () -> {
+            gradingSystemService.deleteDraftGradingSystem(222222L);
+        });
+        assertThat(e.getMessage()).contains("No such grading system found");
     }
 }

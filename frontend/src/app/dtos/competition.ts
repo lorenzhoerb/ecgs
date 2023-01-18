@@ -1,4 +1,4 @@
-import {GradingGroupDetail} from './gradingGroupDetail';
+import {GradingGroupDetail} from './grading-group-detail';
 import {UserDetail} from './user-detail';
 
 export class Competition {

@@ -9,6 +9,8 @@ import {cloneDeep} from 'lodash';
 })
 export class FormularEditorComponent implements OnInit, OnChanges {
 
+  @Input() editable = true;
+
   @Input() vars: any[] = [
     { name: 'A', value: 1, typeHint: 'variableRef', type: 'variable', spaces: 0, priority: 0 },
     { name: 'B', value: 2, typeHint: 'variableRef', type: 'variable', spaces: 0, priority: 0 },
@@ -53,19 +55,20 @@ export class FormularEditorComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     this.variables = cloneDeep(this.vars);
 
-    if(changes.vars.previousValue === undefined) {
+    if(changes?.vars?.previousValue === undefined) {
       return;
     }
+
     const t = this.calculation.filter(arr => arr.length === 0
       || this.variables.map(v => v.value).includes(arr[0].value)
       || this.functions.map(v => v.value).includes(arr[0].value));
 
-      this.calculation = t.map(arr => arr.length === 0 ||
-        this.functions.map(
-          v => v.value).includes(arr[0].value) ? arr : arr.map(v => this.variables.find(x => x.value === v.value)));
+    this.calculation = t.map(arr => arr.length === 0 ||
+      this.functions.map(
+        v => v.value).includes(arr[0].value) ? arr : arr.map(v => this.variables.find(x => x.value === v.value)));
 
-      this.listRebuild();
-      this.buildTree();
+    this.listRebuild();
+    this.buildTree();
 
   }
 

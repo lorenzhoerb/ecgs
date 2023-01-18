@@ -53,6 +53,16 @@ public class GradingSystem {
         this.gradingGroups = gradingGroups;
     }
 
+    public GradingSystem(String name, String description, Boolean isPublic, Boolean isTemplate, String formula, Set<GradingGroup> gradingGroups, ApplicationUser creator) {
+        this.name = name;
+        this.description = description;
+        this.isPublic = isPublic;
+        this.isTemplate = isTemplate;
+        this.formula = formula;
+        this.gradingGroups = gradingGroups;
+        this.creator = creator;
+    }
+
     public Long getId() {
         return id;
     }

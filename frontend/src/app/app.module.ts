@@ -55,7 +55,10 @@ import {BulkEditorComponent} from './components/bulk-editor/bulk-editor.componen
 import { ManageParticipantsComponent } from './components/competition/manage-participants/manage-participants.component';
 import { NavBarComponent } from './components/util/nav-bar/nav-bar.component';
 import { GenderPipe } from './pipes/gender.pipe';
+import { ViewAndEditGradingSystemComponent } from './components/view-and-edit-grading-system/view-and-edit-grading-system.component';
 import { TemplateDialogComponent } from './components/competition/template-dialog/template-dialog.component';
+import { CreateCompetitionSelectGradingSystemDialogComponent }
+  from './components/create-competition-select-grading-system-dialog/create-competition-select-grading-system-dialog.component';
 
 @NgModule({
   declarations: [
@@ -97,6 +100,8 @@ import { TemplateDialogComponent } from './components/competition/template-dialo
     GenderPipe,
     ImportFlagsComponent,
     TemplateDialogComponent,
+    ViewAndEditGradingSystemComponent,
+    CreateCompetitionSelectGradingSystemDialogComponent,
   ],
   imports: [
     BrowserModule,

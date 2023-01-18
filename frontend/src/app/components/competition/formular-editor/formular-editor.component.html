@@ -3,7 +3,7 @@
         Funktionen:
     </div>
     <div cdkDropListGroup class="drop-group">
-        <div class="functions-and-variables">
+        <div class="functions-and-variables" *ngIf="editable">
             <div class="variables copy" cdkDropList [cdkDropListData]="variables" cdkDropListSortingDisabled
                 (cdkDropListDropped)="drop($event)" (cdkDropListExited)="exitedVars($event)"
                 (cdkDropListEntered)="entered()" [cdkDropListEnterPredicate]="noEnterPredicate">
@@ -34,7 +34,7 @@
             </div>
         </div>
 
-        <div class="horizontal-line"></div>
+        <div class="horizontal-line" *ngIf="editable"></div>
 
         <div class="formular">
             <b>{{name}}</b> Ergebnis = <div class="calculation">
@@ -66,7 +66,7 @@
     <div class="flex-me" *ngIf="this.formula.valid">
         <div *ngFor="let list of calculation; index as i;">
             <div [class]="getFormulaClass(i)">
-                <div [class]="[item.type, 'symbol', color]" *ngFor="let item of list;">
+                <div [class]="[item.type, 'symbol', color]" *ngFor="let item of list;" [style.cursor]="!editable ? 'auto' : 'move'">
                     <div>
                         {{item.name}}
                     </div>

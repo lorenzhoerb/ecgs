@@ -239,7 +239,13 @@
 
         <div class="flex-center">
           <div class="add-group flex-center" (click)="addGroup()">
-            <mat-icon class="large">add_circle_outline</mat-icon> Bewertungsgruppe
+            <mat-icon class="large">add_circle_outline</mat-icon> {{localize.gradingGroup}}
+          </div> 
+          <h1>
+            /
+          </h1>
+          <div class="add-group flex-center" (click)="openImportGroupDialog()">
+            <mat-icon class="large">view_list</mat-icon>  {{localize.importGradingGroup}}
           </div>
         </div>
       </div>

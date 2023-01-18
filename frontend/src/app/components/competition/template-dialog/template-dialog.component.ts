@@ -75,7 +75,6 @@ export class TemplateDialogComponent implements OnInit {
 
   close() {
     this.dialogRef.close({ save: false, value: null });
-
   }
 
   public dynamicCssClassesForInput(input: AbstractControl): any {

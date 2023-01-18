@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingSystemDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ViewEditGradingSystemDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.GradingSystem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,4 +15,7 @@ public interface GradingSystemMapper {
     @Mapping(source = "public", target = "isPublic")
     @Mapping(source = "template", target = "isTemplate")
     GradingSystemDetailDto gradingSystemToGradingSystemDetailDto(GradingSystem gradingSystem);
+
+    @Mapping(source = "public", target = "isPublic")
+    ViewEditGradingSystemDto gradingSystemToViewEditGradingSystemDto(GradingSystem gradingSystem);
 }

@@ -14,6 +14,8 @@ import LocalizationService, { LocalizeService } from 'src/app/services/localizat
 import { TemplateAction, TemplateState } from 'src/app/datatypes/templateAction';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { TemplateDialogComponent } from '../template-dialog/template-dialog.component';
+import { CreateCompetitionSelectGradingSystemDialogComponent }
+  from '../../create-competition-select-grading-system-dialog/create-competition-select-grading-system-dialog.component';
 
 @Component({
   selector: 'app-create-competition',
@@ -93,6 +95,7 @@ export class CreateCompetitionComponent implements OnInit {
               for (const gradingGroup of this.gradingGroups) {
                 const gradingSystem = JSON.parse(gradingGroup.gradingSystemDto.formula);
                 gradingGroup.stations = gradingSystem.stations.map(station => ({
+                  id: station.id,
                   title: station.displayName,
                   variables: station.variables.map(variable => ({
                     name: variable.displayName,
@@ -213,7 +216,7 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
         formula: JSON.stringify({
           stations: gradingGroup.stations.map((station, stationId) => ({
             displayName: station.title,
-            id: stationId + 1,
+            id: station.id,
             variables: station.variables.map(variable => ({
               displayName: variable.name,
               id: variable.value
@@ -266,9 +269,71 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
     });
   }
 
+  openImportGroupDialog() {
+    this.gradingSystemService.getSimpleDraftGradingSystems().subscribe({
+      next: data => {
+        const dialogConfig = new MatDialogConfig();
+
+        dialogConfig.data = data;
+
+        const dialogRef = this.dialog.open(CreateCompetitionSelectGradingSystemDialogComponent, dialogConfig);
+
+        dialogRef.afterClosed().subscribe(result => {
+          if(!result.selectedGradingSystemId) {
+            return;
+          }
+
+          this.fetchAndAddGroupById(result.selectedGradingSystemId);
+        });
+
+      }
+    });
+  }
+
+  fetchAndAddGroupById(id: number): void {
+    this.gradingSystemService.getDraftGradingSystemById(id).subscribe({
+      next: data => {
+        const gradingSystem = JSON.parse(data.formula);
+        const newGradingGroup: any = {
+          title: data.name,
+          idCount: Math.max(...gradingSystem.stations.map(s => s.id)),
+          templateState: TemplateState.none,
+        };
+        newGradingGroup.stations = gradingSystem.stations.map(station => ({
+          title: station.displayName,
+          id: station.id,
+          variables: station.variables.map(variable => ({
+            name: variable.displayName,
+            type: 'variable',
+            typeHint: 'variableRef',
+            value: variable.id
+          })),
+          formula: {
+            valid: true,
+            data: station.formula
+          },
+          idCount: Math.max(...station.variables.map(v => v.id))
+        }));
+        newGradingGroup.formula = ({
+          valid: true,
+          data: gradingSystem.formula
+        });
+        newGradingGroup.stationVariables = gradingSystem.stations.map(station => ({
+          name: station.displayName,
+          value: station.id,
+          type: 'variable',
+          typeHint: 'variableRef'
+        }));
+
+        this.gradingGroups.push(newGradingGroup);
+      }
+    });
+  }
+
   addStation(id) {
     this.gradingGroups[id].stations.push({
       title: `Station ${++this.gradingGroups[id].idCount}`,
+      id: this.gradingGroups[id].idCount,
       variables: [], idCount: 0, formula: { valid: false, data: {} }
     });
 
@@ -282,6 +347,7 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
     });
 
     this.gradingGroups[id].stationVariables = cloneDeep(this.gradingGroups[id].stationVariables);
+    console.log(this.gradingGroups); // TODO: remove
   }
 
   addStationVariable(station) {
@@ -345,6 +411,8 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
 
     this.gradingGroups.splice(id + 1, 0, cloneDeep(Object.assign({}, group, { title: group.title + ' Kopie' })));
     this.toastr.info(`${this.gradingGroups[id + 1].title} erfolgreich erstellt.`);
+
+    console.log(this.gradingGroups); // TODO: remove
   }
 
   duplicateStation(groupId, station, stationId) {
@@ -355,9 +423,9 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
       return;
     }
     this.gradingGroups[groupId].stations.splice(stationId + 1, 0, cloneDeep(
-      Object.assign({}, station, { title: station.title + ' Kopie', value: ++this.gradingGroups[groupId].idCount })));
+      Object.assign({}, station, { title: station.title + ' Kopie', id: ++this.gradingGroups[groupId].idCount })));
 
-    this.gradingGroups[groupId].stationVariables.push({
+    this.gradingGroups[groupId].stationVariables.splice(stationId + 1, 0, {
       name: this.gradingGroups[groupId].stations[stationId + 1].title,
       value: this.gradingGroups[groupId].idCount,
       type: 'variable',
@@ -367,6 +435,8 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
     });
     this.gradingGroups[groupId].stationVariables = cloneDeep(this.gradingGroups[groupId].stationVariables);
     this.toastr.info(`${this.gradingGroups[groupId].stations[stationId + 1].title} erfolgreich erstellt.`);
+
+    console.log(this.gradingGroups); // TODO: remove
   }
 
   deleteGroup(id) {
@@ -378,6 +448,7 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
 
     this.gradingGroups[groupId].stationVariables.splice(stationId, 1);
     this.gradingGroups[groupId].stationVariables = cloneDeep(this.gradingGroups[groupId].stationVariables);
+    console.log(this.gradingGroups);
   }
 
   handleTemplateAction(id, action: TemplateAction) {
@@ -403,7 +474,7 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
       formula: JSON.stringify({
         stations: this.gradingGroups[id].stations.map((station, stationId) => ({
           displayName: station.title,
-          id: stationId + 1,
+          id: station.id,
           variables: station.variables.map(variable => ({
             displayName: variable.name,
             id: variable.value
@@ -416,8 +487,6 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
 
     const dialogConfig = new MatDialogConfig();
 
-    //dialogConfig.disableClose = true;
-    //dialogConfig.autoFocus = true;
     dialogConfig.data = { gradingSystem };
 
     const dialogRef = this.dialog.open(TemplateDialogComponent, dialogConfig);

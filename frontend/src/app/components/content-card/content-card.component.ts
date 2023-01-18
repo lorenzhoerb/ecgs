@@ -13,6 +13,7 @@ export class ContentCardComponent implements OnInit {
   @Input() isEdit = false;
   @Input() actions = [];
   @Input() templateState = TemplateState.none;
+  @Input() isCollapsed = false;
 
   @Output() titleChange = new EventEmitter<string>();
 
@@ -23,8 +24,6 @@ export class ContentCardComponent implements OnInit {
 
   public tState = TemplateState;
 
-
-  _collapsed = false;
 
 
 
@@ -45,8 +44,8 @@ export class ContentCardComponent implements OnInit {
     this.duplicate.emit();
   }
   collapse() {
-    this._collapsed = !this._collapsed;
-    this.collapsed.emit(this._collapsed);
+    this.isCollapsed = !this.isCollapsed;
+    this.collapsed.emit(this.isCollapsed);
   }
   templateClicked() {
     this.templateAction.emit(TemplateAction.saveNew);

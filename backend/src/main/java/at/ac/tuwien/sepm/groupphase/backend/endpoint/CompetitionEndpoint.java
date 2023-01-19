@@ -4,6 +4,8 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionViewDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupWithRegisterToDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantResultDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.PageableDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantFilterDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantManageDto;
@@ -182,5 +184,21 @@ public class CompetitionEndpoint {
     public List<SimpleGradingGroupDto> getGroups(@PathVariable Long id) {
         LOGGER.info("GET {}/{}/groups", BASE_PATH, id);
         return gradingGroupService.getAllByCompetition(id);
+    }
+
+    @Secured({"ROLE_PARTICIPANT", "ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER"})
+    @GetMapping(value = "/{id}/group-registrations")
+    @Operation(summary = "Get groups of a competition containing the registrations", security = @SecurityRequirement(name = "apiKey"))
+    public Set<GradingGroupWithRegisterToDto> getGroupsWithRegistrations(@PathVariable Long id) {
+        LOGGER.info("GET {}/{}/group-registrations", BASE_PATH, id);
+        return competitionService.getCompetitionGradingGroupsWithParticipants(id);
+    }
+
+    @Secured({"ROLE_PARTICIPANT", "ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER"})
+    @PostMapping(value = "/{id}/group-registrations")
+    @Operation(summary = "Saves the judgings for a competition", security = @SecurityRequirement(name = "apiKey"))
+    public void updateCompetitionResults(@PathVariable Long id, @RequestBody List<ParticipantResultDto> participantResultDtos) {
+        LOGGER.info("POST {}/{}/group-registrations", BASE_PATH, id);
+        //competitionService.updateCompetitionResults(participantResultDtos, id);
     }
 }

@@ -60,9 +60,9 @@ public class CompetitionBuilder {
         creator = getDefaultAppUser();
     }
 
-    public Competition create() {
-        ApplicationUser creator = applicationUserRepository.save(this.creator);
+    public Competition createWithCreatorAndJudges(ApplicationUser creator, Set<ApplicationUser> judges) {
         competition.setCreator(creator);
+        competition.setJudges(judges);
         Competition tmpCompetition = competitionRepository.save(competition);
 
         at.ac.tuwien.sepm.groupphase.backend.entity.GradingSystem gs = getDefaultGradingSystem();
@@ -77,6 +77,12 @@ public class CompetitionBuilder {
         assignParticipants();
 
         return competition;
+    }
+
+    public Competition create() {
+        ApplicationUser creator = applicationUserRepository.save(this.creator);
+
+        return createWithCreatorAndJudges(creator, null);
     }
 
     private void assignParticipants() {

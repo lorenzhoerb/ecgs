@@ -9,6 +9,7 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.FlagsMapper;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.GradingSystemMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
@@ -41,10 +42,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -67,6 +73,9 @@ public abstract class TestDataProvider {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private GradingSystemMapper gradingSystemMapper;
 
     @Autowired
     private FlagsMapper flagsMapper;
@@ -163,6 +172,47 @@ public abstract class TestDataProvider {
         };
     }
 
+    protected ApplicationUser createValidParticipantUser(ApplicationUserRepository applicationUserRepository,
+                                                   SecurityUserRepository securityUserRepository) {
+        SecurityUser securityUser = new SecurityUser("notDuplicate@email.com", "password");
+
+        ApplicationUser applicationUser = new ApplicationUser(
+            ApplicationUser.Role.PARTICIPANT,
+            "firstName", "lastName",
+            ApplicationUser.Gender.MALE,
+            new Date(2000, 11, 1),
+            ""
+        );
+        applicationUser.setUser(securityUser);
+        securityUser.setUser(applicationUser);
+
+        securityUserRepository.save(securityUser);
+        applicationUserRepository.save(applicationUser);
+
+        return applicationUser;
+    }
+
+    protected ApplicationUser createValidJudgeUser(ApplicationUserRepository applicationUserRepository,
+                                                   SecurityUserRepository securityUserRepository) {
+        SecurityUser securityUser = new SecurityUser("duplicate@email.com", "password");
+
+        ApplicationUser applicationUser = new ApplicationUser(
+            ApplicationUser.Role.PARTICIPANT,
+            "firstName", "lastName",
+            ApplicationUser.Gender.MALE,
+            new Date(2000, 11, 1),
+            ""
+        );
+        applicationUser.setUser(securityUser);
+        securityUser.setUser(applicationUser);
+
+        securityUserRepository.save(securityUser);
+        applicationUserRepository.save(applicationUser);
+
+        return applicationUser;
+    }
+
+
     protected void setUpCompetitionUserWithEMail(String email) {
         String password = "12345678";
 
@@ -231,7 +281,22 @@ public abstract class TestDataProvider {
         CompetitionRepository competitionRepository,
         boolean accepted,
         boolean draft
-    ) {
+    ) throws JsonProcessingException {
+        return createCompetitionEntity(applicationUserRepository,
+            registerToRepository, gradingGroupRepository,
+            competitionRepository, accepted, draft, null, null);
+    }
+
+    protected Competition createCompetitionEntity(
+        ApplicationUserRepository applicationUserRepository,
+        RegisterToRepository registerToRepository,
+        GradingGroupRepository gradingGroupRepository,
+        CompetitionRepository competitionRepository,
+        boolean accepted,
+        boolean draft,
+        ApplicationUser judge,
+        GradingSystemRepository gradingSystemRepository
+    ) throws JsonProcessingException {
         Competition competition = new Competition(
             "Test Competition",
             LocalDateTime.of(2022, 11, 9, 8, 0),
@@ -247,6 +312,10 @@ public abstract class TestDataProvider {
 
         );
 
+        if(judge != null) {
+            competition.setJudges(Set.of(judge));
+        }
+
         ApplicationUser user = new ApplicationUser(
             ApplicationUser.Role.PARTICIPANT,
             "first", "last",
@@ -259,8 +328,24 @@ public abstract class TestDataProvider {
 
         GradingGroup group = new GradingGroup("group 1");
 
+        if (gradingSystemRepository != null) {
+            group.setGradingSystem(new at.ac.tuwien.sepm.groupphase.backend.entity.GradingSystem(
+                "Default",
+                "Default",
+                true,
+                false,
+                getGradingSystemFormula(),
+                Set.of()
+            ));
+        }
+
+
         competition.setGradingGroups(Set.of(group));
         group.setCompetitions(competition);
+
+        if (gradingSystemRepository != null) {
+            gradingSystemRepository.save(group.getGradingSystem());
+        }
 
         competitionRepository.save(competition);
         gradingGroupRepository.save(group);
@@ -422,6 +507,26 @@ public abstract class TestDataProvider {
         return new UserDetailDto[]{
             userMapper.applicationUserToUserDetailDto(applicationUser1),
             userMapper.applicationUserToUserDetailDto(applicationUser2)
+        };
+    }
+
+    protected UserDetailDto[] getValidCompManagerJudge(
+        ApplicationUserRepository applicationUserRepository,
+        SecurityUserRepository securityUserRepository
+    ) {
+
+        ApplicationUser applicationUser1 = new ApplicationUser(
+            ApplicationUser.Role.TOURNAMENT_MANAGER,
+            "CompManager", "Judge",
+            ApplicationUser.Gender.MALE,
+            new Date(2000, 11, 1),
+            ""
+        );
+        applicationUser1.setUser(new SecurityUser(TEST_USER_COMPETITION_MANAGER_EMAIL,"password"));
+        applicationUserRepository.save(applicationUser1);
+
+        return new UserDetailDto[]{
+            userMapper.applicationUserToUserDetailDto(applicationUser1)
         };
     }
 

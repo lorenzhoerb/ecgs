@@ -48,6 +48,13 @@ export class UserService {
     });
   }
 
+  getUserDetail(id?: number): Observable<UserDetail> {
+    console.log('Load user info');
+    return id === null
+      ? this.httpClient.get<UserDetail>(`${this.userBaseUri}/detail`)
+      : this.httpClient.get<UserDetail>(`${this.userBaseUri}/${id}`);
+  }
+
   registerToCompetition(competitionId: number, groupPreference: number): Observable<ResponseParticipantRegistrationDto> {
     const uri = this.userBaseUri + '/competitions/' + competitionId;
     if (groupPreference) {

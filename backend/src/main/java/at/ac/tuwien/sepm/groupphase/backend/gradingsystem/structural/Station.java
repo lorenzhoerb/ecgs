@@ -3,12 +3,16 @@ package at.ac.tuwien.sepm.groupphase.backend.gradingsystem.structural;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Operation;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Getter
+@Setter
 public class Station {
     @JsonProperty("id")
     Long id;

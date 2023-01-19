@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
+import at.ac.tuwien.sepm.groupphase.backend.entity.grade.Grade;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,20 +21,20 @@ public class Judge {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(referencedColumnName = "id")
-    private ApplicationUser participant;
+    private ApplicationUser judge;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(referencedColumnName = "id")
     private Competition competition;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "judging")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "judge")
     private Set<Grade> grades;
 
     public Judge() {
     }
 
-    public Judge(ApplicationUser participant, Competition competition) {
-        this.participant = participant;
+    public Judge(ApplicationUser judge, Competition competition) {
+        this.judge = judge;
         this.competition = competition;
     }
 
@@ -44,12 +46,12 @@ public class Judge {
         this.id = id;
     }
 
-    public ApplicationUser getParticipant() {
-        return participant;
+    public ApplicationUser getJudge() {
+        return judge;
     }
 
-    public void setParticipant(ApplicationUser participant) {
-        this.participant = participant;
+    public void setJudge(ApplicationUser participant) {
+        this.judge = participant;
     }
 
     public Competition getCompetition() {
@@ -72,7 +74,7 @@ public class Judge {
     public String toString() {
         return "Judge{"
             + "id=" + id
-            + ", participant=" + participant
+            + ", participant=" + judge
             + ", competition=" + competition
             + ", grades=" + grades
             + '}';

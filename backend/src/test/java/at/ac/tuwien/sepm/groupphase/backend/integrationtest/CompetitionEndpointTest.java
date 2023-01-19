@@ -7,14 +7,19 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ErrorListRestDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantResultDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleGradingGroupDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.entity.GradingGroup;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Judge;
+import at.ac.tuwien.sepm.groupphase.backend.entity.RegisterTo;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.JudgeRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingSystemRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.SecurityUserRepository;
@@ -22,6 +27,7 @@ import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.With;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,9 +45,12 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static at.ac.tuwien.sepm.groupphase.backend.integrationtest.TestData.ADMIN_ROLES;
 import static at.ac.tuwien.sepm.groupphase.backend.integrationtest.TestData.ADMIN_USER;
@@ -76,6 +85,9 @@ public class CompetitionEndpointTest extends TestDataProvider {
     private RegisterToRepository registerToRepository;
 
     @Autowired
+    private JudgeRepository judgeRepository;
+
+    @Autowired
     private GradingSystemRepository gradingSystemRepository;
 
     @Autowired
@@ -83,6 +95,9 @@ public class CompetitionEndpointTest extends TestDataProvider {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @Autowired
     private SecurityProperties securityProperties;
@@ -525,4 +540,57 @@ public class CompetitionEndpointTest extends TestDataProvider {
             null, true,
             false, null, null);
     }
+
+    /*
+    //TODO delete oder fix test
+
+    @Test
+    @Transactional
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void givenValidJudgeForCompetitionGrading_thenSendGrades_ShouldSucceed() throws Exception {
+        assertEquals(1, Stream.of(judgeRepository.findAll()).toList().size());
+        setUpCompetitionUser();
+        Competition competition = createCompetitionEntity(
+            applicationUserRepository,
+            registerToRepository,
+            gradingGroupRepository,
+            competitionRepository,
+            true,
+            false
+        );
+
+        Optional<ApplicationUser> optApp = applicationUserRepository.findApplicationUserByUserEmail(TEST_USER_COMPETITION_MANAGER_EMAIL);
+        ApplicationUser optional = null;
+        if (optApp.isPresent()) {
+            optional = optApp.get();
+        }
+        Competition competitionLoaded = competitionRepository.findById(competition.getId()).get();
+        Judge toCreate = new Judge();
+        toCreate.setCompetition(competitionLoaded);
+        toCreate.setParticipant(optional);
+        Judge createdJudge = judgeRepository.save(toCreate);
+        List<ParticipantResultDto> resultDtoList = new ArrayList<>();
+        List<RegisterTo> registerTo = registerToRepository.findByGradingGroupCompetitionId(competitionLoaded.getId());
+        ParticipantResultDto resultDto = new ParticipantResultDto(registerTo.get(0).getParticipant().getId(),
+            "[{\"gradingGroupId\":5,\"stations\":[{\"stationId\":1,\"variables\":[{\"variableId\":1,\"value\":\"321\"},{\"variableId\":2,\"value\":\"321\"}]}]}]");
+        resultDtoList.add(resultDto);
+
+        MvcResult mvcResult = this.mockMvc.perform(post(COMPETITION_BASE_URI + "/" + competitionLoaded.getId() + "/group-registrations")
+                .header(
+                    securityProperties.getAuthHeader(),
+                    jwtTokenizer.getAuthToken(
+                        TEST_USER_COMPETITION_MANAGER_EMAIL,
+                        List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
+                    ))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(resultDtoList)))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        assertEquals(2, Stream.of(judgeRepository.findAll()).toList().size());
+        createdJudge = judgeRepository.findById(createdJudge.getId()).get();
+        assertEquals(resultDtoList.size(), createdJudge.getGrades().size());
+    }
+    */
 }

@@ -71,7 +71,7 @@ public class ApplicationUser {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.EAGER)
     private Set<Competition> competitions;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "participant")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "judge")
     private Set<Judge> judges;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "participant")
@@ -80,7 +80,7 @@ public class ApplicationUser {
     public ApplicationUser() {
     }
 
-    @ManyToMany(cascade = {}, mappedBy = "judges")
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "judges")
     private Set<Competition> judging;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator")

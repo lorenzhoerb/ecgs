@@ -25,6 +25,7 @@ import {ResetPasswordComponent} from './components/reset-password/reset-password
 import {ChangePasswordComponent} from './components/change-password/change-password.component';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import { MatRadioModule } from '@angular/material/radio';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import { MatDialogModule } from '@angular/material/dialog';
 import {ViewParticipantsComponent} from './components/competition/view-participants/view-participants.component';
@@ -51,6 +52,12 @@ import {CompetitionHeaderComponent} from './components/competition-header/compet
 import {AutocompleteComponent} from './components/autocomplete/autocomplete.component';
 import { HeaderCreateModalComponent } from './components/header-create-modal/header-create-modal.component';
 import { ImportFlagsComponent } from './components/import-flags/import-flags.component';
+import { CompetitionGradingComponent } from './components/competition/competition-grading/competition-grading.component';
+import { CompetitionGradingGroupComponent }
+  from './components/competition/competition-grading/competition-grading-group/competition-grading-group.component';
+import { CompetitionGradingStationComponent }
+  from './components/competition/competition-grading/competition-grading-station/competition-grading-station.component';
+import { StompService } from './services/stomp.service';
 import {BulkEditorComponent} from './components/bulk-editor/bulk-editor.component';
 import { ManageParticipantsComponent } from './components/competition/manage-participants/manage-participants.component';
 import { NavBarComponent } from './components/util/nav-bar/nav-bar.component';
@@ -95,6 +102,9 @@ import { ChangeUserPassPictureComponent } from './components/change-user-pass-pi
     CompetitionHeaderComponent,
     AutocompleteComponent,
     HeaderCreateModalComponent,
+    CompetitionGradingComponent,
+    CompetitionGradingGroupComponent,
+    CompetitionGradingStationComponent,
     ImportFlagsComponent,
     BulkEditorComponent,
     ManageParticipantsComponent,
@@ -117,6 +127,7 @@ import { ChangeUserPassPictureComponent } from './components/change-user-pass-pi
     FormsModule,
     MatIconModule,
     MatButtonToggleModule,
+    MatRadioModule,
     MatTooltipModule,
     MatDialogModule,
     ToastrModule.forRoot(),
@@ -124,7 +135,8 @@ import { ChangeUserPassPictureComponent } from './components/change-user-pass-pi
     MatFormFieldModule,
     MatInputModule
   ],
-  providers: [httpInterceptorProviders],
+  providers: [
+  httpInterceptorProviders],
   bootstrap: [AppComponent]
 })
 export class AppModule {

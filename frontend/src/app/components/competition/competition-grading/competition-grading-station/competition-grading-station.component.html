@@ -1,0 +1,46 @@
+<div class="card-container">
+  <div class="start">
+    <h4 style="margin-right: 50px;width: 250px; overflow: hidden">{{participantDetailDto.participant.firstName}}
+      {{participantDetailDto.participant.lastName}}</h4>
+    <div *ngFor="let j of otherJudges">
+      <div [ngClass]="calcInactive(j)" class="user judge" [matTooltip]="j.inactive ? 'Inaktiv' : 'Aktiv'" matTooltipPosition="above">
+        <img src="../../../../../assets/user_image.jpg">
+        {{j.firstName}} {{j.lastName}}
+      </div>
+    </div>
+  </div>
+  <div class="contain-grades" *ngIf="station !== undefined">
+
+    <div style="display: flex; flex-direction: row; align-items: flex-end;">
+      <div [ngClass]="getErrorStyle()" style="display: flex; flex-direction: column; align-items: center; margin-left: 15px; margin-right: 15px;"
+        *ngFor="let stationVariable of station.variables">
+        <label [for]="stationVariable.displayName">{{stationVariable.displayName}}</label>
+        <input style="text-align: center;" type="text" [id]="stationVariable.id"
+          [name]="stationVariable.displayName" [value]="getModel(stationVariable.id)" (input)="onInputChange($event, station.id, stationVariable.id)">
+      </div>
+      <button class="primary-btn bc-blue" [ngClass]="getAcceptStateClass()" (click)="sendResults()">
+        <span *ngIf="!getAcceptState() && !getErrorState()">
+          Absenden
+        </span>
+        <mat-icon *ngIf="getAcceptState()">
+          done
+        </mat-icon>
+        <mat-icon *ngIf="getErrorState()" [matTooltip]="getErrorMessage()" matTooltipPosition="above">
+          error
+        </mat-icon>
+      </button>
+      <div class="result">
+        {{getResultText()}}
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: row;" *ngFor="let j of otherJudges">
+      <div style="display: flex; flex-direction: column; align-items: center; margin-left: 15px; margin-right: 15px;"
+        *ngFor="let stationVariable of station.variables">
+        <span [ngClass]="getHighlightClass(j)" class="variable">{{gradeForJudge(j, stationVariable.id)}}</span>
+      </div>
+    </div>
+
+
+  </div>
+
+</div>

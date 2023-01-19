@@ -2,6 +2,7 @@
 @import '../node_modules/bootstrap/scss/bootstrap';
 @import './variables.scss';
 @import '~ngx-toastr/toastr';
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
 
 h6,
 .h6,
@@ -129,7 +130,7 @@ main>* {
 ///////// Spacers and other Helpers
 
 .vertical-seperator {
-  border-right: 2px solid #719c8c
+  border-right: 1px solid #719c8c
     /*#f7f6f7*/
   ;
 }

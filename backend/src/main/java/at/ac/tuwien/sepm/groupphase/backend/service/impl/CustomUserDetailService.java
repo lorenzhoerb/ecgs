@@ -2,6 +2,8 @@ package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamMemberImportDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantSelfRegistrationDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamMemberImportDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlag;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlagsResultDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserCredentialUpdateDto;
@@ -524,5 +526,10 @@ public class CustomUserDetailService implements UserService {
             .role(user.getType())
             .picturePath(user.getPicturePath())
             .build();
+    }
+
+    @Override
+    public UserDetailDto getUser(Long id) {
+        return userMapper.applicationUserToUserDetailDto(userRepository.findById(id).get());
     }
 }

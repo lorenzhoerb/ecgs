@@ -33,10 +33,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.PageAttributes;
@@ -82,9 +85,7 @@ public class UserEndpoint {
     public Set<CalenderViewCompetitionDto> getCompetitionsForCalender(@RequestParam int year, @RequestParam int weekNumber) {
         logger.info("GET {}/calender?year={}&month={}", BASE_URI, year, weekNumber);
 
-        return competitionMapper.competitionSetToCalenderViewCompetitionDtoSet(
-            userService.getCompetitionsForCalendar(year, weekNumber)
-        );
+        return competitionMapper.competitionSetToCalenderViewCompetitionDtoSet(userService.getCompetitionsForCalendar(year, weekNumber));
     }
 
     @Secured({"ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER", "ROLE_PARTICIPANT"})
@@ -120,12 +121,25 @@ public class UserEndpoint {
     }
 
     @Secured({"ROLE_PARTICIPANT", "ROLE_TOURNAMENT_MANAGER", "ROLE_CLUB_MANAGER"})
+    @GetMapping("/detail")
+    public UserDetailDto getUserDetail() {
+        logger.info("GET {}/detail", BASE_PATH);
+        return userService.getUser(sessionUtils.getSessionUser().getId());
+    }
+
+    @Secured({"ROLE_PARTICIPANT", "ROLE_TOURNAMENT_MANAGER", "ROLE_CLUB_MANAGER"})
+    @GetMapping("/{id}")
+    public UserDetailDto getUserDetail(@PathVariable Long id) {
+        logger.info("GET {}/{}", BASE_PATH, id);
+        return userService.getUser(id);
+    }
+
+    @Secured({"ROLE_PARTICIPANT", "ROLE_TOURNAMENT_MANAGER", "ROLE_CLUB_MANAGER"})
     @PostMapping(value = "/competitions/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Registers the authenticated user to a competition", security = @SecurityRequirement(name = "apiKey"))
-    public ResponseParticipantRegistrationDto registerToCompetition(
-        @PathVariable Long id,
-        @RequestBody(required = false) ParticipantSelfRegistrationDto groupPreference) {
+    public ResponseParticipantRegistrationDto registerToCompetition(@PathVariable Long id,
+                                                                    @RequestBody(required = false) ParticipantSelfRegistrationDto groupPreference) {
         logger.info("POST {}/competitions/{}\n{}", BASE_PATH, id, groupPreference);
         return userService.registerToCompetition(id, groupPreference);
     }
@@ -135,8 +149,7 @@ public class UserEndpoint {
     @Operation(summary = "Checks if the authenticated user is registered to the competition.", security = @SecurityRequirement(name = "apiKey"))
     public ResponseEntity<Void> authenticatedUserIsRegisteredToCompetition(@PathVariable Long id) {
         logger.info("GET {}/competitions/{}", BASE_PATH, id);
-        return competitionRegistrationService.isRegisteredTo(id)
-            ? new ResponseEntity<>(HttpStatus.NO_CONTENT) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return competitionRegistrationService.isRegisteredTo(id) ? new ResponseEntity<>(HttpStatus.NO_CONTENT) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @Secured({"ROLE_TOURNAMENT_MANAGER"})

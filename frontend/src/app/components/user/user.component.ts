@@ -49,7 +49,10 @@ export class UserComponent implements OnInit {
       if (this.loggedIn) {
         this.userService.updateUserInfo();
         this.userService.userInfoDto$.subscribe({
-          next: (dto) => this.picturePath = dto.picturePath,
+          next: (dto) => {
+            this.user = dto;
+            this.picturePath = this.user.picturePath;
+          },
           error: () => console.warn('Error during profile update')
         });
       }

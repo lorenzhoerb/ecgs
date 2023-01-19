@@ -29,6 +29,7 @@ export class Englisch implements ILanguage {
     Tournamnet: 'Competition',
     contact: 'Contact',
     participants: 'Participants',
+    managedParticipants: 'Participants managed by you',
 
     title: 'Title',
     phoneNumber: 'Phone number',
@@ -59,7 +60,6 @@ export class Englisch implements ILanguage {
 
     logout: 'Logout',
     importCSV: 'New Team Members',
-    page: 'Page',
     member: 'Member',
     clearAll: 'Clear all',
     genderMan: 'Man',
@@ -68,7 +68,17 @@ export class Englisch implements ILanguage {
     importCSVButton: 'Import as CSV',
     exportCSVButton: 'Export as CSV',
     teamName: 'Team name',
+    page: 'Page',
     createTournament: 'New Competition',
+
+    importFlags: 'Assign flags',
+    flag: 'Flag',
+    optional: 'optional',
+    add: 'add',
+    delete: 'remove',
+    new: 'new',
+    create: 'create',
+    createFlag: 'create Flag',
 
     close: 'Close',
     formula: 'Formula',
@@ -87,11 +97,6 @@ export class Englisch implements ILanguage {
     gradingSystems: 'Grading Systems',
     manageTemplateGradingSystems: 'Manage Grading Systems',
     reset: 'Reset changes',
-    delete: 'Delete',
-
-    importFlags: 'Assign flags',
-    flag: 'Flag',
-    optional: 'optional',
 
     username: 'Username / Email',
     firstname: 'Firstname',
@@ -105,6 +110,17 @@ export class Englisch implements ILanguage {
     dateOfBirth: 'Date of Birth',
     gender: `Gender`,
     type: `User Role`,
+
+    regMemToComp: 'Register Members to a Competition',
+    searchAndSelectToRegister: 'Suche und wähle einen Wettkampf für die Anmeldung',
+    registrationEnds: 'Registration ends',
+    members: 'Members',
+    membersPerPage: 'members per page',
+    searchACompetition: 'Search a competition',
+    back: 'Back',
+
+    editTeam: 'Edit Team',
+
     enter: (type: string) => `Enter ${type}...`,
     reEnter: (type: string) => `Repeat ${type}...`,
     getType: (type: string) => ({

@@ -4,8 +4,11 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlag;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlagsResultDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantSelfRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseParticipantRegistrationDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserCredentialUpdateDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailFlagDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailSetFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserInfoDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
@@ -170,4 +173,32 @@ public interface UserService extends UserDetailsService {
     UserDetailDto getUser(Long id);
 
     ImportFlagsResultDto importFlags(List<ImportFlag> flags);
+
+    /**
+     * Get flags in use by club manager .
+     *
+     * @return flags managed by a club manager
+     */
+    List<SimpleFlagDto> getManagedFlags();
+
+    /**
+     * Add flags for members.
+     *
+     * @param members set flags for members
+     */
+    void addFlagsForUsers(UserDetailSetFlagDto members);
+
+    /**
+     * Remove flags for members.
+     *
+     * @param members set flags for members
+     */
+    void removeFlagsForUsers(UserDetailSetFlagDto members);
+
+    /**
+     * get team members.
+     *
+     * @return members of team
+     */
+    List<UserDetailFlagDto> getMembers();
 }

@@ -1,12 +1,11 @@
 package at.ac.tuwien.sepm.groupphase.backend.service;
 
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.AdvanceCompetitionSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionViewDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradeDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupWithRegisterToDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantResultDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.PageableDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantFilterDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegDetailDto;
@@ -69,8 +68,6 @@ public interface CompetitionService {
      */
     List<CompetitionListDto> searchCompetitions(CompetitionSearchDto competitionSearchDto);
 
-    //TODO: Remove
-    //void updateCompetitionResults(List<ParticipantResultDto> results, Long competitionId);
     /** Returns a list of participants of a competition with registration details.
      * Default value of page=0 and size=10.
      *
@@ -78,4 +75,14 @@ public interface CompetitionService {
      * @return Paginated list of participants
      */
     Page<ParticipantRegDetailDto> getParticipantsRegistrationDetails(PageableDto<ParticipantFilterDto> filter);
+
+    /**
+     * Search non-draft competitions with search params. The params are optional
+     * and can be left away to search for every competition (exluding drafts).
+     * Default result size is 10 and page is 0.
+     *
+     * @param searchDto search parameters
+     * @return Paginated result of competitions
+     */
+    Page<CompetitionListDto> searchCompetitionsAdvanced(AdvanceCompetitionSearchDto searchDto);
 }

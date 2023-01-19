@@ -3,6 +3,10 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.AdvanceCompetitionSearchDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionViewDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupWithRegisterToDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantResultDto;
@@ -10,6 +14,8 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.PageableDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantFilterDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantManageDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegistrationDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseMultiParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseMultiParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleGradingGroupDto;
@@ -44,6 +50,7 @@ import javax.annotation.security.PermitAll;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @RestController
@@ -86,6 +93,16 @@ public class CompetitionEndpoint {
     public CompetitionDetailDto findDetail(@PathVariable Long id) {
         LOGGER.info("GET /api/v1/messages/{}", id);
         return competitionService.findOneDetail(id);
+    }
+
+    @GetMapping
+    @PermitAll
+    @Operation(summary = "Searches all competitions which are not drafts")
+    public Page<CompetitionListDto> searchCompetitions(AdvanceCompetitionSearchDto searchQuery) {
+        LOGGER.info("GET {}", BASE_PATH);
+        LOGGER.trace("searchCompetitions({})", searchQuery);
+        return competitionService
+            .searchCompetitionsAdvanced(Objects.requireNonNullElseGet(searchQuery, AdvanceCompetitionSearchDto::new));
     }
 
     @Secured("ROLE_TOURNAMENT_MANAGER")

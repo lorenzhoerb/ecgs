@@ -29,6 +29,7 @@ export class German implements ILanguage {
     Tournamnet:'Wettkampf',
     contact:'Kontakt',
     participants: 'Teilnehmer',
+    managedParticipants: 'Teilnehmer die Sie verwalten',
 
     title: 'Titel',
     phoneNumber:'Telefonnummer',
@@ -64,12 +65,21 @@ export class German implements ILanguage {
     page: 'Seite',
     member: 'Teammitglied',
     clearAll: 'Alle löschen',
-    genderMan: 'Herr',
+    genderMan: 'Männlich',
     genderWoman: 'Frau',
     genderOther: 'Anders',
     importCSVButton: 'Importieren als CSV',
     exportCSVButton: 'Exportieren als CSV',
     createTournament: 'Neuer Wettkampf',
+
+    importFlags: 'Flags zuweisen',
+    flag: 'Flag',
+    optional: 'optional',
+    add: 'hinzufügen',
+    delete: 'löschen',
+    new: 'neu',
+    create: 'erstellen',
+    createFlag: 'neues Flag erstellen',
 
     close: 'Abbrechen',
     formula: 'Formel',
@@ -84,14 +94,10 @@ export class German implements ILanguage {
     gradingGroup: 'Bewertungsgruppe',
     gradingSystems: 'Bewertungssysteme',
     manageTemplateGradingSystems: 'Bewertungssysteme Verwalten',
-    importFlags: 'Flags zuweisen',
-    flag: 'Flag',
-    optional: 'optional',
     publicTypeAll: 'Publik & Privat',
     publicTypePrivate: 'Privat',
     publicTypePublic: 'Publik',
     reset: 'Zurücksetzen',
-    delete: 'Löschen',
 
     username: 'Benutzername / Email',
     firstname: 'Vorname',
@@ -105,6 +111,17 @@ export class German implements ILanguage {
     dateOfBirth: 'Geburtstag',
     gender: `Geschlecht`,
     type: `Rolle`,
+
+    regMemToComp: 'Registriere Mitgliere zu einem Wettkampf',
+    searchAndSelectToRegister: 'Suche und wähle einen Wettkampf aus',
+    registrationEnds: 'Registrierung endet',
+    members: 'Mitglieder',
+    membersPerPage: 'Mitglieder pro Seite',
+    searchACompetition: 'Suche nach einem Wettkampf',
+    back: 'Zurück',
+
+    editTeam: 'Team bearbeiten',
+
     enter: (type: string) => `${type} eingeben...`,
     reEnter: (type: string) => `${type} wiederholen...`,
     getType: (type: string) => ({

@@ -5,6 +5,8 @@ import at.ac.tuwien.sepm.groupphase.backend.datagenerator.UserProvider;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantManageDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseMultiParticipantRegistrationDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegistrationDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseMultiParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
@@ -148,7 +150,7 @@ public class CompetitionRegistrationServiceTest extends TestDataProvider {
         ForbiddenException ex = assertThrows(ForbiddenException.class, () -> {
             competitionRegistrationService.selfRegisterParticipant(created.getId(), null);
         });
-        assertEquals("Registration for competition " + created.getId() + " is not closed.", ex.getMessage());
+        assertEquals("Registration for competition " + created.getId() + " is closed.", ex.getMessage());
     }
 
     @Test

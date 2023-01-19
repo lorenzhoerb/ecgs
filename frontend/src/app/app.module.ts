@@ -36,7 +36,6 @@ import {FormularEditorComponent} from './components/competition/formular-editor/
 import {RegisterModalComponent} from './components/competition/register-modal/register-modal.component';
 import {HeaderModalComponent} from './components/header-modal/header-modal.component';
 import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatInputModule} from '@angular/material/input';
 import {CompetitionListViewComponent} from './components/competition-list-view/competition-list-view.component';
 import {
   CompetitionListViewEntryComponent
@@ -50,16 +49,21 @@ import {
 } from './components/competition-calender-view/competition-calender-view.component';
 import {CompetitionHeaderComponent} from './components/competition-header/competition-header.component';
 import {AutocompleteComponent} from './components/autocomplete/autocomplete.component';
-import { HeaderCreateModalComponent } from './components/header-create-modal/header-create-modal.component';
-import { ImportFlagsComponent } from './components/import-flags/import-flags.component';
 import { CompetitionGradingComponent } from './components/competition/competition-grading/competition-grading.component';
 import { CompetitionGradingGroupComponent }
   from './components/competition/competition-grading/competition-grading-group/competition-grading-group.component';
 import { CompetitionGradingStationComponent }
   from './components/competition/competition-grading/competition-grading-station/competition-grading-station.component';
-import { StompService } from './services/stomp.service';
 import {BulkEditorComponent} from './components/bulk-editor/bulk-editor.component';
-import { ManageParticipantsComponent } from './components/competition/manage-participants/manage-participants.component';
+import {ManageParticipantsComponent} from './components/competition/manage-participants/manage-participants.component';
+import {ClubManagerEditComponent} from './components/club-manager-edit/club-manager-edit.component';
+import {RegisterToModalComponent} from './components/club-manager-edit/register-to-modal/register-to-modal.component';
+import {
+  SearchSelectCompetitionComponent
+} from './components/club-manager-edit/register-to-modal/search-select-competition/search-select-competition.component';
+import {
+  ReigistrationSummaryComponent
+} from './components/club-manager-edit/register-to-modal/reigistration-summary/reigistration-summary.component';
 import { NavBarComponent } from './components/util/nav-bar/nav-bar.component';
 import { GenderPipe } from './pipes/gender.pipe';
 import { ViewAndEditGradingSystemComponent } from './components/view-and-edit-grading-system/view-and-edit-grading-system.component';
@@ -68,6 +72,9 @@ import { ChangeUserPictureComponent } from './components/change-user-picture/cha
 import { CreateCompetitionSelectGradingSystemDialogComponent }
   from './components/create-competition-select-grading-system-dialog/create-competition-select-grading-system-dialog.component';
 import { ChangeUserPassPictureComponent } from './components/change-user-pass-picture/change-user-pass-picture.component';
+import {MatInputModule} from '@angular/material/input';
+import {ImportFlagsComponent} from './components/import-flags/import-flags.component';
+import {HeaderCreateModalComponent} from './components/header-create-modal/header-create-modal.component';
 
 @NgModule({
   declarations: [
@@ -102,15 +109,20 @@ import { ChangeUserPassPictureComponent } from './components/change-user-pass-pi
     CompetitionHeaderComponent,
     AutocompleteComponent,
     HeaderCreateModalComponent,
+    ImportFlagsComponent,
+    BulkEditorComponent,
+    ManageParticipantsComponent,
+    ClubManagerEditComponent,
+    RegisterToModalComponent,
+    SearchSelectCompetitionComponent,
+    ReigistrationSummaryComponent,
     CompetitionGradingComponent,
     CompetitionGradingGroupComponent,
     CompetitionGradingStationComponent,
-    ImportFlagsComponent,
     BulkEditorComponent,
     ManageParticipantsComponent,
     NavBarComponent,
     GenderPipe,
-    ImportFlagsComponent,
     TemplateDialogComponent,
     ChangeUserPictureComponent,
     ViewAndEditGradingSystemComponent,

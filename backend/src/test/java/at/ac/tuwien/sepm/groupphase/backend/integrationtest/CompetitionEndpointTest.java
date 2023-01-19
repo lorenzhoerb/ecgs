@@ -26,6 +26,7 @@ import at.ac.tuwien.sepm.groupphase.backend.repository.SecurityUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.With;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -54,6 +56,9 @@ import java.util.stream.Stream;
 
 import static at.ac.tuwien.sepm.groupphase.backend.integrationtest.TestData.ADMIN_ROLES;
 import static at.ac.tuwien.sepm.groupphase.backend.integrationtest.TestData.ADMIN_USER;
+
+import java.util.Objects;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -436,6 +441,16 @@ public class CompetitionEndpointTest extends TestDataProvider {
         List<Competition> compList = (List<Competition>) competitionRepository.findAll();
         assertEquals(compList.size(),30);
         assertEquals(30,allByBeginOfCompetitionAfterAndNameStartingWithAndDescriptionContainingIgnoreCase.size());
+    }
+
+    @Test
+    public void searchCompetitionsAdvance() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(get(COMPETITION_BASE_URI)
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES))
+                .queryParam("name", "Haus")
+                .queryParam("isPublic", "TRUE")
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk()).andDo(print()).andReturn();
     }
 
     @Test

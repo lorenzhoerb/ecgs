@@ -33,6 +33,7 @@ export class LocalizationKeys {
   Tournamnet: string;
   contact: string;
   participants: string;
+  managedParticipants: string;
 
   title: string;
   phoneNumber: string;
@@ -64,17 +65,26 @@ export class LocalizationKeys {
 
   logout: string;
   importCSV: string;
-  page: string;
   exportCSVButton: string;
   teamName: string;
   member: string;
   importCSVButton: string;
+  page: string;
   clearAll: string;
   genderMan: string;
   genderWoman: string;
   genderOther: string;
 
   createTournament: string;
+
+  importFlags: string;
+  flag: string;
+  optional: string;
+  add: string;
+  delete: string;
+  new: string;
+  create: string;
+  createFlag: string;
 
   close: string;
   formula: string;
@@ -93,11 +103,6 @@ export class LocalizationKeys {
 
   gradingSystems: string;
   manageTemplateGradingSystems: string;
-  delete: string;
-
-  importFlags: string;
-  flag: string;
-  optional: string;
 
   username: string;
   firstname: string;
@@ -111,6 +116,17 @@ export class LocalizationKeys {
   dateOfBirth: string;
   gender: string;
   type: string;
+
+  regMemToComp: string;
+  searchAndSelectToRegister: string;
+  registrationEnds: string;
+  members: string;
+  membersPerPage: string;
+  searchACompetition: string;
+  back: string;
+
+  editTeam: string;
+
   enter: (type: string) => string;
   reEnter: (type: string) => string;
   getType: (type: string) => string;

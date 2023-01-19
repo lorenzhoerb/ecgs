@@ -1,0 +1,118 @@
+div{
+    white-space:pre-line;
+}
+
+.main-menu {
+    display: block;
+    padding: 0;
+    margin-left: 12.5%;    
+    margin-right: 12.5%; 
+}
+
+.top-bar {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.import-as-csv-button {
+    background-color: rgba(171, 245, 255, 0.72);
+}
+
+.export-as-csv-button {
+    background-color: rgba(171, 245, 255, 0.72);
+}
+
+.csv-button-img {
+    padding-right: 10px;
+}
+
+.add-new-member-btn {
+    white-space: pre;
+    background-color: greenyellow;
+}
+
+.clear-members-btn {
+    margin-right: 2%;
+    background-color: rgb(255, 42, 81);
+    color: white;
+}
+
+.team-content {
+
+}
+
+.save-button {
+    background-color: green; 
+    color: white;
+    width: 250px;
+    height: 100px;
+    font-size: 35px;
+    // border: 3px solid black;
+}
+
+// .buttons {
+//     justify-content: flex-end;
+//     display: flex;
+// }
+
+.team-name-input {
+    // border: 3px solid black;
+    // border-radius: 8px;
+    margin-top: 30px;
+}
+
+.team-name-label {
+    font-size: 35px;
+    font-weight: 750;
+    text-align: center;
+}
+
+.member-field-input {
+    // border-bottom: 2px solid grey;
+    // border-left: 2px solid grey;
+    // box-shadow: -1px 1px grey;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px turquoise solid;
+    padding: 0px;
+    display: inline-block;
+}
+
+// .navigation-button {
+//     outline: solid 0px #000000;
+//     transition: outline 0.1s linear;
+// }
+
+// .navigation-button:hover {
+//     outline-width: 3px;
+// }
+
+
+select {
+    appearance: auto;
+}
+
+table {
+    //margin-top: 30px;
+    border-collapse: separate;
+    align-self: flex-start;
+    // border-radius: 8px;
+    border-spacing: 1px;
+    padding-left: 16px;    
+    padding-right: 16px;    
+    // margin-left: 20%;    
+    // margin-right: 20%;    
+}
+
+tr>td {
+    padding-bottom: 1em;
+}
+
+.toast-container {
+    background-color: black;
+}
+
+::ng-deep #toast-container > div {
+    white-space: pre-line;
+}

@@ -7,7 +7,10 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlag;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlagsResultDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantSelfRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseParticipantRegistrationDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailFlagDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailSetFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserInfoDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.CompetitionMapper;
@@ -27,6 +30,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -157,5 +161,36 @@ public class UserEndpoint {
     public Set<UserDetailDto> getUserByName(UserSearchDto searchDto) {
         logger.info("GET {}/search", BASE_PATH);
         return userService.findByUserName(searchDto);
+    }
+
+    @Secured({"ROLE_TOURNAMENT_MANAGER", "ROLE_CLUB_MANAGER"})
+    @GetMapping("my-flags")
+    public List<SimpleFlagDto> getManagedFlags() {
+        logger.info("GET {}/my-flags", BASE_PATH);
+        return userService.getManagedFlags();
+    }
+
+    @Secured({"ROLE_TOURNAMENT_MANAGER", "ROLE_CLUB_MANAGER"})
+    @PostMapping("members/flags")
+    public ResponseEntity<Void> addMemberFlags(@RequestBody UserDetailSetFlagDto members) {
+        logger.info("GET {}/members/flags", BASE_PATH);
+        userService.addFlagsForUsers(members);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @Secured({"ROLE_TOURNAMENT_MANAGER", "ROLE_CLUB_MANAGER"})
+    @PatchMapping("members/flags")
+    public ResponseEntity<Void> removeMemberFlags(@RequestBody UserDetailSetFlagDto members) {
+        logger.info("GET {}/members/flags", BASE_PATH);
+        userService.removeFlagsForUsers(members);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @Secured({"ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER"})
+    @GetMapping(value = "/members")
+    @Operation(summary = "Get members of club", security = @SecurityRequirement(name = "apiKey"))
+    public List<UserDetailFlagDto> getMembers() {
+        logger.info("GET {}/members", BASE_PATH);
+        return userService.getMembers();
     }
 }

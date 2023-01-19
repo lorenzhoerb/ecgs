@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {CompetitionService} from '../../../services/competition.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {debounceTime, map, of, Subject} from 'rxjs';
+import {debounceTime, Subject} from 'rxjs';
 import {UserDetail} from '../../../dtos/user-detail';
 import {SimpleGradingGroup} from '../../../dtos/simple-grading-group';
 import {PartFilterDto} from '../../../dtos/part-filter-dto';

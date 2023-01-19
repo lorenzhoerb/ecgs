@@ -3,6 +3,8 @@ package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantManageDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseMultiParticipantRegistrationDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegistrationDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseMultiParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
@@ -27,6 +29,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CompetitionRegistrationServiceImpl implements CompetitionRegistrationService {
@@ -205,7 +209,7 @@ public class CompetitionRegistrationServiceImpl implements CompetitionRegistrati
         }
 
         if (!isRegistrationOpen(competition)) {
-            throw new ForbiddenException("Registration for competition " + competition.getId() + " is not closed.");
+            throw new ForbiddenException("Registration for competition " + competition.getId() + " is closed.");
         }
     }
 

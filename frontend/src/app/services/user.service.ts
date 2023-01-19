@@ -7,8 +7,10 @@ import {ResponseParticipantRegistrationDto} from '../dtos/responseParticipantReg
 import {ClubManagerTeamImportDto} from '../dtos/club-manager-team';
 import {CalendarViewCompetition} from '../dtos/competition';
 import {UserDetail} from '../dtos/user-detail';
-import {ImportFlag} from '../dtos/import-flag';
 import {ImportFlagsResultDto} from '../dtos/import-flags-result-dto';
+import { ImportFlag } from '../dtos/import-flag';
+import {SimpleFlagDto} from '../dtos/simpleFlagDto';
+import {UserDetailSetFlagDto} from '../dtos/userDetailSetFlagDto';
 import {ClubManagerTeamImportResults} from '../dtos/club-manager-team-import-results';
 
 @Injectable({
@@ -94,5 +96,30 @@ export class UserService {
 
   getPicture(): Observable<any> {
     return this.httpClient.get(this.userBaseUri + '/picture');
+  }
+
+  getManagedFlags(): Observable<SimpleFlagDto[]> {
+    return this.httpClient.get<SimpleFlagDto[]>(this.userBaseUri + '/my-flags');
+  }
+
+  addMemberFlags(members: UserDetailSetFlagDto): Observable<void> {
+    return this.httpClient.post<void>(this.userBaseUri + '/members/flags', members);
+  }
+
+  removeMemberFlags(members: UserDetailSetFlagDto): Observable<void> {
+    return this.httpClient.patch<void>(this.userBaseUri + '/members/flags', members);
+  }
+
+  getMembers(): Observable<Array<UserDetail>> {
+    return this.httpClient
+      .get<Array<UserDetail>>(this.userBaseUri + '/members')
+      .pipe(
+        map((data: Array<UserDetail>) => {
+          for (const d of data) {
+            d.dateOfBirth = new Date(d.dateOfBirth);
+          }
+          return data;
+        })
+      );
   }
 }

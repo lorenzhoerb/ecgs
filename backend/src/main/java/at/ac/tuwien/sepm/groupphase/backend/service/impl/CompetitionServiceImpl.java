@@ -1,13 +1,12 @@
 package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.AdvanceCompetitionSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradeDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupWithRegisterToDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupWithRegisterToDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantResultDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionViewDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.PageableDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantFilterDto;
@@ -18,17 +17,12 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.GradingSystemMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
-import at.ac.tuwien.sepm.groupphase.backend.entity.grade.Grade;
 import at.ac.tuwien.sepm.groupphase.backend.entity.GradingGroup;
 import at.ac.tuwien.sepm.groupphase.backend.entity.GradingSystem;
-import at.ac.tuwien.sepm.groupphase.backend.entity.Judge;
 import at.ac.tuwien.sepm.groupphase.backend.entity.RegisterTo;
-import at.ac.tuwien.sepm.groupphase.backend.entity.grade.GradePk;
-import at.ac.tuwien.sepm.groupphase.backend.exception.BadWebSocketRequestException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
-import at.ac.tuwien.sepm.groupphase.backend.exception.UnauthorizedException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradeRepository;
@@ -39,6 +33,7 @@ import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import at.ac.tuwien.sepm.groupphase.backend.service.GradingSystemService;
 import at.ac.tuwien.sepm.groupphase.backend.specification.ApplicationUserSpecs;
+import at.ac.tuwien.sepm.groupphase.backend.specification.CompetitionSpecification;
 import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
 import at.ac.tuwien.sepm.groupphase.backend.validation.CompetitionValidator;
 import at.ac.tuwien.sepm.groupphase.backend.validation.GradeValidator;
@@ -56,7 +51,6 @@ import javax.transaction.Transactional;
 import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -64,7 +58,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class CompetitionServiceImpl implements CompetitionService {
-
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final CompetitionRepository competitionRepository;
@@ -422,5 +415,33 @@ public class CompetitionServiceImpl implements CompetitionService {
             registerTo.getAccepted()
         );
     }
-}
 
+    @Override
+    public Page<CompetitionListDto> searchCompetitionsAdvanced(AdvanceCompetitionSearchDto searchDto) {
+        LOGGER.debug("searchCompetitionsAdvanced({})", searchDto);
+        if (searchDto == null) {
+            searchDto = new AdvanceCompetitionSearchDto();
+        }
+        Specification<Competition> specs = CompetitionSpecification.isDraft(false);
+        Specification<Competition> searchSpecs = CompetitionSpecification.getSpecs(searchDto);
+        if (searchSpecs != null) {
+            specs = specs.and(searchSpecs);
+        }
+
+        if (searchDto.getPage() == null || searchDto.getPage() < 0) {
+            searchDto.setPage(0);
+        }
+
+        if (searchDto.getSize() == null || searchDto.getSize() < 0) {
+            searchDto.setSize(10);
+        }
+
+        Pageable pageable = PageRequest.of(searchDto.getPage(), searchDto.getSize());
+        Page<Competition> page = competitionRepository.findAll(specs, pageable);
+
+        return new PageImpl<>(
+            competitionMapper.competitionListToCompetitionListDtoList(page.getContent()),
+            pageable,
+            page.getTotalElements());
+    }
+}

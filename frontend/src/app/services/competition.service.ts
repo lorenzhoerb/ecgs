@@ -7,8 +7,11 @@ import {map, Observable} from 'rxjs';
 import {Globals} from '../global/globals';
 import {SimpleGradingGroup} from '../dtos/simple-grading-group';
 
+import {CompetitionSearchDto} from '../dtos/competitionSearchDto';
+import {ParticipantRegistrationDto, ResponseParticipantRegistrationDto} from '../dtos/ParticipantRegistrationDto';
+import {AdvanceCompetitionSearchDto} from '../dtos/advance-competition-searchDto';
+import {SimpleCompetitionListEntryDto} from '../dtos/simpleCompetitionListEntryDto';
 import {ParticipantResult, ParticipantResultDTO, SimpleCompetitionListDto} from '../dtos/simpleCompetitionListDto';
-import { CompetitionSearchDto } from '../dtos/competitionSearchDto';
 import {GradingGroupWithRegisterToDto} from '../dtos/gradingGroupWithRegisterToDto';
 import {PartFilterDto} from '../dtos/part-filter-dto';
 import {ParticipantManageDto} from '../dtos/participant-manage-dto';
@@ -72,6 +75,27 @@ export class CompetitionService {
       .post<CompetitionDetail>(this.competitionBaseUri, competition);
   }
 
+  searchCompetitionsAdvance(searchParameters: AdvanceCompetitionSearchDto): Observable<Pageable<SimpleCompetitionListEntryDto>> {
+    return this.httpClient
+      .get<Pageable<SimpleCompetitionListEntryDto>>(this.competitionBaseUri, {params: {...searchParameters}})
+      .pipe(
+        map((data: Pageable<SimpleCompetitionListEntryDto>) => {
+          for (const d of data.content) {
+            d.beginOfCompetition = new Date(d.beginOfCompetition);
+            d.endOfCompetition = new Date(d.endOfCompetition);
+            d.beginOfRegistration = new Date(d.beginOfRegistration);
+            d.endOfRegistration = new Date(d.endOfRegistration);
+          }
+          return data;
+        })
+      );
+  }
+
+  registerParticipants(competitionId: number, registrations: ParticipantRegistrationDto[]): Observable<ResponseParticipantRegistrationDto> {
+    return this.httpClient
+      .post<ResponseParticipantRegistrationDto>(`${this.competitionBaseUri}/${competitionId}/participants`, registrations);
+  }
+
   /**
    * Get aprticipants of competition.
    *
@@ -133,8 +157,8 @@ export class CompetitionService {
     return this.httpClient.post<ParticipantResult[]>(this.competitionBaseUri + '/' + id + '/group-registrations', results);
   }
 
-  updateRegisteredParticipants(competitionId: number, update: ParticipantManageDto[]): Observable<Array<ParticipantManageDto>>{
-   return this.httpClient.patch<Array<ParticipantManageDto>>(`${this.competitionBaseUri}/${competitionId}/participants`, update);
+  updateRegisteredParticipants(competitionId: number, update: ParticipantManageDto[]): Observable<Array<ParticipantManageDto>> {
+    return this.httpClient.patch<Array<ParticipantManageDto>>(`${this.competitionBaseUri}/${competitionId}/participants`, update);
   }
 
   /**
@@ -152,16 +176,17 @@ export class CompetitionService {
 
     return this.httpClient
       .get<SimpleCompetitionListDto>(this.competitionBaseUri + '/search', {params})
-        .pipe(
-          map((data: SimpleCompetitionListDto) => {
-            for(const d of data) {
-              d.beginOfCompetition = new Date(d.beginOfCompetition);
-              d.endOfCompetition = new Date(d.endOfCompetition);
-              d.beginOfRegistration = new Date(d.beginOfRegistration);
-              d.endOfRegistration = new Date(d.endOfRegistration);
-            }
-            return data;
-          })
-        );
+      .pipe(
+        map((data: SimpleCompetitionListDto) => {
+
+          for (const d of data) {
+            d.beginOfCompetition = new Date(d.beginOfCompetition);
+            d.endOfCompetition = new Date(d.endOfCompetition);
+            d.beginOfRegistration = new Date(d.beginOfRegistration);
+            d.endOfRegistration = new Date(d.endOfRegistration);
+          }
+          return data;
+        })
+      );
   }
 }

@@ -12,6 +12,7 @@
     <app-competition-header [title]="competition.name"
                             (register)="onRegister()" [isRegistered]="isRegisteredToCompetition" [canRegister]="canRegister"
                             (edit)="onEdit()" [canEdit]="isCreator"
+                            (grading)="onGrading()" [canGrade]="isJudge"
     ></app-competition-header>
 
     <div class="spacer-2"></div>

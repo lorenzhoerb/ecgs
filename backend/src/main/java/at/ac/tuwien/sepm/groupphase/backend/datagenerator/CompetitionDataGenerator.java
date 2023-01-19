@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Set;
 
 @Profile("generateData")
@@ -48,7 +49,7 @@ public class CompetitionDataGenerator {
         LOGGER.debug("generateCompetition");
 
         ApplicationUser user = userBuilder.builder()
-            .withLogin("tm@email.com", "12345678")
+            .withLogin("tm2@email.com", "12345678")
             .withName("Franz", "Fischer")
             .withRole(ApplicationUser.Role.TOURNAMENT_MANAGER)
             .withGender(ApplicationUser.Gender.MALE)

@@ -7,8 +7,9 @@ import {map, Observable} from 'rxjs';
 import {Globals} from '../global/globals';
 import {SimpleGradingGroup} from '../dtos/simple-grading-group';
 
-import {SimpleCompetitionListDto} from '../dtos/simpleCompetitionListDto';
-import {CompetitionSearchDto} from '../dtos/competitionSearchDto';
+import {ParticipantResult, ParticipantResultDTO, SimpleCompetitionListDto} from '../dtos/simpleCompetitionListDto';
+import { CompetitionSearchDto } from '../dtos/competitionSearchDto';
+import {GradingGroupWithRegisterToDto} from '../dtos/gradingGroupWithRegisterToDto';
 import {PartFilterDto} from '../dtos/part-filter-dto';
 import {ParticipantManageDto} from '../dtos/participant-manage-dto';
 import {Pageable} from '../dtos/pageable';
@@ -121,6 +122,15 @@ export class CompetitionService {
   getGroups(id: number): Observable<Array<SimpleGradingGroup>> {
     return this.httpClient
       .get<Array<SimpleGradingGroup>>(this.competitionBaseUri + '/' + id + '/groups');
+  }
+
+  getGroupsWithRegistrations(id: number): Observable<GradingGroupWithRegisterToDto[]> {
+    return this.httpClient
+      .get<GradingGroupWithRegisterToDto[]>(this.competitionBaseUri + '/' + id + '/group-registrations');
+  }
+
+  sendJudgingsForTournament(id: number, results: ParticipantResultDTO[]): Observable<ParticipantResult[]> {
+    return this.httpClient.post<ParticipantResult[]>(this.competitionBaseUri + '/' + id + '/group-registrations', results);
   }
 
   updateRegisteredParticipants(competitionId: number, update: ParticipantManageDto[]): Observable<Array<ParticipantManageDto>>{

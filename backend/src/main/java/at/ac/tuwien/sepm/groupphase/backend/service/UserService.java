@@ -167,5 +167,7 @@ public interface UserService extends UserDetailsService {
      */
     UserInfoDto getUser();
 
+    UserDetailDto getUser(Long id);
+
     ImportFlagsResultDto importFlags(List<ImportFlag> flags);
 }

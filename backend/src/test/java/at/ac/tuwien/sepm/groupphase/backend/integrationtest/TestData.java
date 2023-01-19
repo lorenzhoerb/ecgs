@@ -15,16 +15,16 @@ public interface TestData {
     LocalDateTime TEST_NEWS_PUBLISHED_AT =
         LocalDateTime.of(2019, 11, 13, 12, 15, 0, 0);
 
-    final String BASE_URI = "/api/v1";
-    final String ACCOUNT_REGISTER_URI = BASE_URI + "/registration";
+    String BASE_URI = "/api/v1";
+    String ACCOUNT_REGISTER_URI = BASE_URI + "/registration";
 
-    final String ACCOUNT_REQUEST_PASSWORD_RESET_URI = BASE_URI + "/forgot";
+    String ACCOUNT_REQUEST_PASSWORD_RESET_URI = BASE_URI + "/forgot";
 
-    final String ACCOUNT_RESET_PASSWORD_URI = BASE_URI + "/reset";
+    String ACCOUNT_RESET_PASSWORD_URI = BASE_URI + "/reset";
 
-    final String ACCOUNT_CHANGE_PASSWORD_URI = BASE_URI + "/changePassword";
+    String ACCOUNT_CHANGE_PASSWORD_URI = BASE_URI + "/changePassword";
 
-    final String ACCOUNT_LOGIN_URI = BASE_URI + "/authentication";
+    String ACCOUNT_LOGIN_URI = BASE_URI + "/authentication";
 
 
     String ADMIN_USER = "admin@email.com";

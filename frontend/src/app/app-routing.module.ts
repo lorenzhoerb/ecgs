@@ -17,6 +17,7 @@ import {ResetPasswordComponent} from './components/reset-password/reset-password
 import {ChangePasswordComponent} from './components/change-password/change-password.component';
 import {CreateCompetitionComponent} from './components/competition/create-competition/create-competition.component';
 import {CompetitionListViewComponent} from './components/competition-list-view/competition-list-view.component';
+import {CompetitionGradingComponent} from './components/competition/competition-grading/competition-grading.component';
 import { ImportFlagsComponent } from './components/import-flags/import-flags.component';
 import { ViewAndEditGradingSystemComponent } from './components/view-and-edit-grading-system/view-and-edit-grading-system.component';
 
@@ -33,11 +34,12 @@ const routbuilding: Routes = [
   {path: 'competition', children:[
       {path: 'list', component: CompetitionListViewComponent},
       {path: 'create', canActivate: [TournamentManagerGuard], component: CreateCompetitionComponent},
-      {path: 'edit/:id', canActivate: [TournamentManagerGuard], component: CreateCompetitionComponent},
       {path: ':id', children: [
           {path: '', component: CompetitionComponent},
           {path: 'participants', canActivate: [TournamentManagerGuard], component: ManageParticipantsComponent}
         ]},
+      {path: 'edit/:id', canActivate: [TournamentManagerGuard], component: CreateCompetitionComponent},
+      {path: ':id/grading', component: CompetitionGradingComponent}
     ]
   },
   {path: 'grading-systems', canActivate: [TournamentManagerGuard], component: ViewAndEditGradingSystemComponent},

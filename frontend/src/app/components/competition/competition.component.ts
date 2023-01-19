@@ -7,6 +7,7 @@ import LocalizationService, {LocalizeService} from '../../services/localization/
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {RegisterModalComponent} from './register-modal/register-modal.component';
 import {UserService} from '../../services/user.service';
+import {AuthService} from '../../services/auth.service';
 import {genderMap, UserDetail} from '../../dtos/user-detail';
 import { SimpleGradingGroup } from 'src/app/dtos/simple-grading-group';
 import { ToastrService } from 'ngx-toastr';
@@ -25,15 +26,18 @@ export class CompetitionComponent implements OnInit {
   canRegister = false;
   participants: UserDetail[];
   groups: SimpleGradingGroup[];
+  isCreator = false;
+  //change this to false when isJudge is implemented
+  isJudge = true;
   updateCounter = 0;
-  isCreator: boolean;
 
   constructor(private service: CompetitionService,
               private router: Router,
               private route: ActivatedRoute,
               private modalService: NgbModal,
               private userService: UserService,
-              private toastr: ToastrService) {
+              private toastr: ToastrService,
+              private authService: AuthService) {
     this.localize.changeLanguage(this.currentLanguage);
   }
 
@@ -69,6 +73,10 @@ export class CompetitionComponent implements OnInit {
           next: () => {
             this.isCreator = true;
           }
+        });
+
+        this.service.getCompetitionByIdDetail(this.id).subscribe({
+          //check and set permission if logged in user is judge
         });
       }
     });
@@ -116,6 +124,10 @@ export class CompetitionComponent implements OnInit {
 
   onEdit() {
     this.router.navigate(['/competition/edit', this.id]);
+  }
+
+  onGrading() {
+    this.router.navigate(['competition/' + this.id + '/grading']);
   }
 
   updateParticipants() {

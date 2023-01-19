@@ -522,6 +522,7 @@ public class CustomUserDetailService implements UserService {
             .firstName(user.getFirstName())
             .lastName(user.getLastName())
             .role(user.getType())
+            .picturePath(user.getPicturePath())
             .build();
     }
 }

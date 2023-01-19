@@ -347,7 +347,6 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
     });
 
     this.gradingGroups[id].stationVariables = cloneDeep(this.gradingGroups[id].stationVariables);
-    console.log(this.gradingGroups); // TODO: remove
   }
 
   addStationVariable(station) {
@@ -411,8 +410,6 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
 
     this.gradingGroups.splice(id + 1, 0, cloneDeep(Object.assign({}, group, { title: group.title + ' Kopie' })));
     this.toastr.info(`${this.gradingGroups[id + 1].title} erfolgreich erstellt.`);
-
-    console.log(this.gradingGroups); // TODO: remove
   }
 
   duplicateStation(groupId, station, stationId) {
@@ -435,8 +432,6 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
     });
     this.gradingGroups[groupId].stationVariables = cloneDeep(this.gradingGroups[groupId].stationVariables);
     this.toastr.info(`${this.gradingGroups[groupId].stations[stationId + 1].title} erfolgreich erstellt.`);
-
-    console.log(this.gradingGroups); // TODO: remove
   }
 
   deleteGroup(id) {

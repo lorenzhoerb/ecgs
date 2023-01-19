@@ -103,7 +103,11 @@ export class LocalizationKeys {
   firstname: string;
   lastname: string;
   password: string;
+  userSettings: string;
+  filePictureRestrictions: string;
   changePassword: string;
+  changeUserPicture: string;
+  uploadUserPicture: string;
   dateOfBirth: string;
   gender: string;
   type: string;

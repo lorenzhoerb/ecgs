@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepm.groupphase.backend.integrationtest.userendpoint;
 
+
 import at.ac.tuwien.sepm.groupphase.backend.basetest.TestDataProvider;
 import at.ac.tuwien.sepm.groupphase.backend.config.properties.SecurityProperties;
 import at.ac.tuwien.sepm.groupphase.backend.datagenerator.CalendarViewDataGenerator;
@@ -9,7 +10,6 @@ import at.ac.tuwien.sepm.groupphase.backend.datagenerator.DataCleaner;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamMemberImportDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ErrorListRestDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GeneralResponseDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlag;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlagsResultDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
@@ -20,6 +20,7 @@ import at.ac.tuwien.sepm.groupphase.backend.repository.FlagsRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepm.groupphase.backend.service.helprecords.ClubManagerTeamImportResults;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -27,20 +28,24 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import javax.transaction.Transactional;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.StreamSupport;
 
 import static at.ac.tuwien.sepm.groupphase.backend.help.CalendarViewHelp.CURRENT_WEEK_NUMBER;
@@ -49,8 +54,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @ExtendWith(SpringExtension.class)
@@ -69,6 +77,9 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
     private final ClubManagerTeamImportDataGenerator cmGenerator;
 
     private final FlagsRepository flagsRepository;
+
+    @Autowired
+    private ResourceLoader resourceLoader;
 
     @Autowired
     public UserEndpointTest(ObjectMapper objectMapper, JwtTokenizer jwtTokenizer,
@@ -180,9 +191,6 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
         assertThat(result.getNewImportedFlags()).isEqualTo(3);
         assertThat(resultingFlagsNumber).isEqualTo(3);
         assertThat(resultingFlagNamesNumber).isEqualTo(1);
-
-
-
 
 
         testFlags.add(
@@ -381,8 +389,8 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
     @Transactional(Transactional.TxType.NEVER)
     public void getCompetitionsForCalendar_expectsAllManagedCompetitionsRetrieved() throws Exception {
         MvcResult mvcResult = this.mockMvc.perform(get(String.format("%s?year=%d&weekNumber=%d", BASE_CALENDAR_URI, 2022, 38))
-            .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken("test@test.test", CALENDAR_TEST_ROLES))
-        )
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken("test@test.test", CALENDAR_TEST_ROLES))
+            )
             .andDo(print())
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -406,8 +414,8 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
     @Test
     public void getCompetitionsForCalendar_withInvalidYear_expectsValidationExceptionThrown() throws Exception {
         this.mockMvc.perform(get(String.format("%s?year=%d&weekNumber=%d", BASE_CALENDAR_URI, 1800, CURRENT_WEEK_NUMBER))
-            .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken("test@test.test", CALENDAR_TEST_ROLES))
-        )
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken("test@test.test", CALENDAR_TEST_ROLES))
+            )
             .andExpect(result -> assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus()))
             .andExpect(result -> assertTrue(result.getResolvedException() instanceof ValidationListException))
             .andExpect(result -> assertTrue(result.getResolvedException().getMessage().contains("Invalid date requested")))
@@ -418,8 +426,8 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
     @Test
     public void getCompetitionsForCalendar_withInvalidMonth_expectsValidationExceptionThrown() throws Exception {
         this.mockMvc.perform(get(String.format("%s?year=%d&weekNumber=%d", BASE_CALENDAR_URI, CURRENT_YEAR, 55))
-            .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken("test@test.test", CALENDAR_TEST_ROLES))
-        )
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken("test@test.test", CALENDAR_TEST_ROLES))
+            )
             .andExpect(result -> assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus()))
             .andExpect(result -> assertTrue(result.getResolvedException() instanceof ValidationListException))
             .andExpect(result -> assertTrue(result.getResolvedException().getMessage().contains("Invalid date requested")))
@@ -432,12 +440,12 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
         String body = objectMapper.writeValueAsString(ClubManagerTeamImportGeneratorHelper.testTeams.get(0));
 
         MvcResult mvcResult = this.mockMvc.perform(post(BASE_IMPORT_TEAM_URI)
-            .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(
-                ClubManagerTeamImportGeneratorHelper.testClubManagersSecUsers.get(0).getEmail(),
-                TEAM_IMPORT_TEST_ROLES))
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(body)
-        )
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(
+                    ClubManagerTeamImportGeneratorHelper.testClubManagersSecUsers.get(0).getEmail(),
+                    TEAM_IMPORT_TEST_ROLES))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body)
+            )
             .andDo(print())
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -458,12 +466,12 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
         String body = objectMapper.writeValueAsString(ClubManagerTeamImportGeneratorHelper.testTeams_withInvalidMembers.get(0));
 
         MvcResult mvcResult = this.mockMvc.perform(post(BASE_IMPORT_TEAM_URI)
-            .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(
-                ClubManagerTeamImportGeneratorHelper.testClubManagersSecUsers.get(0).getEmail(),
-                TEAM_IMPORT_TEST_ROLES))
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(body)
-        )
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(
+                    ClubManagerTeamImportGeneratorHelper.testClubManagersSecUsers.get(0).getEmail(),
+                    TEAM_IMPORT_TEST_ROLES))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body)
+            )
             .andDo(print())
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -480,12 +488,12 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
         String body = objectMapper.writeValueAsString(ClubManagerTeamImportGeneratorHelper.testTeams_withInvalidTeamName.get(0));
 
         MvcResult mvcResult = this.mockMvc.perform(post(BASE_IMPORT_TEAM_URI)
-            .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(
-                ClubManagerTeamImportGeneratorHelper.testClubManagersSecUsers.get(0).getEmail(),
-                TEAM_IMPORT_TEST_ROLES))
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(body)
-        )
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(
+                    ClubManagerTeamImportGeneratorHelper.testClubManagersSecUsers.get(0).getEmail(),
+                    TEAM_IMPORT_TEST_ROLES))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body)
+            )
             .andDo(print())
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -504,19 +512,19 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
             new ArrayList<>() {
                 {
                     add(new ClubManagerTeamMemberImportDto(
-                        "first", null, ApplicationUser.Gender.MALE, new Date(946681200L), "ceck@ceck.com"
+                            "first", null, ApplicationUser.Gender.MALE, new Date(946681200L), "ceck@ceck.com"
                         )
                     );
                     add(new ClubManagerTeamMemberImportDto(
-                        "first", "asdasd", ApplicationUser.Gender.MALE, new Date(946681200L), "ceck@ceck.com"
+                            "first", "asdasd", ApplicationUser.Gender.MALE, new Date(946681200L), "ceck@ceck.com"
                         )
                     );
                     add(new ClubManagerTeamMemberImportDto(
-                        null, null, ApplicationUser.Gender.MALE, new Date(946681200L), "ceck.com"
+                            null, null, ApplicationUser.Gender.MALE, new Date(946681200L), "ceck.com"
                         )
                     );
                     add(new ClubManagerTeamMemberImportDto(
-                        "first", "second", ApplicationUser.Gender.MALE, new Date(-1567533357000L), "ceck@ceck.com"
+                            "first", "second", ApplicationUser.Gender.MALE, new Date(-1567533357000L), "ceck@ceck.com"
                         )
                     );
                 }
@@ -524,12 +532,12 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
         ));
 
         MvcResult mvcResult = this.mockMvc.perform(post(BASE_IMPORT_TEAM_URI)
-            .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(
-                ClubManagerTeamImportGeneratorHelper.testClubManagersSecUsers.get(0).getEmail(),
-                TEAM_IMPORT_TEST_ROLES))
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(body)
-        )
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(
+                    ClubManagerTeamImportGeneratorHelper.testClubManagersSecUsers.get(0).getEmail(),
+                    TEAM_IMPORT_TEST_ROLES))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body)
+            )
             .andDo(print())
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -600,5 +608,28 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
                 .getMember().getUser().getEmail())
             .isEqualTo("ceck24@ceck.com");
     }
+
+    @Test
+    public void uploadUserPicture_whenCorrectFileTypeAndContent_ShouldSucceed() throws Exception {
+        setUpCompetitionUser();
+        Resource originalSource = resourceLoader.getResource("classpath:/user-pictures/dot.png");
+        byte[] originalBytes = originalSource.getInputStream().readAllBytes();
+        MockMultipartFile file = new MockMultipartFile("file", "pic.png", MediaType.IMAGE_PNG_VALUE, originalBytes);
+        MvcResult mvcResult = mockMvc.perform(multipart(BASE_UPLOAD_PICTURE_URI).file(file).header("Authorization", "Bearer " + jwtTokenizer.getAuthToken(
+                TEST_USER_COMPETITION_MANAGER_EMAIL,
+                List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
+            )).contentType(MediaType.MULTIPART_FORM_DATA))
+            .andDo(print())
+            .andReturn();
+
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertEquals(response.getContentAsString(),"Picture successfully stored");
+        Path of = Path.of("user-test-pictures/");
+        if (Files.exists(of)) {
+            FileUtils.deleteDirectory(of.toFile());
+        }
+    }
+
 
 }

@@ -1,0 +1,20 @@
+<div class="pt-5">
+  <div class="row">
+    <div class="col-md-6 mx-auto">
+      <span class="anchor"></span>
+      <app-content-card [title]="localize.changeUserPicture">
+        <div class="card-body">
+          {{localize.filePictureRestrictions}}
+          <div class="spacer"></div>
+          <form class="form">
+            <input type="file" (change)="selectFile($event)" [required] accept=".png,.jpg,.jpeg"/>
+            <div class="spacer"></div>
+            <button type="button" (click)="uploadFile()" class="btn btn-success float-right">
+              {{localize.uploadUserPicture}}
+            </button>
+          </form>
+        </div>
+      </app-content-card>
+    </div>
+  </div>
+</div>

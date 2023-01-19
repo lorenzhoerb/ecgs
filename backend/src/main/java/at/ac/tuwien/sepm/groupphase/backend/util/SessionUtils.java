@@ -27,6 +27,7 @@ public class SessionUtils {
     private Object getSessionUserDetails() {
         LOGGER.debug("getSessionUserDetails");
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            LOGGER.warn("getSessionUserDetails: unauthorized access");
             return null;
         }
         return SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -106,7 +107,6 @@ public class SessionUtils {
             return null;
         }
         Optional<ApplicationUser> user = applicationUserRepository.findApplicationUserByUserEmail(sessionUserEmail);
-
         if (user.isEmpty()) {
             return null;
         }

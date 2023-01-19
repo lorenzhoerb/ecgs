@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface TestData {
 
-    static final String TEST_USER_COMPETITION_MANAGER_EMAIL = "comp.manager@email.com";
+    static final String INTEGRATION_TEST_USER_COMPETITION_MANAGER_EMAIL = "comp.manager@email.com";
 
     Long ID = 1L;
     String TEST_NEWS_TITLE = "Title";

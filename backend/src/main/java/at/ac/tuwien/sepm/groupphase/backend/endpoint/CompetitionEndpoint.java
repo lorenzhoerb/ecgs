@@ -105,7 +105,7 @@ public class CompetitionEndpoint {
                                            @RequestParam("begin") String begin, @RequestParam("end") String end,
                                            @RequestParam(value = "beginRegistration") String beginRegistration,
                                            @RequestParam(value = "endRegistration") String endRegistration) {
-        LOGGER.info("GET /{}", BASE_PATH);
+        LOGGER.info("GET {}", BASE_PATH);
         CompetitionSearchDto competitionSearchDto = new CompetitionSearchDto(
             name,
             LocalDateTime.parse(begin),

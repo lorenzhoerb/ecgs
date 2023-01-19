@@ -13,6 +13,7 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.CompetitionMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionRegistrationService;
+import at.ac.tuwien.sepm.groupphase.backend.service.PictureService;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepm.groupphase.backend.service.helprecords.ClubManagerTeamImportResults;
 import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
@@ -21,10 +22,14 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +37,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.PageAttributes;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Set;
@@ -47,6 +56,8 @@ public class UserEndpoint {
     static final String BASE_PATH = "/api/v1/user";
     private final CompetitionMapper competitionMapper;
 
+    private final PictureService pictureService;
+
 
     private final SessionUtils sessionUtils;
     private final CompetitionRegistrationService competitionRegistrationService;
@@ -57,12 +68,13 @@ public class UserEndpoint {
         UserMapper userMapper,
         SessionUtils sessionUtils,
         CompetitionRegistrationService competitionRegistrationService,
-        CompetitionMapper competitionMapper) {
+        CompetitionMapper competitionMapper, PictureService pictureService) {
         this.userService = userService;
         this.competitionMapper = competitionMapper;
         this.userMapper = userMapper;
         this.sessionUtils = sessionUtils;
         this.competitionRegistrationService = competitionRegistrationService;
+        this.pictureService = pictureService;
     }
 
     @Secured({"ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER", "ROLE_PARTICIPANT"})
@@ -73,6 +85,15 @@ public class UserEndpoint {
         return competitionMapper.competitionSetToCalenderViewCompetitionDtoSet(
             userService.getCompetitionsForCalendar(year, weekNumber)
         );
+    }
+
+    @Secured({"ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER", "ROLE_PARTICIPANT"})
+    @PostMapping("/picture")
+    @Operation(summary = "Changes the profile-picture of the authenticated user", security = @SecurityRequirement(name = "apiKey"))
+    public String updateUserPicture(@RequestPart(name = "file") MultipartFile file) {
+        logger.info("POST {}/user/picture/?multiPartFile={}", BASE_URI, file);
+        pictureService.saveUserPicture(file);
+        return "Picture successfully stored";
     }
 
     @Secured({"ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER"})

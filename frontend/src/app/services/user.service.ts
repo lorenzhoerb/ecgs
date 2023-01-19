@@ -1,29 +1,32 @@
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpEvent, HttpParams, HttpRequest} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {map, Observable} from 'rxjs';
+import {map, Observable, Subject} from 'rxjs';
 import {UserInfoDto} from '../dtos/userInfoDto';
 import {Globals} from '../global/globals';
 import {ResponseParticipantRegistrationDto} from '../dtos/responseParticipantRegistrationDto';
 import {ClubManagerTeamImportDto} from '../dtos/club-manager-team';
 import {CalendarViewCompetition} from '../dtos/competition';
 import {UserDetail} from '../dtos/user-detail';
-import { ImportFlag } from '../dtos/import-flag';
-import { ImportFlagsResultDto } from '../dtos/import-flags-result-dto';
+import {ImportFlag} from '../dtos/import-flag';
+import {ImportFlagsResultDto} from '../dtos/import-flags-result-dto';
 import {ClubManagerTeamImportResults} from '../dtos/club-manager-team-import-results';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
+  public userInfoDto$: Subject<UserInfoDto>;
+
   private userBaseUri: string = this.globals.backendUri + '/user';
 
   constructor(private httpClient: HttpClient, private globals: Globals) {
+    this.userInfoDto$ = new Subject<UserInfoDto>();
   }
 
   public getCompetitionsForCalender(year: number, weekNumber: number): Observable<CalendarViewCompetition[]> {
     const params = new HttpParams()
-    .set('year', year)
-    .set('weekNumber', weekNumber);
+      .set('year', year)
+      .set('weekNumber', weekNumber);
 
     return this.httpClient.get<CalendarViewCompetition[]>(`${this.userBaseUri}/calendar`, {params});
   }
@@ -36,9 +39,13 @@ export class UserService {
     return this.httpClient.post<ImportFlagsResultDto>(`${this.userBaseUri}/flags`, flags);
   }
 
-  getUserInfo(): Observable<UserInfoDto> {
-    console.log('Load user info');
-    return this.httpClient.get<UserInfoDto>(this.userBaseUri);
+  updateUserInfo(): void {
+    this.httpClient.get<UserInfoDto>(this.userBaseUri).subscribe(value => {
+      if (value.picturePath != null)  {
+        value.picturePath = 'http://localhost:8080/' + value.picturePath + '?' + new Date().getTime();
+      }
+      this.userInfoDto$.next(value);
+    });
   }
 
   registerToCompetition(competitionId: number, groupPreference: number): Observable<ResponseParticipantRegistrationDto> {
@@ -67,5 +74,18 @@ export class UserService {
           user.dateOfBirth = new Date(user.dateOfBirth);
           return user;
         })));
+  }
+
+  uploadPicture(file: File): Observable<HttpEvent<any>> {
+    const multipartFile: FormData = new FormData();
+    multipartFile.append('file', file, file.name);
+    const request = new HttpRequest('POST', this.userBaseUri + '/picture', multipartFile, {
+      responseType: 'text'
+    });
+    return this.httpClient.request(request);
+  }
+
+  getPicture(): Observable<any> {
+    return this.httpClient.get(this.userBaseUri + '/picture');
   }
 }

@@ -7,8 +7,8 @@
                 <mat-button-toggle value="en-US">English</mat-button-toggle>
             </mat-button-toggle-group>
         </div>
-        <a class="menu-item" [routerLink]="['/changePassword']">
-            {{localize.changePassword}}
+        <a class="menu-item" [routerLink]="['/user/change-picture-password']">
+            {{localize.userSettings}}
         </a>
         <a class="menu-item" (click)="logout()">
             {{localize.logout}}

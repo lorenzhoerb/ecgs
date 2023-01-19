@@ -144,7 +144,6 @@ export class CompetitionService {
       .get<SimpleCompetitionListDto>(this.competitionBaseUri + '/search', {params})
         .pipe(
           map((data: SimpleCompetitionListDto) => {
-            console.log(data.length);
             for(const d of data) {
               d.beginOfCompetition = new Date(d.beginOfCompetition);
               d.endOfCompetition = new Date(d.endOfCompetition);

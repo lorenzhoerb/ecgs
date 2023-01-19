@@ -3,6 +3,7 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint.exceptionhandler;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.BulkErrorListDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ErrorListRestDto;
 
+import at.ac.tuwien.sepm.groupphase.backend.exception.FileInputException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenListException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.UnauthorizedException;
@@ -104,6 +105,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleSecurity(RuntimeException ex, WebRequest request) {
         LOGGER.warn(ex.getMessage());
         return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
+    }
+
+    /**
+     * Handle FileInputException.
+     */
+    @ExceptionHandler(value = {FileInputException.class})
+    protected ResponseEntity<Object> handleFileInputException(RuntimeException ex, WebRequest request) {
+        LOGGER.warn(ex.getMessage());
+        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
 

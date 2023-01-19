@@ -57,8 +57,10 @@ import { NavBarComponent } from './components/util/nav-bar/nav-bar.component';
 import { GenderPipe } from './pipes/gender.pipe';
 import { ViewAndEditGradingSystemComponent } from './components/view-and-edit-grading-system/view-and-edit-grading-system.component';
 import { TemplateDialogComponent } from './components/competition/template-dialog/template-dialog.component';
+import { ChangeUserPictureComponent } from './components/change-user-picture/change-user-picture.component';
 import { CreateCompetitionSelectGradingSystemDialogComponent }
   from './components/create-competition-select-grading-system-dialog/create-competition-select-grading-system-dialog.component';
+import { ChangeUserPassPictureComponent } from './components/change-user-pass-picture/change-user-pass-picture.component';
 
 @NgModule({
   declarations: [
@@ -100,8 +102,10 @@ import { CreateCompetitionSelectGradingSystemDialogComponent }
     GenderPipe,
     ImportFlagsComponent,
     TemplateDialogComponent,
+    ChangeUserPictureComponent,
     ViewAndEditGradingSystemComponent,
     CreateCompetitionSelectGradingSystemDialogComponent,
+    ChangeUserPassPictureComponent,
   ],
   imports: [
     BrowserModule,

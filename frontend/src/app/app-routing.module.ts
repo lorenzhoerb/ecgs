@@ -21,6 +21,8 @@ import { ImportFlagsComponent } from './components/import-flags/import-flags.com
 import { ViewAndEditGradingSystemComponent } from './components/view-and-edit-grading-system/view-and-edit-grading-system.component';
 
 import {ManageParticipantsComponent} from './components/competition/manage-participants/manage-participants.component';
+import {ChangeUserPictureComponent} from './components/change-user-picture/change-user-picture.component';
+import {ChangeUserPassPictureComponent} from './components/change-user-pass-picture/change-user-pass-picture.component';
 
 const routbuilding: Routes = [
   {path: '', component: CompetitionListViewComponent},
@@ -28,7 +30,6 @@ const routbuilding: Routes = [
   {path: 'login', component: LoginComponent},
   {path: 'forgot', component: ForgotPasswordComponent},
   {path: 'reset', component: ResetPasswordComponent},
-  {path: 'changePassword', canActivate: [AuthGuard], component: ChangePasswordComponent},
   {path: 'competition', children:[
       {path: 'list', component: CompetitionListViewComponent},
       {path: 'create', canActivate: [TournamentManagerGuard], component: CreateCompetitionComponent},
@@ -43,7 +44,8 @@ const routbuilding: Routes = [
   {path: 'user', children: [
       {path: 'calendar', component: CompetitionCalenderViewComponent},
       {path: 'import-team', canActivate: [ClubManagerGuard], component: ClubManagerImportTeamComponent},
-      {path: 'flags', canActivate: [ClubManagerGuard], component: ImportFlagsComponent}
+      {path: 'flags', canActivate: [ClubManagerGuard], component: ImportFlagsComponent},
+      {path: 'change-picture-password', canActivate: [AuthGuard], component: ChangeUserPassPictureComponent},
     ]
   },
   {path: '**', component: CompetitionListViewComponent},

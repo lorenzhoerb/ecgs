@@ -1,0 +1,44 @@
+<div class="background">
+    <h2 class="dialog-title" mat-dialog-title>{{title}} als Vorlage speichern</h2>
+
+    <mat-dialog-content [formGroup]="templateForm">
+        <div class="spacer"></div>
+        <div class="dialog-content">
+            <label for="title">Titel:</label>
+            <div class="form-group">
+                <input class="form-control" name="title" placeholder="Titel" type="text" formControlName="title"
+                    [ngClass]="dynamicCssClassesForInput(templateForm.controls.title)">
+                <span class="invalid-feedback">
+                    {{localize.isRequired(localize.title)}}
+                </span>
+            </div>
+
+            <label for="description">Beschreibung:</label>
+            <div class="form-group">
+                <input class="form-control" name="description" placeholder="Beschreibung" type="text"
+                    formControlName="description"
+                    [ngClass]="dynamicCssClassesForInput(templateForm.controls.description)">
+                <span class="invalid-feedback">
+                    {{localize.isRequired(localize.description)}}
+                </span>
+            </div>
+
+            <label for="public">Öffentlich:</label>
+            <div class="form-group">
+                <div class="left">
+                    <input name="public" type="checkbox" formControlName="isPublic">
+                </div>
+            </div>
+        </div>
+
+    </mat-dialog-content>
+
+    <div class="spacer-2"></div>
+
+    <mat-dialog-actions>
+        <div class="action-row">
+            <button class="close-btn" (click)="close()">Abbrechen</button>
+            <button class="save-btn" (click)="save()">Speichern</button>
+        </div>
+    </mat-dialog-actions>
+</div>

@@ -5,6 +5,7 @@ import {Injectable} from '@angular/core';
 })
 export class Globals {
   backendUri: string = this.findBackendUrl();
+  websocketPollFrequency: number = 2 * 60 * 1000;
 
   public findBackendUrl(): string {
     if (window.location.port === '4200') { // local `ng serve`, backend at localhost:8080

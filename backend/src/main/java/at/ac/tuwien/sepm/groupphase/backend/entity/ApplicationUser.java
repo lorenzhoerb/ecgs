@@ -68,10 +68,10 @@ public class ApplicationUser {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "member")
     private Set<ManagedBy> managers;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.EAGER)
     private Set<Competition> competitions;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "participant")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "judge")
     private Set<Judge> judges;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "participant")
@@ -80,8 +80,11 @@ public class ApplicationUser {
     public ApplicationUser() {
     }
 
-    @ManyToMany(cascade = CascadeType.MERGE, mappedBy = "judges")
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "judges")
     private Set<Competition> judging;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator")
+    private Set<GradingSystem> gradingSystems;
 
     public ApplicationUser(Role type, String firstName, String lastName, Gender gender,
                            Date dateOfBirth, String picturePath) {
@@ -195,6 +198,22 @@ public class ApplicationUser {
 
     public void setRegistrations(Set<RegisterTo> registrations) {
         this.registrations = registrations;
+    }
+
+    public Set<Competition> getJudging() {
+        return judging;
+    }
+
+    public void setJudging(Set<Competition> judging) {
+        this.judging = judging;
+    }
+
+    public Set<GradingSystem> getGradingSystems() {
+        return gradingSystems;
+    }
+
+    public void setGradingSystems(Set<GradingSystem> gradingSystems) {
+        this.gradingSystems = gradingSystems;
     }
 
     @Override

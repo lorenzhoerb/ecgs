@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -47,9 +48,9 @@ public class CompetitionManagerServiceTest extends TestDataProvider {
     }
 
     @Test
-    public void allManagedInTimeCompetitionsAreRetrieved() {
-        var managedCompetitions = userService.getCompetitionsForCalendar(
-            generator.generatedCompetitionManagers.get(0), 2022, 38);
+    @WithMockUser(username = "test@test.test")
+    public void getCompetitionsForCalendar_expectsAllManagedCompetitionsRetrieved() {
+        var managedCompetitions = userService.getCompetitionsForCalendar(2022, 38);
         assertThat(managedCompetitions)
             .map(Competition::getName,
                 (t -> t.getBeginOfRegistration().toLocalDate().toString()),
@@ -63,10 +64,9 @@ public class CompetitionManagerServiceTest extends TestDataProvider {
     }
 
     @Test
-    public void nonManagedCompetitionIsNotRetrieved() {
-
-        var managedCompetitions = userService.getCompetitionsForCalendar(
-            generator.generatedCompetitionManagers.get(0), CURRENT_YEAR, CURRENT_WEEK_NUMBER);
+    @WithMockUser(username = "test@test.test")
+    public void getCompetitionsForCalendar_expectsNonManagedCompetitionNotRetrieved() {
+        var managedCompetitions = userService.getCompetitionsForCalendar(CURRENT_YEAR, CURRENT_WEEK_NUMBER);
         assertThat(managedCompetitions)
             .map(Competition::getName,
                 (t -> t.getBeginOfRegistration().toLocalDate().toString()),

@@ -11,7 +11,6 @@ import javax.transaction.Transactional;
 @Component
 @Profile({"test", "manual-test"})
 @DependsOn("DataCleaner")
-@Transactional
 public class ClubManagerTeamImportDataGenerator implements ClubManagerTeamImportGeneratorHelper {
     private final ApplicationUserRepository userRepository;
 
@@ -21,7 +20,7 @@ public class ClubManagerTeamImportDataGenerator implements ClubManagerTeamImport
 
     @PostConstruct
     public void setup() {
-        // clear();
+        userRepository.flush();
         setupClubManagers();
     }
 

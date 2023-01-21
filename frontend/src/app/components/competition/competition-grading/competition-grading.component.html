@@ -1,0 +1,72 @@
+<div class="select-stations" *ngIf="gradingGroups !== undefined">
+  <h2 [ngClass]="dynamicStyleClass(true)" class="heading with-line">Wähle eine Station aus:</h2>
+
+  <div [ngClass]="dynamicStyleClass(true)" *ngIf="gradingGroups !== undefined" class="select-stations-header">
+    <span>Zeige nur Stationen für Gruppe: </span>
+    <select [(ngModel)]="selectedGroup">
+      <option [value]="-1">Alle Gruppen</option>
+      <option *ngFor="let group of gradingGroups;let i = index;" [value]="i">
+        {{group.title}}
+      </option>
+    </select>
+  </div>
+  <mat-radio-group [ngClass]="dynamicStyleClass(true)" [(ngModel)]="selectedStation"
+    aria-labelledby="example-radio-group-label" *ngIf="uniqueStations !== undefined" class="select-stations-body">
+
+    <mat-radio-button *ngFor="let station of uniqueStations; let i = index;" class="unique-station-select" [value]="i">
+      {{station.displayName}}
+    </mat-radio-button>
+
+  </mat-radio-group>
+
+  <div [ngClass]="{'scale-up': loggedInStation}" class="login-to">
+    <h2 *ngIf="loggedInStation">Angemeldet in {{uniqueStations[selectedStation].displayName}}</h2>
+    <button *ngIf="!loggedInStation" (click)="loggIntoStation()" class="primary-btn">Anmelden in
+      {{displaySelectedGroupName(selectedGroup)}}</button>
+    <button *ngIf="loggedInStation" (click)="loggoutFromStation()" class="primary-btn">Abmelden</button>
+  </div>
+
+  <div class="judges">
+    <div *ngFor="let j of getHeaderJudges()">
+      <div [ngClass]="calcInactive(j)" class="user judge" matTooltipPosition="above"
+        [matTooltip]="isJudgeInactive(j) ? 'Inaktiv': 'Aktiv'">
+        <img src="../../../assets/user_image.jpg" alt="User image">
+        {{j.firstName}} {{j.lastName}}
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-row" *ngIf="loggedInStation">
+    <div class="filter-inputs">
+    <div class="stack">
+      <label for="byname">Teilnehmer</label>
+      <input name="byname" type="text" [(ngModel)]="filterNameModel" (input)="onFilterInputChanged()">
+    </div>
+
+    <div class="stack">
+      <label for="byflag">Flag</label>
+      <input name="byflag" type="text" [(ngModel)]="filterFlagModel" (input)="onFilterInputChanged()">
+    </div>
+
+    <div class="stack">
+      <label for="bygroup">Gruppe</label>
+      <input name="bygroup" type="text" [(ngModel)]="filterGroupModel" (input)="onFilterInputChanged()">
+    </div>
+  </div>
+  <button *ngIf="filterNameModel !== '' || filterFlagModel !== ''  || filterGroupModel !== ''" matTooltip="Filter zurücksetzen" matTooltipPosition="above" class="primary-btn clear" (click)="clearFilter()">
+    <mat-icon>clear</mat-icon>
+  </button>
+  </div>
+
+  <div *ngIf="loggedInStation" class="group-container">
+    <ng-container *ngIf="gradingGroups">
+      <div *ngFor="let group of filteredGroups" style="min-width: 80%; width: 100%;">
+        <ng-container>
+          <app-competition-grading-group [otherJudges]="getOtherJudges(group)"
+            [gradingGroup]="group" [stationIndex]="selectedStation"
+            (participantChange)="onParticipantChange($event)"></app-competition-grading-group>
+        </ng-container>
+      </div>
+    </ng-container>
+  </div>
+</div>

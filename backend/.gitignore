@@ -52,3 +52,8 @@ buildNumber.properties
 
 ### VS Code ###
 .vscode/
+
+### Picture files ###
+/user-pictures/1.jpeg
+/user-pictures/1.png
+/user-pictures/

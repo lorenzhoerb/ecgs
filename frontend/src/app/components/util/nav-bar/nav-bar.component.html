@@ -1,0 +1,9 @@
+<div class="d-flex">
+  <div class="px-2 py-3" [class.cActive]="active === navItem.key" *ngFor="let navItem of navigation">
+    <a class="nav-item" (click)="onClick(navItem.key)">
+      <span>{{navItem.title}}</span>
+      <span class="m-lg-1 badge rounded-pill badge-primary notification"
+            *ngIf="navItem.notifications">{{navItem.notifications}}</span>
+    </a>
+  </div>
+</div>

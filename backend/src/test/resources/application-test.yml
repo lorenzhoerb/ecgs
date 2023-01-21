@@ -1,5 +1,7 @@
 logging:
   file.name: ./log/backend-test.log
+  level:
+    at.ac.tuwien: debug
 
 spring:
   datasource:

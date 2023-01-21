@@ -14,43 +14,46 @@ export class UserComponent implements OnInit {
   @Output() showMenu = new EventEmitter();
   public loggedIn = false;
   public user?: UserInfoDto;
+  public language: string;
+  public picturePath: string;
 
-
-  constructor(public authService: AuthService, public userService: UserService, private router: Router) { }
+  constructor(public authService: AuthService, public userService: UserService, private router: Router) {
+  }
 
   public get localize(): LocalizeService {
     return LocalizationService;
   }
 
   ngOnInit(): void {
+    this.language = this.localize.getLanguage();
     this.loggedIn = this.authService.isLoggedIn();
-    if(this.loggedIn) {
-      this.userService.getUserInfo().subscribe({
-        next: data => {
-          this.user = data;
+    this.picturePath = '../../../assets/user_image.jpg';
+    if (this.loggedIn) {
+      this.userService.updateUserInfo();
+      this.userService.userInfoDto$.subscribe({
+        next: (dto) => {
+          this.user = dto;
+          this.picturePath = this.user.picturePath;
+
         },
-        error: error => {
-          console.error('Error fetching user information', error);
-          this.loggedIn = false;
-        }
+        error: () => console.warn('Error during profile update')
       });
     }
 
     this.router.events.subscribe((event) => {
       const tempLoggedIn = this.authService.isLoggedIn();
-      if(this.loggedIn === tempLoggedIn) {
+      if (this.loggedIn === tempLoggedIn) {
         return;
       }
       this.loggedIn = tempLoggedIn;
-      if(this.loggedIn) {
-        this.userService.getUserInfo().subscribe({
-          next: data => {
-            this.user = data;
+      if (this.loggedIn) {
+        this.userService.updateUserInfo();
+        this.userService.userInfoDto$.subscribe({
+          next: (dto) => {
+            this.user = dto;
+            this.picturePath = this.user.picturePath;
           },
-          error: error => {
-            console.error('Error fetching competition information', error);
-            this.loggedIn = false;
-          }
+          error: () => console.warn('Error during profile update')
         });
       }
     });

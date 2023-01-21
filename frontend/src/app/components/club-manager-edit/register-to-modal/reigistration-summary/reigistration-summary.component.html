@@ -1,0 +1,56 @@
+<div>
+  <div class="competition Details">
+    <h5 class="card-title">{{competition.name}}</h5>
+    <small>{{localize.competition}}: {{competition.beginOfCompetition | date}} - {{competition.endOfCompetition | date}} •
+      {{localize.registrationEnds}}: {{competition.endOfRegistration | date}}</small>
+    <p class="card-text mt-2">{{competition.description}}</p>
+  </div>
+  <hr/>
+  <div>
+    <h5 class="card-title">{{localize.register}} {{participants.length}} {{localize.members}}</h5>
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">{{localize.firstname}}</th>
+        <th scope="col">{{localize.lastname}}</th>
+        <th scope="col">{{localize.dateOfBirth}}</th>
+        <th scope="col">{{localize.groupPreference}}</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let user of displayParticipants; let i = index">
+        <th scope="row">{{ (page - 1) * pageSize + i + 1}}</th>
+        <td>
+          {{ user.firstName }}
+        </td>
+        <td>{{ user.lastName }}</td>
+        <td>{{ user.dateOfBirth | date }}</td>
+        <td>
+          <select class="form-select" aria-label="Grading Group"
+                  [(ngModel)]="participants[(page - 1) * pageSize + i].groupId" (change)="onSelectGroup()">
+            <option [value]=""></option>
+            <option *ngFor="let gg of gradingGroups" [value]="gg.id">{{gg.title}}</option>
+          </select>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between p-2">
+      <ngb-pagination
+        [collectionSize]="participants.length"
+        [(page)]="page"
+        [pageSize]="pageSize"
+        (pageChange)="refreshCountries()"
+      >
+      </ngb-pagination>
+
+      <select class="form-select" style="width: auto" [(ngModel)]="pageSize" (ngModelChange)="refreshCountries()">
+        <option [ngValue]="5">5 {{localize.membersPerPage}}</option>
+        <option [ngValue]="10">10 {{localize.membersPerPage}}</option>
+        <option [ngValue]="20">20 {{localize.membersPerPage}}</option>
+      </select>
+    </div>
+  </div>
+</div>

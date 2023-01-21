@@ -1,0 +1,8 @@
+<div class="spacer-2"></div>
+<app-content-card [title]="gradingGroup.title" [actions]="['collapse']">
+  <div style="max-height: 500px; overflow-y: scroll">
+    <ng-container *ngFor="let participant of gradingGroup.registrations">
+      <app-competition-grading-station [otherJudges]="otherJudges" [grade]="getResultForStation(stations[stationIndex], participant)" [otherGrade]="getParticipantsForStation(stations[stationIndex], participant)" [station]="stations[stationIndex]" [participantDetailDto]="participant" (participantChange)="receiveResults($event)"></app-competition-grading-station>
+    </ng-container>
+  </div>
+</app-content-card>

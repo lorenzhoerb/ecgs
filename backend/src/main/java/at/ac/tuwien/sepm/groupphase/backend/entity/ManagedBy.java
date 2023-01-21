@@ -85,9 +85,9 @@ public class ManagedBy {
     public String toString() {
         return "ManagedBy{"
             + "id=" + id
-            + ", manager=" + manager
-            + ", member=" + member
-            + ", flags=" + flags
+            // + ", manager=" + manager
+            // + ", member=" + member
+            // + ", flags=" + flags
             + ", teamName='" + teamName + '\''
             + '}';
     }

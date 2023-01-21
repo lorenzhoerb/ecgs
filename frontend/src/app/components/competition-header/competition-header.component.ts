@@ -18,6 +18,14 @@ export class CompetitionHeaderComponent implements OnInit, AfterViewInit {
 
   @Output() register = new EventEmitter<void>();
 
+  @Input() canEdit = false;
+
+  @Output() edit = new EventEmitter<void>();
+
+  @Input() canGrade = false;
+
+  @Output() grading = new EventEmitter<void>();
+
   @ViewChild('header', {read: ElementRef})
   header: ElementRef;
   @ViewChild('ob', {read: ElementRef})
@@ -51,5 +59,13 @@ export class CompetitionHeaderComponent implements OnInit, AfterViewInit {
 
   onRegisterClick() {
     this.register.emit();
+  }
+
+  onEditClick() {
+    this.edit.emit();
+  }
+
+  onGradingClick() {
+    this.grading.emit();
   }
 }

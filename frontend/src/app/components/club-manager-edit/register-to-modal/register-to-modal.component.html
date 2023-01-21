@@ -1,0 +1,17 @@
+<div class="modal-header">
+  <h4 class="modal-title">{{localize.regMemToComp}}</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+</div>
+<div class="modal-body" style="padding: 1.2em">
+  <div *ngIf="state === registerState.selectCompetition">
+      <app-search-select-competition (compSelect)="onCompSelect($event)">
+      </app-search-select-competition>
+  </div>
+  <div *ngIf="state === registerState.summary">
+    <app-reigistration-summary [competition]="selectedComp" [participants]="participants" (groupChange)="onGroupChange($event)"></app-reigistration-summary>
+  </div>
+</div>
+<div class="modal-footer d-flex justify-content-between" *ngIf="state === registerState.summary">
+  <button type="button" class="btn btn-secondary" (click)="onBack()">{{localize.back}}</button>
+  <button type="button" class="btn btn-primary" (click)="onRegister()">{{localize.register}}</button>
+</div>

@@ -17,16 +17,20 @@ public class GradingSystemDto {
     private Boolean isPublic;
 
     @NotNull(message = "Client Error")
+    private Boolean isTemplate;
+
+    @NotNull(message = "Client Error")
     private String formula;
 
     public GradingSystemDto() {
     }
 
-    public GradingSystemDto(Long id, String name, String description, Boolean isPublic, String formula) {
+    public GradingSystemDto(Long id, String name, String description, Boolean isPublic, Boolean isTemplate, String formula) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.isPublic = isPublic;
+        this.isTemplate = isTemplate;
         this.formula = formula;
     }
 

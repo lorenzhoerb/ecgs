@@ -66,15 +66,15 @@ public class Competition {
         this.judges = judges;
     }
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(referencedColumnName = "id")
     private ApplicationUser creator;
 
-    @ManyToMany(cascade = CascadeType.MERGE)
+    @ManyToMany(cascade = {})
     @JoinTable(
         name = "Competition_Judge",
-        joinColumns = { @JoinColumn(name = "competition_id") },
-        inverseJoinColumns = { @JoinColumn(name = "judge_id") }
+        joinColumns = {@JoinColumn(name = "competition_id")},
+        inverseJoinColumns = {@JoinColumn(name = "judge_id")}
     )
     private Set<ApplicationUser> judges;
 

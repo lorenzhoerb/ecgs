@@ -17,7 +17,6 @@ import java.lang.invoke.MethodHandles;
 @Profile({"test", "manual-test"})
 @DependsOn("DataCleaner")
 @Component
-@Transactional
 public class CalendarViewDataGenerator implements CompetitionGeneratorHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final ApplicationUserRepository applicationUserRepository;
@@ -40,6 +39,7 @@ public class CalendarViewDataGenerator implements CompetitionGeneratorHelper {
         generatedCompetitions.clear();
         var iterator = testCompetitions.iterator();
         var t = iterator.next();
+
         t.setCreator(generatedCompetitionManagers.get(0));
         generatedCompetitions.add(competitionRepository.save(t));
 
@@ -74,8 +74,6 @@ public class CalendarViewDataGenerator implements CompetitionGeneratorHelper {
         t = iterator.next();
         t.setCreator(generatedCompetitionManagers.get(0));
         generatedCompetitions.add(competitionRepository.save(t));
-
-        var temp = applicationUserRepository.findAll();
 
         reloadGeneratedManagers();
     }

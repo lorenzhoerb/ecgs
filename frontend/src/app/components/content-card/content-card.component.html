@@ -2,17 +2,24 @@
     <div class="content-card-heading {{color}}">
         <h3 *ngIf="!isEdit">{{title}}</h3>
         <h3 *ngIf="isEdit"><input type="text" (change)="updateTitle()" [(ngModel)]="title"></h3>
-        <div class="collapsed-content" *ngIf="_collapsed">
+        <div class="collapsed-content" *ngIf="isCollapsed">
             <ng-content select="[mini]"></ng-content>
         </div>
         <div class="action-container">
+            <mat-icon 
+                *ngIf="actions.includes('template') && templateState ===  tState.saved" 
+                data-toggle="tooltip" title="Als Vorlage gespeichert">bookmark</mat-icon>
+            <mat-icon 
+                *ngIf="actions.includes('template') && templateState === tState.none" 
+                data-toggle="tooltip" title="Als Vorlage speichern"
+                (click)="templateClicked()">bookmark_outline</mat-icon>
             <mat-icon *ngIf="actions.includes('delete')" (click)="deleteClicked()">delete</mat-icon>
             <mat-icon *ngIf="actions.includes('duplicate')" (click)="duplicateClicked()">content_copy</mat-icon>
-            <mat-icon *ngIf="actions.includes('collapse') && !_collapsed" (click)="collapse()">expand_less</mat-icon>
-            <mat-icon *ngIf="actions.includes('collapse') && _collapsed" (click)="collapse()">expand_more</mat-icon>
+            <mat-icon *ngIf="actions.includes('collapse') && !isCollapsed" (click)="collapse()">expand_less</mat-icon>
+            <mat-icon *ngIf="actions.includes('collapse') && isCollapsed" (click)="collapse()">expand_more</mat-icon>
         </div>
     </div>
-    <div class="content-card-content" *ngIf="!_collapsed">
+    <div class="content-card-content" *ngIf="!isCollapsed">
         <ng-content></ng-content>
     </div>
 </div>

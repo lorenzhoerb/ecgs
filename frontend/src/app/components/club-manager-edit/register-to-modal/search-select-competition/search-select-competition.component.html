@@ -1,0 +1,26 @@
+<div>
+  <div class="row">
+    <div class="col">
+      <h5 class="card-subtitle mb-2 text-muted">{{localize.searchAndSelectToRegister}}</h5>
+      <input class="form-control" type="text" [placeholder]="localize.searchACompetition" [(ngModel)]="searchValue"
+             (ngModelChange)="onChange.next($event)">
+
+      <div class="list-group mt-2">
+        <a
+          style="cursor: pointer"
+          class="list-group-item list-group-item-action flex-column align-items-start"
+          *ngFor="let comp of competitions$ | async; let i = index"
+          (click)="compSelect.emit(comp)">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">{{comp.name}}</h5>
+          </div>
+          <p
+            class="mb-1">{{ (comp.description.length > 150) ? (comp.description | slice:0:150) + '...' : (comp.description) }}</p>
+          <small>{{localize.competition}}: {{comp.beginOfCompetition | date}} - {{comp.endOfCompetition | date}}
+            • {{localize.registrationEnds}}: {{comp.endOfRegistration | date}}</small>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>

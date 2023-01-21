@@ -1,3 +1,6 @@
+import {GradingGroupDetail} from './grading-group-detail';
+import {UserDetail} from './user-detail';
+
 export class Competition {
   name: string;
   beginOfRegistration: Date;
@@ -6,10 +9,12 @@ export class Competition {
   beginOfCompetition: Date;
   description: string;
   picturePath: string;
-  isPublic: boolean;
+  public: boolean;
   draft: boolean;
   email: string;
   phone: string;
+  gradingGroups: GradingGroupDetail[];
+  judges: UserDetail[];
 }
 
 export interface CalendarViewCompetition {

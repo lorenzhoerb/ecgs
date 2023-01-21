@@ -3,37 +3,67 @@ package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamMemberImportDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantSelfRegistrationDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseParticipantRegistrationDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlag;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlagsResultDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserCredentialUpdateDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserInfoDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailFlagDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailSetFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamMemberImportDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlag;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlagsResultDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserCredentialUpdateDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantSelfRegistrationDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseParticipantRegistrationDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserInfoDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserPasswordResetDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserPasswordResetRequestDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserSearchDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailSetFlagDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailFlagDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleFlagDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.FlagsMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.FlagsMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Flags;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ManagedBy;
 import at.ac.tuwien.sepm.groupphase.backend.entity.SecurityUser;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenListException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.ManagedByRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.FlagsRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.SecurityUserRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.ManagedByRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionRegistrationService;
 import at.ac.tuwien.sepm.groupphase.backend.service.EmailService;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
+import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import at.ac.tuwien.sepm.groupphase.backend.service.helprecords.ClubManagerTeamImportResults;
 import at.ac.tuwien.sepm.groupphase.backend.util.PasswordGenerator;
 import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
 import at.ac.tuwien.sepm.groupphase.backend.validation.ClubManagerTeamImportDtoValidator;
 import at.ac.tuwien.sepm.groupphase.backend.validation.ForgotPasswordValidator;
+import at.ac.tuwien.sepm.groupphase.backend.validation.ImportManyFlagsValidator;
+import at.ac.tuwien.sepm.groupphase.backend.validation.PasswordChangeValidator;
+import at.ac.tuwien.sepm.groupphase.backend.validation.RegistrationValidator;
+import at.ac.tuwien.sepm.groupphase.backend.validation.UserSetFlagValidator;
+import at.ac.tuwien.sepm.groupphase.backend.validation.SimpleFlagValidator;
+import at.ac.tuwien.sepm.groupphase.backend.validation.ForgotPasswordValidator;
+import at.ac.tuwien.sepm.groupphase.backend.validation.ImportManyFlagsValidator;
 import at.ac.tuwien.sepm.groupphase.backend.validation.PasswordChangeValidator;
 import at.ac.tuwien.sepm.groupphase.backend.validation.RegistrationValidator;
 import net.bytebuddy.utility.RandomString;
@@ -52,17 +82,28 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.mail.MessagingException;
+
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.HashSet;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Service
 @Transactional
@@ -77,25 +118,40 @@ public class CustomUserDetailService implements UserService {
     private final PasswordChangeValidator passwordChangeValidator;
     private final ForgotPasswordValidator forgotPasswordValidator;
     private final UserMapper userMapper;
+    private final FlagsMapper flagsMapper;
 
     private final EmailService emailService;
 
     private final ManagedByRepository managedByRepository;
     private final ClubManagerTeamImportDtoValidator teamValidator;
+    private final UserSetFlagValidator userSetFlagValidator;
+    private final SimpleFlagValidator simpleFlagValidator;
 
     private final CompetitionRegistrationService competitionRegistrationService;
     private final SessionUtils sessionUtils;
 
+    private final CompetitionRepository competitionRepository;
+    private final ImportManyFlagsValidator flagsValidator;
+    private final FlagsRepository flagsRepository;
+
+    private final CompetitionService competitionService;
 
     @Autowired
     public CustomUserDetailService(ApplicationUserRepository userRepository,
-                                   SecurityUserRepository securityUserRepository, PasswordEncoder passwordEncoder,
-                                   JwtTokenizer jwtTokenizer, ManagedByRepository managedByRepository,
+                                   SecurityUserRepository securityUserRepository,
+                                   PasswordEncoder passwordEncoder,
+                                   JwtTokenizer jwtTokenizer,
+                                   ManagedByRepository managedByRepository,
                                    ClubManagerTeamImportDtoValidator teamValidator,
                                    EmailService emailService, UserMapper userMapper, SessionUtils sessionUtils,
+                                   UserSetFlagValidator userSetFlagValidator, SimpleFlagValidator simpleFlagValidator,
+                                   CompetitionService competitionService,
                                    RegistrationValidator registrationValidator,
-                                   PasswordChangeValidator passwordChangeValidator, ForgotPasswordValidator forgotPasswordValidator,
-                                   CompetitionRegistrationService competitionRegistrationService) {
+                                   PasswordChangeValidator passwordChangeValidator,
+                                   ForgotPasswordValidator forgotPasswordValidator,
+                                   CompetitionRegistrationService competitionRegistrationService,
+                                   ImportManyFlagsValidator flagsValidator, FlagsRepository flagsRepository, CompetitionRepository competitionRepository,
+                                   FlagsMapper flagsMapper) {
         this.userRepository = userRepository;
         this.securityUserRepository = securityUserRepository;
         this.passwordEncoder = passwordEncoder;
@@ -108,7 +164,74 @@ public class CustomUserDetailService implements UserService {
         this.emailService = emailService;
         this.userMapper = userMapper;
         this.sessionUtils = sessionUtils;
+        this.flagsValidator = flagsValidator;
+        this.flagsRepository = flagsRepository;
+        this.flagsMapper = flagsMapper;
+        this.competitionService = competitionService;
+        this.userSetFlagValidator = userSetFlagValidator;
+        this.simpleFlagValidator = simpleFlagValidator;
         this.competitionRegistrationService = competitionRegistrationService;
+        this.competitionRepository = competitionRepository;
+    }
+
+    @Override
+    public ImportFlagsResultDto importFlags(List<ImportFlag> flags) {
+        LOGGER.debug("importFlags({})", flags);
+        flagsValidator.validate(flags);
+        var role = sessionUtils.getApplicationUserRole();
+        if (role != ApplicationUser.Role.CLUB_MANAGER && role != ApplicationUser.Role.TOURNAMENT_MANAGER) {
+            throw new ForbiddenException("Not authorized");
+        }
+
+        // Grouping because of how entity flags are defined
+        Map<String, List<ImportFlag>> groupedByFlagNamesMap = flags.stream().collect(groupingBy(ImportFlag::getFlag));
+        var optThisUsersManagedByes = managedByRepository.findAllByManagerIs(sessionUtils.getSessionUser());
+        List<ManagedBy> thisUsersManagedByes = null;
+        if (optThisUsersManagedByes.isPresent()) {
+            thisUsersManagedByes = optThisUsersManagedByes.get();
+        }
+        if (thisUsersManagedByes != null && !thisUsersManagedByes.isEmpty()) {
+            Map<String, ManagedBy> emailToManagedByMap = new HashMap<>();
+            for (ManagedBy managedby : thisUsersManagedByes) {
+                emailToManagedByMap.put(managedby.getMember().getUser().getEmail(), managedby);
+            }
+            Set<String> managedEmails = emailToManagedByMap.keySet();
+            var errors = new ArrayList<String>();
+            for (int i = 0; i < flags.size(); i++) {
+                String flagEmailToCheck = flags.get(i).getEmail();
+                if (!managedEmails.contains(flagEmailToCheck)) {
+                    errors.add(String.format("#%d - %s", i + 1, flagEmailToCheck));
+                }
+            }
+
+            if (!errors.isEmpty()) {
+                throw new ForbiddenListException("Some emails are not managed by you", errors);
+            }
+
+            var result = new ImportFlagsResultDto();
+            for (var flag : groupedByFlagNamesMap.entrySet()) {
+                var flagSet = flag.getValue().stream()
+                    .map(ImportFlag::getEmail)
+                    .map(emailToManagedByMap::get).collect(Collectors.toSet());
+                var flagOpt = flagsRepository.findByName(flag.getKey());
+                if (flagOpt.isPresent()) {
+                    var clubs = flagOpt.get().getClubs();
+                    var initManagedByes = clubs.size();
+                    clubs.addAll(flagSet);
+                    result.addNewImportedFlags(clubs.size() - initManagedByes);
+                } else {
+                    flagsRepository.save(new Flags(
+                        flag.getKey(),
+                        flagSet)
+                    );
+                    result.addNewImportedFlags(flagSet.size());
+                }
+            }
+
+            return result;
+        } else {
+            throw new ForbiddenException("You do not manage anybody yet.");
+        }
     }
 
     @Override
@@ -122,6 +245,25 @@ public class CustomUserDetailService implements UserService {
             throw new UsernameNotFoundException(e.getMessage(), e);
         }
     }
+
+    @Override
+    public String prepareAndSendPasswordResetMail(UserPasswordResetRequestDto userPasswordResetRequestDto) {
+        LOGGER.debug("Prepares a reset password mail and sends it afterwards {}", userPasswordResetRequestDto);
+        try {
+            String token = RandomString.make(32);
+            this.updateResetPasswordToken(userPasswordResetRequestDto.getEmail(), token);
+            String resetLink = "http://localhost:4200/#/reset?token=" + token;
+            emailService.sendPasswordResetMail(userPasswordResetRequestDto.getEmail(), resetLink);
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No entry found for given email: " + userPasswordResetRequestDto.getEmail());
+        } catch (MessagingException e) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "The mail could not been sent with the given properties!");
+        } catch (UnsupportedEncodingException e) {
+            throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Unsupported encoding for Payload");
+        }
+        return "{\"success\": \"true\"}";
+    }
+
 
     @Override
     public ApplicationUser findApplicationUserByEmail(String email) {
@@ -171,7 +313,8 @@ public class CustomUserDetailService implements UserService {
     }
 
     @Override
-    public Set<Competition> getCompetitionsForCalendar(ApplicationUser user, int year, int weekNumber) {
+    public Set<Competition> getCompetitionsForCalendar(int year, int weekNumber) {
+        LOGGER.debug("getCompetitionsForCalendar(year={}, weekNumber={})", year, weekNumber);
         List<String> errors = new ArrayList<>();
         if (year < 2000) {
             errors.add("Year must be at least 2000");
@@ -183,6 +326,8 @@ public class CustomUserDetailService implements UserService {
             throw new ValidationListException("Invalid date requested", errors);
         }
 
+        ApplicationUser user = sessionUtils.getSessionUser();
+
         var firstMondayOfSelectedYear = LocalDateTime.of(year, 1, 1, 0, 0);
         while (!firstMondayOfSelectedYear.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
             firstMondayOfSelectedYear = firstMondayOfSelectedYear.plusDays(1);
@@ -192,15 +337,12 @@ public class CustomUserDetailService implements UserService {
 
         final var endOfSelectedWeek = beginOfSelectedWeek.plusDays(7).minusSeconds(1);
 
-        Optional<ApplicationUser> userOptional = userRepository.findById(user.getId());
-        if (userOptional.isEmpty()) {
-            return null;
-        }
-        user = userOptional.get();
-
         var competitions = user.getCompetitions();
+
+        var kek = userRepository.findAll();
+        var k2k = competitionRepository.findAll();
         if (competitions == null) {
-            return null;
+            return Set.of();
         }
 
         return competitions.stream().filter(
@@ -214,14 +356,34 @@ public class CustomUserDetailService implements UserService {
         ).collect(Collectors.toUnmodifiableSet());
     }
 
+    private void importOneFlag(String flag, ManagedBy managedBy) {
+        if (flag == null || flag.isEmpty() || managedBy == null) {
+            return;
+        }
+        var role = sessionUtils.getApplicationUserRole();
+        if (role != ApplicationUser.Role.CLUB_MANAGER && role != ApplicationUser.Role.TOURNAMENT_MANAGER) {
+            throw new ForbiddenException("Not authorized");
+        }
+
+        var flagWithSameName = flagsRepository.findByName(flag);
+        if (flagWithSameName.isPresent()) {
+            flagWithSameName.get().getClubs().add(managedBy);
+        } else {
+            flagsRepository.save(new Flags(
+                flag,
+                Set.of(managedBy)
+            ));
+        }
+    }
+
     @Override
-    public ClubManagerTeamImportResults importTeam(ApplicationUser clubManager, ClubManagerTeamImportDto clubManagerTeamImportDto) {
+    public ClubManagerTeamImportResults importTeam(ClubManagerTeamImportDto clubManagerTeamImportDto) {
         if (clubManagerTeamImportDto == null) {
             throw new ValidationException("Team is empty!");
         }
+        ApplicationUser clubManager = sessionUtils.getSessionUser();
 
-        int addedParticipants = 0;
-        int alreadyManagedParticipants = 0;
+        ClubManagerTeamImportResults results = new ClubManagerTeamImportResults();
         if (!clubManager.getType().equals(ApplicationUser.Role.CLUB_MANAGER)
             && !clubManager.getType().equals(ApplicationUser.Role.TOURNAMENT_MANAGER)) {
             throw new ForbiddenException("No permissions to import a team");
@@ -233,8 +395,12 @@ public class CustomUserDetailService implements UserService {
             Optional<ApplicationUser> existingParticipantOpt = userRepository.findApplicationUserByUserEmail(clubManagerTeamMemberImportDto.email());
             if (existingParticipantOpt.isPresent()) {
                 teamMember = existingParticipantOpt.get();
-                if (managedByRepository.findByManagerAndMember(clubManager, teamMember).isPresent()) {
-                    alreadyManagedParticipants++;
+                var foundManagedBy = managedByRepository.findByManagerAndMember(clubManager, teamMember);
+                if (foundManagedBy.isPresent()) {
+                    results.incrementOldParticipantsCount();
+                    foundManagedBy.get().setTeamName(clubManagerTeamImportDto.teamName());
+                    importOneFlag(clubManagerTeamMemberImportDto.flag(), foundManagedBy.get());
+                    foundManagedBy.get().setTeamName(clubManagerTeamImportDto.teamName());
                     continue;
                 }
             } else {
@@ -256,17 +422,15 @@ public class CustomUserDetailService implements UserService {
             }
 
 
-            managedByRepository.save(
+            var newManagedBy = managedByRepository.save(
                 new ManagedBy(clubManager, teamMember, clubManagerTeamImportDto.teamName())
             );
+            importOneFlag(clubManagerTeamMemberImportDto.flag(), newManagedBy);
 
-            addedParticipants++;
+            results.incrementNewParticipantsCount();
         }
 
-        return new ClubManagerTeamImportResults(
-            addedParticipants,
-            alreadyManagedParticipants
-        );
+        return results;
     }
 
     @Override
@@ -351,24 +515,6 @@ public class CustomUserDetailService implements UserService {
     }
 
     @Override
-    public String prepareAndSendPasswordResetMail(UserPasswordResetRequestDto userPasswordResetRequestDto) {
-        LOGGER.debug("Prepares a reset password mail and sends it afterwards {}", userPasswordResetRequestDto);
-        try {
-            String token = RandomString.make(32);
-            this.updateResetPasswordToken(userPasswordResetRequestDto.getEmail(), token);
-            String resetLink = "http://localhost:4200/#/reset?token=" + token;
-            emailService.sendPasswordResetMail(userPasswordResetRequestDto.getEmail(), resetLink);
-        } catch (NotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No entry found for given email: " + userPasswordResetRequestDto.getEmail());
-        } catch (MessagingException e) {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "The mail could not been sent with the given properties!");
-        } catch (UnsupportedEncodingException e) {
-            throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Unsupported encoding for Payload");
-        }
-        return "{\"success\": \"true\"}";
-    }
-
-    @Override
     public String resetPassword(UserPasswordResetDto userPasswordResetDto) {
         LOGGER.debug("Resets a password by its reset token{}", userPasswordResetDto);
         String token = userPasswordResetDto.getToken();
@@ -421,6 +567,207 @@ public class CustomUserDetailService implements UserService {
             .firstName(user.getFirstName())
             .lastName(user.getLastName())
             .role(user.getType())
+            .picturePath(user.getPicturePath())
             .build();
     }
+
+    public UserDetailDto getUser(Long id) {
+        return userMapper.applicationUserToUserDetailDto(userRepository.findById(id).get());
+    }
+
+    @Override
+    public List<SimpleFlagDto> getManagedFlags() {
+        if (!sessionUtils.isCompetitionManager() && !sessionUtils.isClubManager()) {
+            throw new ForbiddenException("Not authorized");
+        }
+
+        ApplicationUser sessionUser = sessionUtils.getSessionUser();
+        Set<ManagedBy> managedBies = sessionUser.getMembers();
+        HashSet<Flags> hs = new HashSet<>();
+
+        for (ManagedBy m : managedBies) {
+            hs.addAll(m.getFlags());
+        }
+
+        List<Flags> sorted = new ArrayList<>(hs.stream().toList());
+        sorted.sort(Comparator.comparing(Flags::getName));
+
+        List<SimpleFlagDto> result = flagsMapper.flagsListToSimpleFlagDtoList(sorted);
+        return result == null ? new ArrayList<>() : result;
+    }
+
+    private ManagedBy checkUserIsManaged(ApplicationUser sessionUser, ApplicationUser m) {
+        if (m == null) {
+            throw new ValidationListException("User was null",
+                List.of("User was null"));
+        }
+
+        Optional<ManagedBy> relOpt = m.getManagers().stream()
+            .filter(x -> x.getManager().getId().equals(sessionUser.getId())).findFirst();
+
+        if (relOpt.isEmpty()) {
+            throw new ValidationListException("Unmanaged user was passed",
+                List.of("Unmanaged user was passed"));
+        }
+
+        return relOpt.get();
+    }
+
+    private void userFlagValidation(UserDetailSetFlagDto members) {
+        if (!sessionUtils.isCompetitionManager() && !sessionUtils.isClubManager()) {
+            throw new ForbiddenException("Not authorized");
+        }
+
+        this.userSetFlagValidator.validate(members);
+        this.simpleFlagValidator.validate(members.getFlag());
+
+        for (UserDetailDto user : members.getUsers()) {
+            if (user == null) {
+                throw new ValidationListException("User was null",
+                    List.of("User was null"));
+            }
+
+            if (user.id() == null) {
+                throw new ValidationListException("User id was null",
+                    List.of("User id was null"));
+            }
+        }
+
+    }
+
+    @Override
+    public void addFlagsForUsers(UserDetailSetFlagDto members) {
+        userFlagValidation(members);
+
+        List<ApplicationUser> users =
+            userRepository.findAllById(members.getUsers().stream().map(UserDetailDto::id).toList());
+        Set<Long> myFlagIds = getManagedFlags().stream().map(SimpleFlagDto::id).collect(Collectors.toSet());
+        Flags flag = flagsMapper.simpleFlagDtoToFlags(members.getFlag());
+
+        if (flag == null) {
+            throw new ValidationListException("Invalid flag was passed",
+                List.of("Invalid flag was passed"));
+        }
+
+        if (flag.getId() < 0) {
+            flagsRepository.save(flag);
+            flag.setClubs(new HashSet<>());
+        } else {
+            if (!myFlagIds.contains(flag.getId())) {
+                throw new ValidationListException("Unmanaged flag was passed",
+                    List.of("Unmanaged flag was passed"));
+            }
+
+            Optional<Flags> found = flagsRepository.findById(flag.getId());
+
+            if (found.isEmpty()) {
+                throw new ValidationListException("Invalid flag was passed",
+                    List.of("Invalid flag was passed"));
+            }
+
+            flag = found.get();
+        }
+
+        ApplicationUser sessionUser = sessionUtils.getSessionUser();
+        List<Long> ids = flag.getClubs().stream().map(ManagedBy::getId).toList();
+
+        for (ApplicationUser m : users) {
+            ManagedBy rel = checkUserIsManaged(sessionUser, m);
+
+            if (ids.contains(rel.getId())) {
+                continue;
+            }
+
+            flag.getClubs().add(rel);
+        }
+
+        flagsRepository.save(flag);
+    }
+
+
+    @Override
+    public void removeFlagsForUsers(UserDetailSetFlagDto members) {
+        userFlagValidation(members);
+
+        Set<Long> myFlagIds = getManagedFlags().stream().map(SimpleFlagDto::id).collect(Collectors.toSet());
+        Flags flag = flagsMapper.simpleFlagDtoToFlags(members.getFlag());
+
+        if (flag == null) {
+            throw new ValidationListException("Invalid flag was passed",
+                List.of("Invalid flag was passed"));
+        }
+
+        if (flag.getId() < 0 || !myFlagIds.contains(flag.getId())) {
+            throw new ValidationListException("Unmanaged flag was passed",
+                List.of("Unmanaged flag was passed"));
+        }
+
+        Optional<Flags> found = flagsRepository.findById(flag.getId());
+
+        if (found.isEmpty()) {
+            throw new ValidationListException("Invalid flag was passed",
+                List.of("Invalid flag was passed"));
+        }
+
+        flag = found.get();
+
+        ApplicationUser sessionUser = sessionUtils.getSessionUser();
+        List<ApplicationUser> users =
+            userRepository.findAllById(members.getUsers().stream().map(UserDetailDto::id).toList());
+        List<Long> ids = flag.getClubs().stream().map(ManagedBy::getId).toList();
+
+        for (ApplicationUser m : users) {
+            ManagedBy rel = checkUserIsManaged(sessionUser, m);
+
+            if (!ids.contains(rel.getId())) {
+                continue;
+            }
+
+            flag.getClubs().removeIf(x -> x.getId().equals(rel.getId()));
+        }
+
+        flagsRepository.save(flag);
+    }
+
+    private int compare(Object o1, Object o2) {
+        UserDetailFlagDto p1 = (UserDetailFlagDto) o1;
+        UserDetailFlagDto p2 = (UserDetailFlagDto) o2;
+        int res =  p1.getLastName().compareToIgnoreCase(p2.getLastName());
+        if (res != 0) {
+            return res;
+        }
+        return p1.getFirstName().compareToIgnoreCase(p2.getFirstName());
+    }
+
+    @Override
+    public List<UserDetailFlagDto> getMembers() {
+        LOGGER.debug("List members");
+
+        if (sessionUtils.getApplicationUserRole() == ApplicationUser.Role.PARTICIPANT) {
+            throw new ForbiddenException("No Permission to get participants with flags");
+        }
+
+        ApplicationUser applicationUser = sessionUtils.getSessionUser();
+
+        if (sessionUtils.isClubManager()) {
+            ArrayList<UserDetailFlagDto> result = new ArrayList<>();
+
+            for (ManagedBy m : applicationUser.getMembers()) {
+                ApplicationUser current = m.getMember();
+                UserDetailFlagDto mp = userMapper.applicationUserToUserDetailFlagDto(current);
+                List<Flags> flags = new ArrayList<>(m.getFlags().stream().toList());
+                flags.sort(Comparator.comparing(Flags::getName));
+
+                mp.setFlags(flagsMapper.flagsListToSimpleFlagDtoList(flags));
+                result.add(mp);
+            }
+            result.sort(this::compare);
+
+            return result;
+
+        } else {
+            throw new ConflictException("Unknown Role", List.of("Unknown Role"));
+        }
+    }
+
 }

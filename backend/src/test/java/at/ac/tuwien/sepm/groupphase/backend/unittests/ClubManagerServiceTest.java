@@ -8,15 +8,19 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepm.groupphase.backend.service.helprecords.ClubManagerTeamImportResults;
+import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
+import org.junit.jupiter.api.*;
+import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -34,32 +38,34 @@ public class ClubManagerServiceTest {
     private final DataCleaner cleaner;
     private final ClubManagerTeamImportDataGenerator cmGenerator;
 
+    private final SessionUtils sessionUtils;
+
     @Autowired
-    public ClubManagerServiceTest(UserService userService, ApplicationUserRepository userRepository, DataCleaner cleaner, ClubManagerTeamImportDataGenerator cmGenerator) {
+    public ClubManagerServiceTest(UserService userService, ApplicationUserRepository userRepository, DataCleaner cleaner, ClubManagerTeamImportDataGenerator cmGenerator, SessionUtils sessionUtils) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.cleaner = cleaner;
         this.cmGenerator = cmGenerator;
+        this.sessionUtils = sessionUtils;
     }
 
-    @BeforeAll
+    @BeforeEach
     public void refreshTestDate() {
         cleaner.clear();
         cmGenerator.setup();
     }
 
     @Test
-    @Order(1)
-    public void importNonExistingTeamMembers() {
+    @WithMockUser(username = "cm_test@test.test")
+    public void importTeam_whenTeamMembersAreNotInDB_shouldCountCorrectlyNewAndOldMembers() {
         ClubManagerTeamImportDto relevantTestTeam = ClubManagerTeamImportGeneratorHelper.testTeams.get(0);
         long initUserCount = userRepository.count();
         ClubManagerTeamImportResults results = userService.importTeam(
-            ClubManagerTeamImportGeneratorHelper.generatedClubManagers.get(0),
             relevantTestTeam
         );
         long laterUserCount = userRepository.count();
-        assertThat(results.newParticipantsCount()).isEqualTo(4);
-        assertThat(results.oldParticipantsCount()).isEqualTo(0);
+        assertThat(results.getNewParticipantsCount()).isEqualTo(4);
+        assertThat(results.getOldParticipantsCount()).isEqualTo(0);
         assertThat(laterUserCount).isEqualTo(initUserCount + 4L);
         var mapToAssert = assertThat(userRepository.findAll())
             .map(ApplicationUser::getFirstName, ApplicationUser::getLastName,
@@ -73,17 +79,20 @@ public class ClubManagerServiceTest {
     }
 
     @Test
-    @Order(2)
-    public void importBothExistingAndNonExisting() {
+    @WithMockUser(username = "cm_test@test.test")
+    public void importTeam_whenTeamMembersArePartiallyInDB_shouldCountCorrectlyNewAndOldMembers() {
+        userService.importTeam(
+            ClubManagerTeamImportGeneratorHelper.testTeams.get(0)
+        );
+
         ClubManagerTeamImportDto relevantTestTeam = ClubManagerTeamImportGeneratorHelper.testTeams.get(1);
         long initUserCount = userRepository.count();
         ClubManagerTeamImportResults results = userService.importTeam(
-            ClubManagerTeamImportGeneratorHelper.generatedClubManagers.get(0),
             relevantTestTeam
         );
         long laterUserCount = userRepository.count();
-        assertThat(results.newParticipantsCount()).isEqualTo(1);
-        assertThat(results.oldParticipantsCount()).isEqualTo(1);
+        assertThat(results.getNewParticipantsCount()).isEqualTo(1);
+        assertThat(results.getOldParticipantsCount()).isEqualTo(1);
         assertThat(laterUserCount).isNotEqualTo(initUserCount + 2L);
         var memberToTest = relevantTestTeam.teamMembers().get(1);
         assertThat(userRepository.findAll())
@@ -93,11 +102,6 @@ public class ClubManagerServiceTest {
             .contains(tuple(memberToTest.firstName(), memberToTest.lastName(),
                 memberToTest.gender(), ApplicationUser.Role.PARTICIPANT,
                 memberToTest.email()));
-    }
-
-    @Test
-    public void importTeamWithIncorrectFirtsNames() {
-
     }
 }
 

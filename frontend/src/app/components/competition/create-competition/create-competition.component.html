@@ -176,9 +176,9 @@
 
       <div class="second-scrollabove">
         <div class="group-container" *ngFor="let group of gradingGroups; index as id;">
-          <app-content-card [title]="group.title" (titleChange)="updateGroupName(id,$event)" [isEdit]="true" [actions]="['duplicate','delete','collapse']"
-            (delete)="deleteGroup(id)" (duplicate)="duplicateGroup(group,id)" (collapsed)="group.collapsed = $event"
-            [color]="'bc-ming'">
+          <app-content-card [title]="group.title" (titleChange)="updateGroupName(id,$event)" [isEdit]="true" [actions]="['duplicate','delete','collapse','template']"
+            (delete)="deleteGroup(id)" (duplicate)="duplicateGroup(group,id)" (collapsed)="group.collapsed = $event" (templateAction)="handleTemplateAction(id, $event)"
+            [templateState]="group.templateState" [color]="'bc-ming'">
 
             <div mini class="minimize" *ngIf="group.collapsed">
               <app-formular-editor [color]="'bc-space'" [collapsed]="true" [vars]="group.stationVariables" [(formula)]="group.formula"></app-formular-editor>
@@ -239,7 +239,13 @@
 
         <div class="flex-center">
           <div class="add-group flex-center" (click)="addGroup()">
-            <mat-icon class="large">add_circle_outline</mat-icon> Bewertungsgruppe
+            <mat-icon class="large">add_circle_outline</mat-icon> {{localize.gradingGroup}}
+          </div> 
+          <h1>
+            /
+          </h1>
+          <div class="add-group flex-center" (click)="openImportGroupDialog()">
+            <mat-icon class="large">view_list</mat-icon>  {{localize.importGradingGroup}}
           </div>
         </div>
       </div>

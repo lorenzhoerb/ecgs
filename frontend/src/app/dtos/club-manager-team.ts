@@ -11,4 +11,5 @@ export interface ClubManagerTeamMemberImportDto {
     gender: Gender;
     dateOfBirth: string;// Date;
     email: string;
+    flag?: string;
 }

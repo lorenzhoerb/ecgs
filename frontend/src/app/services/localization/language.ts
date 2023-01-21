@@ -23,6 +23,9 @@ export class LocalizationKeys {
   noPreference: string;
   forgotPassword: string;
   sendResetLink: string;
+  gradingGroup: string;
+
+  edit: string;
 
   datesAndContacts: string;
   description: string;
@@ -30,6 +33,7 @@ export class LocalizationKeys {
   Tournamnet: string;
   contact: string;
   participants: string;
+  managedParticipants: string;
 
   title: string;
   phoneNumber: string;
@@ -48,18 +52,81 @@ export class LocalizationKeys {
   registrationNotDone: string;
   search: string;
 
+  all: string;
+  accepted: string;
+  outstanding: string;
+  status: string;
+  action: string;
+  editStatus: string;
+  editGradingGroup: string;
+  manageParticipants: string;
+  cancel: string;
+  oopsSomethingWentWrong: string;
+
   logout: string;
   importCSV: string;
+  exportCSVButton: string;
+  teamName: string;
+  member: string;
+  importCSVButton: string;
+  page: string;
+  clearAll: string;
+  genderMan: string;
+  genderWoman: string;
+  genderOther: string;
+
   createTournament: string;
+
+  importFlags: string;
+  flag: string;
+  optional: string;
+  add: string;
+  delete: string;
+  new: string;
+  create: string;
+  createFlag: string;
+
+  close: string;
+  formula: string;
+  chooseGradingGroup: string;
+  importGradingGroup: string;
+  createGradingSystem: string;
+  others: string;
+  publicType: string;
+  publicTypeAll: string;
+  publicTypePrivate: string;
+  publicTypePublic: string;
+  reset: string;
+  onlyEditables: string;
+  yes: string;
+  no: string;
+
+  gradingSystems: string;
+  manageTemplateGradingSystems: string;
 
   username: string;
   firstname: string;
   lastname: string;
   password: string;
+  userSettings: string;
+  filePictureRestrictions: string;
   changePassword: string;
+  changeUserPicture: string;
+  uploadUserPicture: string;
   dateOfBirth: string;
   gender: string;
   type: string;
+
+  regMemToComp: string;
+  searchAndSelectToRegister: string;
+  registrationEnds: string;
+  members: string;
+  membersPerPage: string;
+  searchACompetition: string;
+  back: string;
+
+  editTeam: string;
+
   enter: (type: string) => string;
   reEnter: (type: string) => string;
   getType: (type: string) => string;

@@ -25,6 +25,9 @@ import {ResetPasswordComponent} from './components/reset-password/reset-password
 import {ChangePasswordComponent} from './components/change-password/change-password.component';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import { MatRadioModule } from '@angular/material/radio';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import { MatDialogModule } from '@angular/material/dialog';
 import {ViewParticipantsComponent} from './components/competition/view-participants/view-participants.component';
 import {ErrorComponent} from './components/error/error.component';
 import {ToastrModule} from 'ngx-toastr';
@@ -46,6 +49,31 @@ import {
 } from './components/competition-calender-view/competition-calender-view.component';
 import {CompetitionHeaderComponent} from './components/competition-header/competition-header.component';
 import {AutocompleteComponent} from './components/autocomplete/autocomplete.component';
+import { CompetitionGradingComponent } from './components/competition/competition-grading/competition-grading.component';
+import { CompetitionGradingGroupComponent }
+  from './components/competition/competition-grading/competition-grading-group/competition-grading-group.component';
+import { CompetitionGradingStationComponent }
+  from './components/competition/competition-grading/competition-grading-station/competition-grading-station.component';
+import {BulkEditorComponent} from './components/bulk-editor/bulk-editor.component';
+import {ManageParticipantsComponent} from './components/competition/manage-participants/manage-participants.component';
+import {RegisterToModalComponent} from './components/club-manager-edit/register-to-modal/register-to-modal.component';
+import {
+  SearchSelectCompetitionComponent
+} from './components/club-manager-edit/register-to-modal/search-select-competition/search-select-competition.component';
+import {
+  ReigistrationSummaryComponent
+} from './components/club-manager-edit/register-to-modal/reigistration-summary/reigistration-summary.component';
+import { NavBarComponent } from './components/util/nav-bar/nav-bar.component';
+import { GenderPipe } from './pipes/gender.pipe';
+import { ViewAndEditGradingSystemComponent } from './components/view-and-edit-grading-system/view-and-edit-grading-system.component';
+import { TemplateDialogComponent } from './components/competition/template-dialog/template-dialog.component';
+import { ChangeUserPictureComponent } from './components/change-user-picture/change-user-picture.component';
+import { CreateCompetitionSelectGradingSystemDialogComponent }
+  from './components/create-competition-select-grading-system-dialog/create-competition-select-grading-system-dialog.component';
+import { ClubManagerEditComponent } from './components/club-manager-edit/club-manager-edit.component';
+import { ChangeUserPassPictureComponent } from './components/change-user-pass-picture/change-user-pass-picture.component';
+import {MatInputModule} from '@angular/material/input';
+import {ImportFlagsComponent} from './components/import-flags/import-flags.component';
 import {HeaderCreateModalComponent} from './components/header-create-modal/header-create-modal.component';
 
 @NgModule({
@@ -81,6 +109,29 @@ import {HeaderCreateModalComponent} from './components/header-create-modal/heade
     CompetitionHeaderComponent,
     AutocompleteComponent,
     HeaderCreateModalComponent,
+    ImportFlagsComponent,
+    BulkEditorComponent,
+    ManageParticipantsComponent,
+    ClubManagerEditComponent,
+    RegisterToModalComponent,
+    SearchSelectCompetitionComponent,
+    ReigistrationSummaryComponent,
+    CompetitionGradingComponent,
+    CompetitionGradingGroupComponent,
+    CompetitionGradingStationComponent,
+    BulkEditorComponent,
+    ManageParticipantsComponent,
+    NavBarComponent,
+    GenderPipe,
+    TemplateDialogComponent,
+    ChangeUserPictureComponent,
+    ViewAndEditGradingSystemComponent,
+    CreateCompetitionSelectGradingSystemDialogComponent,
+    ImportFlagsComponent,
+    BulkEditorComponent,
+    ManageParticipantsComponent,
+    ClubManagerEditComponent,
+    ChangeUserPassPictureComponent,
   ],
   imports: [
     BrowserModule,
@@ -92,11 +143,16 @@ import {HeaderCreateModalComponent} from './components/header-create-modal/heade
     FormsModule,
     MatIconModule,
     MatButtonToggleModule,
+    MatRadioModule,
+    MatTooltipModule,
+    MatDialogModule,
     ToastrModule.forRoot(),
     DragDropModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    MatInputModule
   ],
-  providers: [httpInterceptorProviders],
+  providers: [
+  httpInterceptorProviders],
   bootstrap: [AppComponent]
 })
 export class AppModule {

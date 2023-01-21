@@ -20,7 +20,8 @@ public class GradingSystem {
     @JsonProperty("formula")
     public Operation formula;
 
-    public GradingSystem() {}
+    public GradingSystem() {
+    }
 
     public GradingSystem(String json) throws ValidationException {
         ObjectMapper mapper = new ObjectMapper();
@@ -38,14 +39,14 @@ public class GradingSystem {
 
     public void bindVariable(Long stationId, Long variableId, Double value) throws NotFoundException {
         Optional<Station> station = Arrays.stream(stations)
-                                        .filter(s -> s.id.equals(stationId)).findFirst();
+            .filter(s -> s.id.equals(stationId)).findFirst();
 
         if (station.isEmpty()) {
             throw new NotFoundException("station not found");
         }
 
         Optional<Variable> variable = Arrays.stream(station.get().variables)
-                                        .filter(v -> v.id.equals(variableId)).findFirst();
+            .filter(v -> v.id.equals(variableId)).findFirst();
 
         if (variable.isEmpty()) {
             throw new NotFoundException("variable in station not found");

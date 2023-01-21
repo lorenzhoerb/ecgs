@@ -34,9 +34,9 @@ public class UserProvider {
         "Isabella Clark", "Dalton Berry",
     };
 
-    private static ApplicationUser.Role[] roles = ApplicationUser.Role.values();
-    private static ApplicationUser.Gender[] genders = ApplicationUser.Gender.values();
-    private static Random rd = new Random();
+    private static final ApplicationUser.Role[] roles = ApplicationUser.Role.values();
+    private static final ApplicationUser.Gender[] genders = ApplicationUser.Gender.values();
+    private static final Random rd = new Random();
 
     public static List<ApplicationUser> getParticipants(int amount) {
         ArrayList<ApplicationUser> users = new ArrayList<>();

@@ -34,6 +34,50 @@ public record ClubManagerTeamMemberImportDto(
     @Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,63}",
         flags = Pattern.Flag.CASE_INSENSITIVE)
     @Size(max = 255, message = "Email must be shorter")
-    String email
+    String email,
+
+    @Size(max = 255, message = "Flag must be shorter")
+    String flag
 ) {
+    public ClubManagerTeamMemberImportDto(@NotBlank(message = "First name must not be blank") // basically min = 1
+                                          @Size(max = 255, message = "First name must be shorter")
+                                          @Pattern(regexp = "^[a-zA-Z \\u00C0-\\u017F-]*$", message = "First name can only include letters, spaces and -")
+                                          String firstName, @NotBlank(message = "Last name must not be blank")
+                                          // basically min = 1
+                                          @Size(max = 255, message = "Last name must be shorter")
+                                          @Pattern(regexp = "^[a-zA-Z \\u00C0-\\u017F-]*$", message = "Last name can only include letters, spaces and -")
+                                          String lastName, @NotNull(message = "Gender field is blank")
+                                          Gender gender, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+                                          @Past(message = "Date of birth must be in the past")
+                                          @NotNull(message = "Date of birth must be given")
+                                          Date dateOfBirth, @NotBlank(message = "Email must be given")
+                                          @Email
+                                          @Size(max = 255, message = "Email must be shorter")
+                                          String email, @Size(max = 255, message = "Flag must be shorter")
+                                          String flag) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.gender = gender;
+        this.dateOfBirth = dateOfBirth;
+        this.email = email;
+        this.flag = flag;
+    }
+
+    public ClubManagerTeamMemberImportDto(@NotBlank(message = "First name must not be blank") // basically min = 1
+                                          @Size(max = 255, message = "First name must be shorter")
+                                          @Pattern(regexp = "^[a-zA-Z \\u00C0-\\u017F-]*$", message = "First name can only include letters, spaces and -")
+                                          String firstName, @NotBlank(message = "Last name must not be blank")
+                                          // basically min = 1
+                                          @Size(max = 255, message = "Last name must be shorter")
+                                          @Pattern(regexp = "^[a-zA-Z \\u00C0-\\u017F-]*$", message = "Last name can only include letters, spaces and -")
+                                          String lastName, @NotNull(message = "Gender field is blank")
+                                          Gender gender, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+                                          @Past(message = "Date of birth must be in the past")
+                                          @NotNull(message = "Date of birth must be given")
+                                          Date dateOfBirth, @NotBlank(message = "Email must be given")
+                                          @Email
+                                          @Size(max = 255, message = "Email must be shorter")
+                                          String email) {
+        this(firstName, lastName, gender, dateOfBirth, email, "");
+    }
 }

@@ -3,6 +3,7 @@ import {ToastrService} from 'ngx-toastr';
 import {CompetitionSearchDto} from 'src/app/dtos/competitionSearchDto';
 import {SimpleCompetitionListDto} from 'src/app/dtos/simpleCompetitionListDto';
 import {CompetitionService} from 'src/app/services/competition.service';
+import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
 
 @Component({
   selector: 'app-competition-list-view',
@@ -11,32 +12,58 @@ import {CompetitionService} from 'src/app/services/competition.service';
 })
 export class CompetitionListViewComponent implements OnInit {
   competitions: SimpleCompetitionListDto = [];
+  competitionsPerPage = 5;
+  currentPage = 1;
 
   constructor(
     private competitionService: CompetitionService,
     private notification: ToastrService
   ) { }
 
+
+  public get localize(): LocalizeService {
+    return LocalizationService;
+  }
+
   ngOnInit(): void {
     // filter component raises an event, that calls fetchCompetition()
   }
 
-  fetchCompetitions(competitionSearch: CompetitionSearchDto): void {
+  public onPageChangeClick(change: number) {
+    if (change > 0 && Math.ceil(this.competitions.length / this.competitionsPerPage) - this.currentPage <= 0) {
+      return;
+    }
+    if (change < 0 && this.currentPage + change <= 0) {
+      return;
+    }
+    this.currentPage += change;
+  }
+
+
+  public fetchCompetitions(competitionSearch: CompetitionSearchDto): void {
     this.competitionService.searchCompetitions(competitionSearch).subscribe(
       {
         next: (data: SimpleCompetitionListDto) => {
           this.competitions = data;
         },
         error: (err) => {
-          console.log(err);
-          if (err.status === 401 || err.status === 403) {
+          if (err.status === 0) {
+            this.notification.error('Could not reach server', 'Connection error');
+          } else if (err.status === 401 || err.status === 403) {
             this.notification.error('Unauthenticated!', 'Error');
-            return;
+          } else {
+            this.notification.error(err.message, 'Error');
           }
-          this.notification.error(err.message, 'Error');
         }
       }
     );
+  }
+
+  public getCompetitionsForCurrentPage(): SimpleCompetitionListDto {
+    const lowerBound = (this.currentPage - 1) * this.competitionsPerPage;
+    const upperBound = lowerBound + this.competitionsPerPage;
+
+    return this.competitions.slice(lowerBound, upperBound);
   }
 
   competitionSearchChange(newCompetitionSearch: CompetitionSearchDto): void {

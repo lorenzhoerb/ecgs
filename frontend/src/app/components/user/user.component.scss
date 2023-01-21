@@ -12,3 +12,40 @@
     border-radius: 50%;
     margin-right: 1em;
 }
+
+.menu {
+    box-shadow: 2px 1px 3px 0px rgba(11,12,12,0.4);
+    background-color: white;
+    color: black;
+    position: absolute;
+    right: 1rem;;
+    z-index: 1000;
+}
+
+.menu-item {
+    height: 3em;
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid rgba(17,15,17,0.2);
+}
+
+.menu-item mat-button-toggle:not(.mat-button-toggle-checked):hover {
+    background-color: hsla(188, 39%, 36%, 0.3);
+}
+
+.menu-item .mat-button-toggle-checked {
+    background-color: var(--ming);
+    color: white;
+}
+
+a.menu-item {
+    padding: 20px;
+}
+
+a.menu-item:hover {
+    //background-color: rgba(212,214,213,1);
+    background-color: var(--ming);
+    color: white;
+    cursor: pointer;
+}

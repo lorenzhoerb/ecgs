@@ -2,42 +2,64 @@ package at.ac.tuwien.sepm.groupphase.backend.integrationtest;
 
 import at.ac.tuwien.sepm.groupphase.backend.basetest.TestDataProvider;
 import at.ac.tuwien.sepm.groupphase.backend.config.properties.SecurityProperties;
+import at.ac.tuwien.sepm.groupphase.backend.datagenerator.builder.CompetitionBuilder;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ErrorListRestDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantResultDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleGradingGroupDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.entity.GradingGroup;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Judge;
+import at.ac.tuwien.sepm.groupphase.backend.entity.RegisterTo;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.JudgeRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.GradingSystemRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.SecurityUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
+import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
+import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.With;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static at.ac.tuwien.sepm.groupphase.backend.integrationtest.TestData.ADMIN_ROLES;
 import static at.ac.tuwien.sepm.groupphase.backend.integrationtest.TestData.ADMIN_USER;
+
+import java.util.Objects;
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -68,7 +90,19 @@ public class CompetitionEndpointTest extends TestDataProvider {
     private RegisterToRepository registerToRepository;
 
     @Autowired
+    private JudgeRepository judgeRepository;
+
+    @Autowired
+    private GradingSystemRepository gradingSystemRepository;
+
+    @Autowired
+    private SecurityUserRepository securityUserRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @Autowired
     private SecurityProperties securityProperties;
@@ -76,12 +110,20 @@ public class CompetitionEndpointTest extends TestDataProvider {
     @Autowired
     private JwtTokenizer jwtTokenizer;
 
+    @Autowired
+    private CompetitionService competitionService;
+
+    @Autowired
+    private UserService userService;
+
     @BeforeEach
     public void beforeEach() {
         competitionRepository.deleteAll();
         applicationUserRepository.deleteAll();
         gradingGroupRepository.deleteAll();
         registerToRepository.deleteAll();
+        gradingSystemRepository.deleteAll();
+        securityUserRepository.deleteAll();
     }
 
     @Test
@@ -322,6 +364,52 @@ public class CompetitionEndpointTest extends TestDataProvider {
         assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
     }
 
+    @Test
+    public void getRegParticipantsManagement_whenNotLoggedIn_expect403() throws Exception {
+        MvcResult mvcResult = this.mockMvc.perform(
+                get(COMPETITION_BASE_URI + "/{id}/participants/registrations",
+                    1L)
+            )
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
+    }
+
+    @Test
+    @Transactional
+    public void searchRegisteredParticipants_withDetailedInformation_expect200() throws Exception {
+        setUpCompetitionUser();
+        ApplicationUser creator = applicationUserRepository.findApplicationUserByUserEmail(TEST_USER_COMPETITION_MANAGER_EMAIL).get();
+        Competition c = new CompetitionBuilder(
+            applicationUserRepository,
+            competitionRepository,
+            gradingGroupRepository,
+            registerToRepository,
+            gradingSystemRepository
+        )
+            .withCreator(creator)
+            .withParticipantsPerGroup(25)
+            .withGradingGroups(Set.of("T1"))
+            .create();
+
+        MvcResult mvcResult = this.mockMvc.perform(
+                get(COMPETITION_BASE_URI + "/{id}/participants/registrations?page=0",
+                    c.getId())
+                    .header(
+                        securityProperties.getAuthHeader(),
+                        jwtTokenizer.getAuthToken(
+                            TEST_USER_COMPETITION_MANAGER_EMAIL,
+                            List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
+                        ))
+            )
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+    }
+
+
     //@Transactional
     @Test
     public void searchCompetitionList() throws Exception {
@@ -355,6 +443,109 @@ public class CompetitionEndpointTest extends TestDataProvider {
         assertEquals(30,allByBeginOfCompetitionAfterAndNameStartingWithAndDescriptionContainingIgnoreCase.size());
     }
 
+    @Test
+    public void searchCompetitionsAdvance() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(get(COMPETITION_BASE_URI)
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES))
+                .queryParam("name", "Haus")
+                .queryParam("isPublic", "TRUE")
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk()).andDo(print()).andReturn();
+    }
+
+    @Test
+    public void testFindDetail_competitionNotFound_shouldThrowNotFoundException_404() throws Exception {
+        setUpCompetitionUser();
+        Long id = -1L;
+
+        MvcResult mvcResult = this.mockMvc.perform(get(COMPETITION_BASE_URI + "/{id}/detail", id)
+                .header(
+                    securityProperties.getAuthHeader(),
+                    jwtTokenizer.getAuthToken(
+                        TEST_USER_COMPETITION_MANAGER_EMAIL,
+                        List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
+                    ))
+                .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void testFindDetail_validInput_shouldReturnCompetitionDetailDto_200() throws Exception {
+        setUpCompetitionUser();
+
+        CompetitionDetailDto expectedCompetition = getValidCompetitionDetailDto();
+        expectedCompetition = competitionService.create(expectedCompetition);
+        Long id = expectedCompetition.getId();
+
+        MvcResult mvcResult = this.mockMvc.perform(get(COMPETITION_BASE_URI + "/{id}/detail", id)
+                .header(
+                    securityProperties.getAuthHeader(),
+                    jwtTokenizer.getAuthToken(
+                        TEST_USER_COMPETITION_MANAGER_EMAIL,
+                        List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
+                    ))
+                .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        CompetitionDetailDto actualCompetitionDetailDto = objectMapper.readerFor(CompetitionDetailDto.class)
+            .readValue(response.getContentAsByteArray());
+
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertEquals(expectedCompetition.getName(), actualCompetitionDetailDto.getName());
+        assertEquals(expectedCompetition.getBeginOfCompetition(), actualCompetitionDetailDto.getBeginOfCompetition());
+        assertEquals(expectedCompetition.getEndOfCompetition(), actualCompetitionDetailDto.getEndOfCompetition());
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void testFindDetail_sessionUserDoesNotHaveEditingAccess_shouldThrowForbiddenException_403() throws Exception {
+        setUpCompetitionUser();
+
+        CompetitionDetailDto expectedCompetition = getValidCompetitionDetailDto();
+        expectedCompetition = competitionService.create(expectedCompetition);
+        Long id = expectedCompetition.getId();
+
+        String email = "notcreator@notcreator.com";
+        setUpCompetitionUserWithEMail(email);
+
+        MvcResult mvcResult = this.mockMvc.perform(get(COMPETITION_BASE_URI + "/{id}/detail", id)
+                .header(
+                    securityProperties.getAuthHeader(),
+                    jwtTokenizer.getAuthToken(
+                        email,
+                        List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
+                    ))
+                .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void testFindDetail_unauthorizedUser_shouldThrowForbiddenException_403() throws Exception {
+        setUpCompetitionUser();
+
+        CompetitionDetailDto expectedCompetition = getValidCompetitionDetailDto();
+        expectedCompetition = competitionService.create(expectedCompetition);
+        Long id = expectedCompetition.getId();
+
+        MvcResult mvcResult = this.mockMvc.perform(get(COMPETITION_BASE_URI + "/{id}/detail", id)
+                .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
+    }
 
     public Competition createCompetition() {
         compId++;

@@ -1,16 +1,28 @@
 package at.ac.tuwien.sepm.groupphase.backend.service;
 
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlag;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlagsResultDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantSelfRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseParticipantRegistrationDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserCredentialUpdateDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailFlagDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailSetFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserInfoDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserSearchDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlag;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlagsResultDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserPasswordResetDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserPasswordResetRequestDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserSearchDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleFlagDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailSetFlagDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.entity.SecurityUser;
@@ -20,6 +32,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -105,7 +118,7 @@ public interface UserService extends UserDetailsService {
      * @param weekNumber the week number of @param{year} to fetch calendar for
      * @return set of competitions attached to user for that @param{year} and @param{weekNumber}
      */
-    Set<Competition> getCompetitionsForCalendar(ApplicationUser competitionManager, int year, int weekNumber);
+    Set<Competition> getCompetitionsForCalendar(int year, int weekNumber);
 
     /**
      * Import a team as a club manager.
@@ -113,7 +126,7 @@ public interface UserService extends UserDetailsService {
      * @param clubManagerTeamImportDto a dto for club manager's team.
      * @return Dto that has a number of new participants added to the team and a number of already present ones. (present == managed by you)
      */
-    ClubManagerTeamImportResults importTeam(ApplicationUser clubManager, ClubManagerTeamImportDto clubManagerTeamImportDto);
+    ClubManagerTeamImportResults importTeam(ClubManagerTeamImportDto clubManagerTeamImportDto);
 
     /**
      * Search application user by name.
@@ -163,4 +176,36 @@ public interface UserService extends UserDetailsService {
      * @return the current session user
      */
     UserInfoDto getUser();
+
+    UserDetailDto getUser(Long id);
+
+    ImportFlagsResultDto importFlags(List<ImportFlag> flags);
+
+    /**
+     * Get flags in use by club manager .
+     *
+     * @return flags managed by a club manager
+     */
+    List<SimpleFlagDto> getManagedFlags();
+
+    /**
+     * Add flags for members.
+     *
+     * @param members set flags for members
+     */
+    void addFlagsForUsers(UserDetailSetFlagDto members);
+
+    /**
+     * Remove flags for members.
+     *
+     * @param members set flags for members
+     */
+    void removeFlagsForUsers(UserDetailSetFlagDto members);
+
+    /**
+     * get team members.
+     *
+     * @return members of team
+     */
+    List<UserDetailFlagDto> getMembers();
 }

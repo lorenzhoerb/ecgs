@@ -1,0 +1,53 @@
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: white;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #EEE;
+}
+
+.dropdown-button:focus + .dropdown-content {
+  display: block;
+}
+
+.dropdown-button {
+  line-height: 1rem;
+  color: #333238;
+  fill: currentColor;
+  box-shadow: inset 0 0 0 1px #bfbfc3;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.25rem;
+}
+
+.badge {
+  color: white;
+  padding: 4px 8px;
+  text-align: center;
+  border-radius: 5px;
+}
+
+.badge-success {
+  background-color: green;
+}
+
+.badge-error {
+  background-color: red;
+}

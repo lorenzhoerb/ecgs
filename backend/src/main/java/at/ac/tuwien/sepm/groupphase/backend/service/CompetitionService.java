@@ -49,7 +49,7 @@ public interface CompetitionService {
      * @param id id of competition
      * @return Users registered to competition
      */
-    Set<UserDetailDto> getParticipants(Long id);
+    List<UserDetailDto> getParticipants(Long id);
 
     /**
      * Get the grading groups of a competition with their Participants.

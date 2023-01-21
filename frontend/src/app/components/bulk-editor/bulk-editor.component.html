@@ -1,73 +1,74 @@
-  <div class="team-content">
-    <div style="margin-top:25px;display: flex; align-items: baseline; justify-content: space-between;">
-      <div style="display: flex; width: 50%;">
+<div class="team-content">
+  <div style="margin-top:25px;display: flex; align-items: baseline; justify-content: space-between;">
+    <div style="display: flex; width: 50%;">
 
-      </div>
-      <div class="page-section" *ngIf="enablePagination">
-        <button
-          style="margin-right: 15px;"
-          (click)="onPageChangeClick(-1)"
-          class="navigation-button"
-        >
-          &lt;
-        </button>
-        {{localize.page}} {{currentPage}}
-        <button
-          style="margin-left: 15px;"
-          (click)="onPageChangeClick(1)"
-          class="navigation-button"
-        >
-          &gt;
-        </button>
-      </div>
     </div>
-
-    <div style="display: flex;">
-      <table class="table table-striped m-2">
-        <thead>
-        <tr>
-          <th *ngIf="!disableCount" scope="col">#</th>
-          <th *ngIf="!disableCheckBox"><input type="checkbox" class="form-check-input" [(ngModel)]="masterChecked" (change)="onMasterBulkChange($event.target.checked)"></th>
-          <th *ngFor="let name of header">{{name}}</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let record of displayData; let i = index">
-          <td *ngIf="!disableCount">{{i + 1 + (currentPage - 1) * recordsPerPage}}</td>
-          <td *ngIf="!disableCheckBox"><input type="checkbox" class="form-check-input" [(ngModel)]="checks[i + (currentPage - 1) * recordsPerPage]"></td>
-          <td *ngFor="let elem of mapRecord(record)">
-            {{elem}}
-          </td>
-          <td *ngIf="!disableDelete">
-            <mat-icon (click)="onRemoveFlagClickInternal(i + (currentPage - 1) * recordsPerPage)" style="cursor: pointer; color: hsla(349, 73%, 44%, 1);"
-                      _ngcontent-xam-c83="" role="img"
-                      class="mat-icon notranslate material-icons mat-ligature-font mat-icon-no-color ng-star-inserted"
-                      aria-hidden="true" data-mat-icon-type="font">delete
-            </mat-icon>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-    <div style="display: flex; align-items: baseline; justify-content: space-between; padding-top: 20px;">
-      <div>
-      </div>
-      <div class="page-section" *ngIf="enablePagination">
-        <button
-          style="margin-right: 15px;"
-          (click)="onPageChangeClick(-1)"
-          class="navigation-button"
-        >
-          &lt;
-        </button>
-        {{localize.page}} {{currentPage}}
-        <button
-          style="margin-left: 15px;"
-          (click)="onPageChangeClick(1)"
-          class="navigation-button"
-        >
-          &gt;
-        </button>
-      </div>
+    <div class="page-section" *ngIf="enablePagination">
+      <button
+        style="margin-right: 15px;"
+        (click)="onPageChangeClick(-1)"
+        class="navigation-button"
+      >
+        &lt;
+      </button>
+      {{localize.page}} {{currentPage}}
+      <button
+        style="margin-left: 15px;"
+        (click)="onPageChangeClick(1)"
+        class="navigation-button"
+      >
+        &gt;
+      </button>
     </div>
   </div>
+
+  <div style="display: flex;">
+    <table class="table table-striped m-2">
+      <thead>
+      <tr>
+        <th *ngIf="!disableCount" scope="col">#</th>
+        <th *ngIf="!disableCheckBox"><input type="checkbox" class="form-check-input" [(ngModel)]="masterChecked" (change)="onMasterBulkChange($event.target.checked)"></th>
+        <th *ngFor="let name of header">{{name}}</th>
+      </tr>
+      </thead>
+      <hr/>
+      <tbody>
+      <tr *ngFor="let record of displayData; let i = index">
+        <td *ngIf="!disableCount">{{i + 1 + (currentPage - 1) * recordsPerPage}}</td>
+        <td *ngIf="!disableCheckBox"><input type="checkbox" class="form-check-input" [(ngModel)]="checks[i + (currentPage - 1) * recordsPerPage]"></td>
+        <td *ngFor="let elem of mapRecord(record)">
+          {{elem}}
+        </td>
+        <td *ngIf="!disableDelete">
+          <mat-icon (click)="onRemoveFlagClickInternal(i + (currentPage - 1) * recordsPerPage)" style="cursor: pointer; color: hsla(349, 73%, 44%, 1);"
+                    _ngcontent-xam-c83="" role="img"
+                    class="mat-icon notranslate material-icons mat-ligature-font mat-icon-no-color ng-star-inserted"
+                    aria-hidden="true" data-mat-icon-type="font">delete
+          </mat-icon>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="display: flex; align-items: baseline; justify-content: space-between; padding-top: 20px;">
+    <div>
+    </div>
+    <div class="page-section" *ngIf="enablePagination">
+      <button
+        style="margin-right: 15px;"
+        (click)="onPageChangeClick(-1)"
+        class="navigation-button"
+      >
+        &lt;
+      </button>
+      {{localize.page}} {{currentPage}}
+      <button
+        style="margin-left: 15px;"
+        (click)="onPageChangeClick(1)"
+        class="navigation-button"
+      >
+        &gt;
+      </button>
+  </div>
+</div>
+</div>

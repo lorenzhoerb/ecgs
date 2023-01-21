@@ -56,7 +56,6 @@ import { CompetitionGradingStationComponent }
   from './components/competition/competition-grading/competition-grading-station/competition-grading-station.component';
 import {BulkEditorComponent} from './components/bulk-editor/bulk-editor.component';
 import {ManageParticipantsComponent} from './components/competition/manage-participants/manage-participants.component';
-import {ClubManagerEditComponent} from './components/club-manager-edit/club-manager-edit.component';
 import {RegisterToModalComponent} from './components/club-manager-edit/register-to-modal/register-to-modal.component';
 import {
   SearchSelectCompetitionComponent
@@ -71,6 +70,7 @@ import { TemplateDialogComponent } from './components/competition/template-dialo
 import { ChangeUserPictureComponent } from './components/change-user-picture/change-user-picture.component';
 import { CreateCompetitionSelectGradingSystemDialogComponent }
   from './components/create-competition-select-grading-system-dialog/create-competition-select-grading-system-dialog.component';
+import { ClubManagerEditComponent } from './components/club-manager-edit/club-manager-edit.component';
 import { ChangeUserPassPictureComponent } from './components/change-user-pass-picture/change-user-pass-picture.component';
 import {MatInputModule} from '@angular/material/input';
 import {ImportFlagsComponent} from './components/import-flags/import-flags.component';
@@ -127,6 +127,10 @@ import {HeaderCreateModalComponent} from './components/header-create-modal/heade
     ChangeUserPictureComponent,
     ViewAndEditGradingSystemComponent,
     CreateCompetitionSelectGradingSystemDialogComponent,
+    ImportFlagsComponent,
+    BulkEditorComponent,
+    ManageParticipantsComponent,
+    ClubManagerEditComponent,
     ChangeUserPassPictureComponent,
   ],
   imports: [

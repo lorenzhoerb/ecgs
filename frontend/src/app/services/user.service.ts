@@ -7,6 +7,7 @@ import {ResponseParticipantRegistrationDto} from '../dtos/responseParticipantReg
 import {ClubManagerTeamImportDto} from '../dtos/club-manager-team';
 import {CalendarViewCompetition} from '../dtos/competition';
 import {UserDetail} from '../dtos/user-detail';
+import { ImportFlagsComponent } from '../components/import-flags/import-flags.component';
 import {ImportFlagsResultDto} from '../dtos/import-flags-result-dto';
 import { ImportFlag } from '../dtos/import-flag';
 import {SimpleFlagDto} from '../dtos/simpleFlagDto';

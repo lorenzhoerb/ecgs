@@ -51,6 +51,7 @@ import javax.transaction.Transactional;
 import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -216,16 +217,15 @@ public class CompetitionServiceImpl implements CompetitionService {
     private int compare(Object o1, Object o2) {
         ApplicationUser p1 = (ApplicationUser) o1;
         ApplicationUser p2 = (ApplicationUser) o2;
-        int res = p1.getLastName().compareToIgnoreCase(p2.getLastName());
+        int res =  p1.getLastName().compareToIgnoreCase(p2.getLastName());
         if (res != 0) {
             return res;
         }
         return p1.getFirstName().compareToIgnoreCase(p2.getFirstName());
     }
 
-    @Override
-    public Set<UserDetailDto> getParticipants(Long id) {
-        LOGGER.debug("List participants for competition {}", id);
+    private List<ApplicationUser> getParticipantsInternal(Long id) {
+        LOGGER.debug("List participants internal for competition {}", id);
 
         if (sessionUtils.getApplicationUserRole() == null) {
             throw new ForbiddenException("No Permission to get participants");
@@ -250,10 +250,12 @@ public class CompetitionServiceImpl implements CompetitionService {
             gradingGroups.stream().map(GradingGroup::getRegistrations).toList();
         List<RegisterTo> registerTos =
             registerToSets.stream().flatMap(Set::stream).filter(RegisterTo::getAccepted).toList();
-        Set<ApplicationUser> participants =
-            registerTos.stream().map(RegisterTo::getParticipant).collect(Collectors.toSet());
+        List<ApplicationUser> participants =
+            new ArrayList<>(registerTos.stream().map(RegisterTo::getParticipant).toList());
 
-        return userMapper.applicationUserSetToUserDetailDtoSet(participants);
+        participants.sort(this::compare);
+
+        return participants;
     }
 
     @Transactional
@@ -273,6 +275,15 @@ public class CompetitionServiceImpl implements CompetitionService {
 
         throw new NotFoundException(String.format("Could not find competition with id %s", competitionId));
     }
+
+    @Override
+    public List<UserDetailDto> getParticipants(Long id) {
+        LOGGER.debug("List participants for competition {}", id);
+
+        List<ApplicationUser> participants = getParticipantsInternal(id);
+        return userMapper.applicationUserListToUserDetailDtoList(participants);
+    }
+
 
     @Override
     public Page<ParticipantRegDetailDto> getParticipantsRegistrationDetails(PageableDto<ParticipantFilterDto> filter) {

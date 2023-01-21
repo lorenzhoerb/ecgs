@@ -80,6 +80,7 @@ export class CompetitionComponent implements OnInit {
         });
       }
     });
+
   }
 
   fetchIsRegistered(id) {

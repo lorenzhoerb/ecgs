@@ -11,14 +11,26 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailSetFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamMemberImportDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlag;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlagsResultDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserCredentialUpdateDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantSelfRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserInfoDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserPasswordResetDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserPasswordResetRequestDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserSearchDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailSetFlagDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailFlagDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.FlagsMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.FlagsMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Flags;
@@ -39,10 +51,17 @@ import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionRegistrationService;
 import at.ac.tuwien.sepm.groupphase.backend.service.EmailService;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
+import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import at.ac.tuwien.sepm.groupphase.backend.service.helprecords.ClubManagerTeamImportResults;
 import at.ac.tuwien.sepm.groupphase.backend.util.PasswordGenerator;
 import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
 import at.ac.tuwien.sepm.groupphase.backend.validation.ClubManagerTeamImportDtoValidator;
+import at.ac.tuwien.sepm.groupphase.backend.validation.ForgotPasswordValidator;
+import at.ac.tuwien.sepm.groupphase.backend.validation.ImportManyFlagsValidator;
+import at.ac.tuwien.sepm.groupphase.backend.validation.PasswordChangeValidator;
+import at.ac.tuwien.sepm.groupphase.backend.validation.RegistrationValidator;
+import at.ac.tuwien.sepm.groupphase.backend.validation.UserSetFlagValidator;
+import at.ac.tuwien.sepm.groupphase.backend.validation.SimpleFlagValidator;
 import at.ac.tuwien.sepm.groupphase.backend.validation.ForgotPasswordValidator;
 import at.ac.tuwien.sepm.groupphase.backend.validation.ImportManyFlagsValidator;
 import at.ac.tuwien.sepm.groupphase.backend.validation.PasswordChangeValidator;
@@ -76,6 +95,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.HashSet;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -97,21 +118,23 @@ public class CustomUserDetailService implements UserService {
     private final PasswordChangeValidator passwordChangeValidator;
     private final ForgotPasswordValidator forgotPasswordValidator;
     private final UserMapper userMapper;
+    private final FlagsMapper flagsMapper;
 
     private final EmailService emailService;
 
     private final ManagedByRepository managedByRepository;
     private final ClubManagerTeamImportDtoValidator teamValidator;
+    private final UserSetFlagValidator userSetFlagValidator;
+    private final SimpleFlagValidator simpleFlagValidator;
 
     private final CompetitionRegistrationService competitionRegistrationService;
     private final SessionUtils sessionUtils;
+
+    private final CompetitionRepository competitionRepository;
     private final ImportManyFlagsValidator flagsValidator;
     private final FlagsRepository flagsRepository;
 
-    private final CompetitionRepository competitionRepository;
-
-    private final FlagsMapper flagsMapper;
-
+    private final CompetitionService competitionService;
 
     @Autowired
     public CustomUserDetailService(ApplicationUserRepository userRepository,
@@ -120,9 +143,9 @@ public class CustomUserDetailService implements UserService {
                                    JwtTokenizer jwtTokenizer,
                                    ManagedByRepository managedByRepository,
                                    ClubManagerTeamImportDtoValidator teamValidator,
-                                   EmailService emailService,
-                                   UserMapper userMapper,
-                                   SessionUtils sessionUtils,
+                                   EmailService emailService, UserMapper userMapper, SessionUtils sessionUtils,
+                                   UserSetFlagValidator userSetFlagValidator, SimpleFlagValidator simpleFlagValidator,
+                                   CompetitionService competitionService,
                                    RegistrationValidator registrationValidator,
                                    PasswordChangeValidator passwordChangeValidator,
                                    ForgotPasswordValidator forgotPasswordValidator,
@@ -141,11 +164,14 @@ public class CustomUserDetailService implements UserService {
         this.emailService = emailService;
         this.userMapper = userMapper;
         this.sessionUtils = sessionUtils;
-        this.competitionRegistrationService = competitionRegistrationService;
         this.flagsValidator = flagsValidator;
         this.flagsRepository = flagsRepository;
-        this.competitionRepository = competitionRepository;
         this.flagsMapper = flagsMapper;
+        this.competitionService = competitionService;
+        this.userSetFlagValidator = userSetFlagValidator;
+        this.simpleFlagValidator = simpleFlagValidator;
+        this.competitionRegistrationService = competitionRegistrationService;
+        this.competitionRepository = competitionRepository;
     }
 
     @Override
@@ -489,6 +515,67 @@ public class CustomUserDetailService implements UserService {
     }
 
     @Override
+    public String resetPassword(UserPasswordResetDto userPasswordResetDto) {
+        LOGGER.debug("Resets a password by its reset token{}", userPasswordResetDto);
+        String token = userPasswordResetDto.getToken();
+        String password = userPasswordResetDto.getPassword();
+        Optional<SecurityUser> account = this.getSecurityUserByResetToken(token);
+
+        if (account.isPresent()) {
+            SecurityUser temp = account.get();
+            this.updateSecurityUserPassword(temp, password);
+            return "{\"success\": \"true\"}";
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid token for password reset");
+        }
+    }
+
+    @Override
+    public String changePassword(UserCredentialUpdateDto userCredentialUpdateDto) {
+        LOGGER.debug("Changes a password of the logged in User{}", userCredentialUpdateDto);
+        String email = userCredentialUpdateDto.getEmail();
+        String password = userCredentialUpdateDto.getPassword();
+        Optional<SecurityUser> account = this.findSecurityUserByEmail(email);
+
+        if (account.isPresent()) {
+            SecurityUser temp = account.get();
+            if (temp.getEmail().equals(sessionUtils.getSessionUser().getUser().getEmail())) {
+                this.updateSecurityUserPassword(temp, password);
+                return "{\"success\": \"true\"}";
+            } else {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Changing a password of another user is forbidden!");
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid email for password change");
+        }
+    }
+
+    @Override
+    public ResponseParticipantRegistrationDto registerToCompetition(Long id, ParticipantSelfRegistrationDto groupPreference) {
+        LOGGER.debug("Registers the logged in user to the competition and its groupPreference {}{}", id, groupPreference);
+        if (groupPreference == null) {
+            return competitionRegistrationService.selfRegisterParticipant(id, null);
+        }
+        return competitionRegistrationService.selfRegisterParticipant(id, groupPreference.getGroupPreference());
+    }
+
+    @Override
+    public UserInfoDto getUser() {
+        ApplicationUser user = sessionUtils.getSessionUser();
+
+        return UserInfoDto.builder()
+            .firstName(user.getFirstName())
+            .lastName(user.getLastName())
+            .role(user.getType())
+            .picturePath(user.getPicturePath())
+            .build();
+    }
+
+    public UserDetailDto getUser(Long id) {
+        return userMapper.applicationUserToUserDetailDto(userRepository.findById(id).get());
+    }
+
+    @Override
     public List<SimpleFlagDto> getManagedFlags() {
         if (!sessionUtils.isCompetitionManager() && !sessionUtils.isClubManager()) {
             throw new ForbiddenException("Not authorized");
@@ -509,29 +596,49 @@ public class CustomUserDetailService implements UserService {
         return result == null ? new ArrayList<>() : result;
     }
 
-    @Override
-    public String resetPassword(UserPasswordResetDto userPasswordResetDto) {
-        LOGGER.debug("Resets a password by its reset token{}", userPasswordResetDto);
-        String token = userPasswordResetDto.getToken();
-        String password = userPasswordResetDto.getPassword();
-        Optional<SecurityUser> account = this.getSecurityUserByResetToken(token);
-
-        if (account.isPresent()) {
-            SecurityUser temp = account.get();
-            this.updateSecurityUserPassword(temp, password);
-            return "{\"success\": \"true\"}";
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid token for password reset");
+    private ManagedBy checkUserIsManaged(ApplicationUser sessionUser, ApplicationUser m) {
+        if (m == null) {
+            throw new ValidationListException("User was null",
+                List.of("User was null"));
         }
+
+        Optional<ManagedBy> relOpt = m.getManagers().stream()
+            .filter(x -> x.getManager().getId().equals(sessionUser.getId())).findFirst();
+
+        if (relOpt.isEmpty()) {
+            throw new ValidationListException("Unmanaged user was passed",
+                List.of("Unmanaged user was passed"));
+        }
+
+        return relOpt.get();
     }
 
-    @Override
-    public void addFlagsForUsers(UserDetailSetFlagDto members) {
+    private void userFlagValidation(UserDetailSetFlagDto members) {
         if (!sessionUtils.isCompetitionManager() && !sessionUtils.isClubManager()) {
             throw new ForbiddenException("Not authorized");
         }
 
-        ApplicationUser sessionUser = sessionUtils.getSessionUser();
+        this.userSetFlagValidator.validate(members);
+        this.simpleFlagValidator.validate(members.getFlag());
+
+        for (UserDetailDto user : members.getUsers()) {
+            if (user == null) {
+                throw new ValidationListException("User was null",
+                    List.of("User was null"));
+            }
+
+            if (user.id() == null) {
+                throw new ValidationListException("User id was null",
+                    List.of("User id was null"));
+            }
+        }
+
+    }
+
+    @Override
+    public void addFlagsForUsers(UserDetailSetFlagDto members) {
+        userFlagValidation(members);
+
         List<ApplicationUser> users =
             userRepository.findAllById(members.getUsers().stream().map(UserDetailDto::id).toList());
         Set<Long> myFlagIds = getManagedFlags().stream().map(SimpleFlagDto::id).collect(Collectors.toSet());
@@ -561,23 +668,11 @@ public class CustomUserDetailService implements UserService {
             flag = found.get();
         }
 
+        ApplicationUser sessionUser = sessionUtils.getSessionUser();
         List<Long> ids = flag.getClubs().stream().map(ManagedBy::getId).toList();
 
         for (ApplicationUser m : users) {
-            if (m == null) {
-                throw new ValidationListException("User was null",
-                    List.of("User was null"));
-            }
-
-            Optional<ManagedBy> relOpt = m.getManagers().stream()
-                .filter(x -> x.getManager().getId().equals(sessionUser.getId())).findFirst();
-
-            if (relOpt.isEmpty()) {
-                throw new ValidationListException("Unmanaged user was passed",
-                    List.of("Unmanaged user was passed"));
-            }
-
-            ManagedBy rel = relOpt.get();
+            ManagedBy rel = checkUserIsManaged(sessionUser, m);
 
             if (ids.contains(rel.getId())) {
                 continue;
@@ -589,33 +684,11 @@ public class CustomUserDetailService implements UserService {
         flagsRepository.save(flag);
     }
 
-    @Override
-    public String changePassword(UserCredentialUpdateDto userCredentialUpdateDto) {
-        LOGGER.debug("Changes a password of the logged in User{}", userCredentialUpdateDto);
-        String email = userCredentialUpdateDto.getEmail();
-        String password = userCredentialUpdateDto.getPassword();
-        Optional<SecurityUser> account = this.findSecurityUserByEmail(email);
-
-        if (account.isPresent()) {
-            SecurityUser temp = account.get();
-            if (temp.getEmail().equals(sessionUtils.getSessionUser().getUser().getEmail())) {
-                this.updateSecurityUserPassword(temp, password);
-                return "{\"success\": \"true\"}";
-            } else {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Changing a password of another user is forbidden!");
-            }
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid email for password change");
-        }
-    }
 
     @Override
     public void removeFlagsForUsers(UserDetailSetFlagDto members) {
-        if (!sessionUtils.isCompetitionManager() && !sessionUtils.isClubManager()) {
-            throw new ForbiddenException("Not authorized");
-        }
+        userFlagValidation(members);
 
-        ApplicationUser sessionUser = sessionUtils.getSessionUser();
         Set<Long> myFlagIds = getManagedFlags().stream().map(SimpleFlagDto::id).collect(Collectors.toSet());
         Flags flag = flagsMapper.simpleFlagDtoToFlags(members.getFlag());
 
@@ -638,25 +711,13 @@ public class CustomUserDetailService implements UserService {
 
         flag = found.get();
 
+        ApplicationUser sessionUser = sessionUtils.getSessionUser();
         List<ApplicationUser> users =
             userRepository.findAllById(members.getUsers().stream().map(UserDetailDto::id).toList());
         List<Long> ids = flag.getClubs().stream().map(ManagedBy::getId).toList();
 
         for (ApplicationUser m : users) {
-            if (m == null) {
-                throw new ValidationListException("User was null",
-                    List.of("User was null"));
-            }
-
-            Optional<ManagedBy> relOpt = m.getManagers().stream()
-                .filter(x -> x.getManager().getId().equals(sessionUser.getId())).findFirst();
-
-            if (relOpt.isEmpty()) {
-                throw new ValidationListException("Unmanaged user was passed",
-                    List.of("Unmanaged user was passed"));
-            }
-
-            ManagedBy rel = relOpt.get();
+            ManagedBy rel = checkUserIsManaged(sessionUser, m);
 
             if (!ids.contains(rel.getId())) {
                 continue;
@@ -666,6 +727,16 @@ public class CustomUserDetailService implements UserService {
         }
 
         flagsRepository.save(flag);
+    }
+
+    private int compare(Object o1, Object o2) {
+        UserDetailFlagDto p1 = (UserDetailFlagDto) o1;
+        UserDetailFlagDto p2 = (UserDetailFlagDto) o2;
+        int res =  p1.getLastName().compareToIgnoreCase(p2.getLastName());
+        if (res != 0) {
+            return res;
+        }
+        return p1.getFirstName().compareToIgnoreCase(p2.getFirstName());
     }
 
     @Override
@@ -699,40 +770,4 @@ public class CustomUserDetailService implements UserService {
         }
     }
 
-
-    @Override
-    public ResponseParticipantRegistrationDto registerToCompetition(Long id, ParticipantSelfRegistrationDto groupPreference) {
-        LOGGER.debug("Registers the logged in user to the competition and its groupPreference {}{}", id, groupPreference);
-        if (groupPreference == null) {
-            return competitionRegistrationService.selfRegisterParticipant(id, null);
-        }
-        return competitionRegistrationService.selfRegisterParticipant(id, groupPreference.getGroupPreference());
-    }
-
-    @Override
-    public UserInfoDto getUser() {
-        ApplicationUser user = sessionUtils.getSessionUser();
-
-        return UserInfoDto.builder()
-            .firstName(user.getFirstName())
-            .lastName(user.getLastName())
-            .role(user.getType())
-            .picturePath(user.getPicturePath())
-            .build();
-    }
-
-    @Override
-    public UserDetailDto getUser(Long id) {
-        return userMapper.applicationUserToUserDetailDto(userRepository.findById(id).get());
-    }
-
-    private int compare(Object o1, Object o2) {
-        UserDetailFlagDto p1 = (UserDetailFlagDto) o1;
-        UserDetailFlagDto p2 = (UserDetailFlagDto) o2;
-        int res =  p1.getLastName().compareToIgnoreCase(p2.getLastName());
-        if (res != 0) {
-            return res;
-        }
-        return p1.getFirstName().compareToIgnoreCase(p2.getFirstName());
-    }
 }

@@ -1,4 +1,3 @@
-<app-error title="Wettkampffehler" [error]="error"></app-error>
 <main *ngIf="competition !== null">
   <div class="hold-image">
     <div class="turnier-image">
@@ -7,13 +6,7 @@
     </div>
   </div>
   <div class="scrollabove">
-    <app-error [error]="error"></app-error>
-
-    <app-competition-header [title]="competition.name"
-                            (register)="onRegister()" [isRegistered]="isRegisteredToCompetition" [canRegister]="canRegister"
-                            (edit)="onEdit()" [canEdit]="isCreator"
-                            (grading)="onGrading()" [canGrade]="isJudge"
-    ></app-competition-header>
+    <app-competition-header [title]="competition.name" (register)="onRegister()" [isRegistered]="isRegisteredToCompetition" [canRegister]="canRegister"></app-competition-header>
 
     <div class="spacer-2"></div>
 
@@ -49,11 +42,11 @@
         [enablePagination]="true"
         [fetchData]="fetchParticipants"
         [mapRecord]="mapParticipant"
-        [disableCount]="true"
         [disableCheckBox]="true"
         [disableDelete]="true"
         [updateCounter]="this.updateCounter"
       ></app-bulk-editor>
     </app-content-card>
+
   </div>
 </main>

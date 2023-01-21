@@ -65,8 +65,9 @@ export class BulkEditorComponent<T> implements OnInit, OnChanges {
   ngOnChanges(changes: any) {
     if(changes.updateCounter != null) {
       this.fetchDataInternal();
+    } else {
+      changes.bulkAction.currentValue(this.getCheckedData());
     }
-    changes.bulkAction.currentValue(this.getCheckedData());
     this.updateDisplayData();
     this.bulkAction = null;
     this.setAllBulk(false);
@@ -82,7 +83,7 @@ export class BulkEditorComponent<T> implements OnInit, OnChanges {
   }
 
   public onPageChangeClick(change: number) {
-    this.currentPage = Math.max(Math.min(this.currentPage + change, this.data.length / this.recordsPerPage), 1);
+    this.currentPage = Math.max(Math.min(this.currentPage + change, Math.ceil(this.data.length/this.recordsPerPage)), 1);
     this.updateDisplayData();
     this.pageChange.next(this.currentPage);
   }
@@ -94,7 +95,9 @@ export class BulkEditorComponent<T> implements OnInit, OnChanges {
   }
 
   private updateDisplayData() {
-    this.displayData = this.data.slice((this.currentPage-1)*this.recordsPerPage, this.currentPage*this.recordsPerPage);
+    const low = (this.currentPage-1)*this.recordsPerPage;
+    const high = Math.min(this.currentPage*this.recordsPerPage, this.data.length);
+    this.displayData = this.data.slice(low,high);
   }
 
   private setAllBulk(checked: boolean) {

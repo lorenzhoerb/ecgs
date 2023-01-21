@@ -7,9 +7,9 @@ import javax.validation.constraints.Size;
 
 public record SimpleFlagDto(
     @NotNull(message = "id must be given")
-    @NotBlank(message = "id must be given")
     //@Notice: Flag id can be negative. This signals a new flag
     Long id,
+    @NotNull(message = "Flag must be specified")
     @NotBlank(message = "Flag must be specified")
     @Size(max = 255, message = "Flag is too long")
     String name

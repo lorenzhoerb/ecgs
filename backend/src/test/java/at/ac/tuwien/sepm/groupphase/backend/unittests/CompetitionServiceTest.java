@@ -179,7 +179,7 @@ public class CompetitionServiceTest extends TestDataProvider {
             false
         );
 
-        Set<UserDetailDto> participants =
+        List<UserDetailDto> participants =
             competitionService.getParticipants(competition.getId());
         assertNotNull(participants);
         assertEquals(participants.size(), 1);
@@ -201,7 +201,7 @@ public class CompetitionServiceTest extends TestDataProvider {
             false
         );
 
-        Set<UserDetailDto> participants =
+        List<UserDetailDto> participants =
             competitionService.getParticipants(competition.getId());
         assertNotNull(participants);
         assertEquals(participants.size(), 0);

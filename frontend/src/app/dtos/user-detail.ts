@@ -31,7 +31,8 @@ export class UserRegisterDetail {
   gender: Gender;
   dateOfBirth: Date;
   picturePath: string;
-  active?: boolean;
   flags: SimpleFlagDto[];
+  gradingGroup?: number;
+  active?: boolean;
   groupId?: number;
 }

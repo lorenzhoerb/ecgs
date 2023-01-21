@@ -22,8 +22,6 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleGradingGroupDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.CompetitionMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
-import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
-import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionRegistrationService;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import at.ac.tuwien.sepm.groupphase.backend.service.GradingGroupService;
@@ -138,7 +136,7 @@ public class CompetitionEndpoint {
     @Secured({"ROLE_PARTICIPANT", "ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER"})
     @GetMapping(value = "/{id}/participants")
     @Operation(summary = "Get participants of competition", security = @SecurityRequirement(name = "apiKey"))
-    public Set<UserDetailDto> getParticipants(@PathVariable Long id) {
+    public List<UserDetailDto> getParticipants(@PathVariable Long id) {
         LOGGER.info("GET {}", BASE_PATH);
         return competitionService.getParticipants(id);
     }

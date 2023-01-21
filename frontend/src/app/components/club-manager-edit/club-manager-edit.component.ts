@@ -1,6 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {genderMap, UserDetail} from '../../dtos/user-detail';
 import {SimpleFlagDto} from '../../dtos/simpleFlagDto';
+import {CompetitionService} from '../../services/competition.service';
 import {UserService} from '../../services/user.service';
 import {AuthService} from '../../services/auth.service';
 import {ToastrService} from 'ngx-toastr';

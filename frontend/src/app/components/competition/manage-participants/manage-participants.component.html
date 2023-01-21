@@ -1,0 +1,195 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-10 offset-md-1">
+      <app-content-card [title]="localize.manageParticipants">
+        <form #form="ngForm" class="d-flex flex-row w-auto mb-3">
+          <!-- this button is here, just so that simple submitting of this form
+               to reload the horses, is possible -->
+          <button type="submit" hidden="true">submit</button>
+          <div class="flex-grow-2">
+            <label for="firstName" class="col-form-label">
+              {{localize.firstname}}
+            </label>
+            <input type="text" name="firstName" id="firstName"
+                   class="form-control"
+                   [(ngModel)]="searchParameters.firstName"
+                   (ngModelChange)="this.inputChange.next($event)">
+          </div>
+          <div class="ms-2">
+            <label for="lastName" class="col-form-label">
+              {{localize.lastname}}
+            </label>
+            <input type="text" name="lastName" id="lastName"
+                   class="form-control"
+                   [(ngModel)]="searchParameters.lastName"
+                   (ngModelChange)="this.inputChange.next($event)">
+          </div>
+          <div class="ms-1" style="min-width: 200px;">
+            <label for="gradingGroup" class="col-form-label">
+              {{localize.gradingGroup}}
+            </label>
+            <select name="gradingGroup" id="gradingGroup"
+                    class="form-select"
+                    [(ngModel)]="searchParameters.gradingGroup"
+                    (ngModelChange)="this.inputChange.next($event)">
+              <option></option>
+              <option *ngFor="let gg of this.gradingGroups" [value]="gg.id">{{gg.title}}</option>
+            </select>
+          </div>
+          <div class="ms-1">
+            <label for="sex" class="col-form-label">
+              {{localize.gender}}
+            </label>
+            <select name="sex" id="sex"
+                    class="form-select"
+                    [(ngModel)]="searchParameters.gender"
+                    (ngModelChange)="this.inputChange.next($event)">
+              <option></option>
+              <option value="FEMALE">{{localize.genderWoman}}</option>
+              <option value="MALE">{{localize.genderMan}}</option>
+              <option value="OTHER">{{localize.genderOther}}</option>
+            </select>
+          </div>
+        </form>
+        <div class="row">
+          <div
+            style="border-top: 2px solid #dcdcde;
+            border-bottom: 2px solid #dcdcde;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;">
+            <div>
+              <app-nav-bar
+                active="all"
+                (navSelect)="onTopBarSelect($event)"
+                [navigation]="[
+            {title: localize.all, key: 'all'},
+            {title: localize.accepted, key: 'accepted'},
+            {title: localize.outstanding, key: 'outstanding'},
+            ]"
+              >
+              </app-nav-bar>
+            </div>
+
+            <div style="flex: 1"></div>
+
+            <div ngbDropdown container="body">
+              <button type="button" class="btn btn-outline-primary btn-md"
+                      ngbDropdownToggle>{{localize.action}}</button>
+              <div ngbDropdownMenu>
+                <button ngbDropdownItem (click)="onSetActive(setStatusModal)">{{localize.editStatus}}</button>
+                <button ngbDropdownItem (click)="onSetGroup(setGroupModal)">{{localize.editGradingGroup}}</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="row">
+          <table class="table table-striped">
+            <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col"><input type="checkbox" class="form-check-input"
+                                     (change)="onMasterBulk($event.target.checked)" [(ngModel)]="masterBulked"/></th>
+              <th scope="col">{{localize.firstname}}</th>
+              <th scope="col">{{localize.lastname}}</th>
+              <th scope="col">{{localize.dateOfBirth}}</th>
+              <th scope="col">{{localize.gender}}</th>
+              <th scope="col">{{localize.gradingGroup}}</th>
+              <th scope="col">{{localize.status}}</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let record of this.participants; let i = index">
+              <th scope="row">{{i + 1 + (page - 1) * pageSize}}</th>
+              <td><input
+                type="checkbox"
+                class="form-check-input"
+                (change)="onBulk($event.target.checked, record)"
+                [(ngModel)]="bulkStates[i]"
+              ></td>
+              <td>{{record.firstName}}</td>
+              <td>{{record.lastName}}</td>
+              <td>{{record.dateOfBirth | date: 'dd.MM.YYYY'}}</td>
+              <td>{{record.gender | gender}}</td>
+              <td>{{getGradingGroupTitle(record.gradingGroup)}}</td>
+              <td>
+                <span class="badge" [ngClass]="record.accepted ? 'badge-success' : 'badge-error'">
+                  {{getAcceptedText(record.accepted)}}
+                </span></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="row">
+          <div style="display: flex; justify-content: center">
+            <ngb-pagination
+              [collectionSize]="totalElements"
+              [(page)]="page"
+              [pageSize]="pageSize"
+              (pageChange)="onPageChange()"
+              [maxSize]="5"
+              aria-label="Default pagination"
+            ></ngb-pagination>
+          </div>
+        </div>
+
+      </app-content-card>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #setGroupModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="set-grading-group">{{localize.editGradingGroup}}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="mb-3">
+        <label for="changeGradingGroup">{{localize.gradingGroup}}</label>
+        <div class="input-group">
+          <select name="changeGradingGroup" id="changeGradingGroup"
+                  class="form-select" #selectGradingGroup>
+            <option [value]="gg.id" *ngFor="let gg of gradingGroups">{{gg.title}}</option>
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="modal.dismiss('Canel')">{{localize.cancel}}</button>
+    <button type="button" class="btn btn-primary"
+            (click)="modal.close(selectGradingGroup.value)">{{localize.save}}</button>
+  </div>
+</ng-template>
+
+<ng-template #setStatusModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="set-status">{{localize.editStatus}}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="mb-3">
+        <label for="changeAccepted">{{localize.status}}</label>
+        <div class="input-group">
+          <select name="changeAccepted" id="changeAccepted"
+                  class="form-select" #selectedStatus>
+            <option [value]="true">{{localize.accepted}}</option>
+            <option [value]="false">{{localize.outstanding}}</option>
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="modal.dismiss('Canel')">{{localize.cancel}}</button>
+    <button type="button" class="btn btn-primary" (click)="modal.close(selectedStatus.value)">{{localize.save}}</button>
+  </div>
+</ng-template>
+
+

@@ -13,5 +13,6 @@ public class Constant extends Operation {
         return value;
     }
 
-    public void bind(Long id, Double value) {}
+    public void bind(Long id, Double value) {
+    }
 }

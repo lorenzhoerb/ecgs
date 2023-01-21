@@ -1,3 +1,5 @@
+import {SimpleFlagDto} from './simpleFlagDto';
+
 export enum Gender {
   male = 'MALE',
   female = 'FEMALE',
@@ -12,9 +14,25 @@ export const genderMap: Map<Gender, string> = new Map<Gender, string>([
 
 export class UserDetail {
   id: number;
+  email: string;
   firstName: string;
   lastName: string;
   gender: Gender;
   dateOfBirth: Date;
   picturePath: string;
+  flags: SimpleFlagDto[];
+}
+
+export class UserRegisterDetail {
+  id: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  gender: Gender;
+  dateOfBirth: Date;
+  picturePath: string;
+  flags: SimpleFlagDto[];
+  gradingGroup?: number;
+  active?: boolean;
+  groupId?: number;
 }

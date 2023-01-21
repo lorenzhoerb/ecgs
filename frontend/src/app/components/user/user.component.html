@@ -3,6 +3,6 @@
 </div>
 
 <div class="user" *ngIf="loggedIn" (click)="showMenu.emit()">
-    <img src="../../../assets/user_image.jpg" alt="User image">
+    <img [src]="picturePath" onerror="this.src='../../../assets/user_image.jpg'" alt="User image">
     <h3>{{user?.firstName + " " + user?.lastName}}</h3>
 </div>

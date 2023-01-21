@@ -1,0 +1,30 @@
+<div class="background">
+    <h2 class="dialog-title" mat-dialog-title>{{localize.chooseGradingGroup}}</h2>
+
+    <mat-dialog-content>
+        <div class="searchOptions">
+            <label for="nameSearch" style="margin-right: 1em;">Name:</label>
+            <input type="text" id="nameSearch" name="nameSearch" style="width: 100%;" [(ngModel)]="searchParams.name" />
+        </div>
+        <hr>
+        <div>
+            <div class="options-menu">
+                <div 
+                    *ngFor="let simpleGradingSystem of getMatchingSimpleGradingSystems()" 
+                    class="options-menu-item options-menu-item-hover"
+                    (click)="onGradingSystemSelection(simpleGradingSystem.id)">
+                    {{simpleGradingSystem.name}}
+                </div>
+            </div>
+        </div>
+    </mat-dialog-content>
+
+    <div class="spacer-2"></div>
+
+    <mat-dialog-actions>
+        <div class="action-row">
+            <div></div>
+            <button class="close-btn" style="background-color: rgb(255, 42, 81); color: white; border: none;" (click)="closeDialog()">{{localize.close}}</button>
+        </div>
+    </mat-dialog-actions>
+</div>

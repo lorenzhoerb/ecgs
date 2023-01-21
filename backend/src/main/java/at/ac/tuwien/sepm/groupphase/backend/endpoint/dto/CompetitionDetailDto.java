@@ -79,6 +79,8 @@ public class CompetitionDetailDto {
     @UserIdsValid(message = "Id of a judge invalid")
     private UserDetailDto[] judges;
 
+    // is optional
+    private UserDetailDto creator;
 
     public String getName() {
         return name;
@@ -186,6 +188,14 @@ public class CompetitionDetailDto {
     public CompetitionDetailDto setPhone(String phone) {
         this.phone = phone;
         return this;
+    }
+
+    public UserDetailDto getCreator() {
+        return creator;
+    }
+
+    public void setCreator(UserDetailDto creator) {
+        this.creator = creator;
     }
 
     @Override

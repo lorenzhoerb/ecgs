@@ -1,0 +1,153 @@
+.select-stations {
+    background: snow;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 1em 1em;
+}
+
+.group-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--ming);
+    margin: 2em -1em -1em;
+    padding: 2em 4em;
+    width: calc(100% + 2em);
+    flex-direction: column;
+}
+
+.select-stations-header {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+    padding-bottom: 16px;
+    margin-bottom: 1rem;
+}
+
+.select-stations-body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.unique-station-select {
+    background-color: rgba(59, 53, 97, 0.2);
+    padding: 0.5em;
+    border-radius: 4px;
+}
+
+:host ::ng-deep .mat-radio-label>.mat-radio-container {
+    visibility: hidden;
+    width: 0;
+    height: 0;
+}
+
+mat-radio-button.mat-radio-checked {
+    background-color: var(--space-cadet);
+    color: snow;
+}
+
+
+.with-line {
+    width: 100%;
+    /* justify-content: center; */
+    border-bottom: 1px solid;
+    margin-bottom: 1rem;
+}
+
+.login-to {
+    display: flex;
+    justify-content: end;
+    width: 100%;
+    margin-top: 2rem;
+
+    transition: all 0.5s;
+}
+
+.showmefast {
+    transition: all 0.5s;
+}
+
+.primary-btn.clear {
+    font-size: 16px;
+    padding: 4px 4px 0;
+    margin: 0 1.5em;
+    background-color: rgba(156,155,150,1);
+}
+
+.primary-btn.clear:hover {
+    background-color: var(--fancy-red);
+}
+
+.hidemefast {
+    //display: none;
+    height: 0;
+    opacity: 0;
+    margin: 0;
+    padding: 0;
+    transition: all 0.5s;
+}
+
+.scale-up {
+    background-color: var(--space-cadet);
+    padding: 1em;
+    justify-content: space-between;
+    color: snow;
+    margin: -1px -1em 1em -1em;
+    width: calc(100% + 2em);
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    transition: all 0.5s;
+}
+
+.filter-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin: 2em 0;
+    align-items: flex-end;
+}
+
+.filter-inputs {
+    display: flex;
+}
+
+.stack {
+    display: grid;
+}
+
+.scale-up button.primary-btn {
+    background-color: var(--fancy-red);
+}
+
+.judges {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+:host ::ng-deep .user.judge,
+.user.judge {
+    height: auto;
+    padding: 8px;
+    gap: 8px;
+    background-color: var(--ming);
+    color: snow;
+    border-radius: 8px;
+}
+
+:host ::ng-deep .user.judge.inactive,
+.user.judge.inactive {
+    background-color: rgba(56, 119, 128, 0.4);
+    color: rgba(32, 30, 31, 0.5);
+}
+
+:host ::ng-deep .user.judge>img,
+.user.judge>img {
+    margin: 0;
+    width: 24px;
+}

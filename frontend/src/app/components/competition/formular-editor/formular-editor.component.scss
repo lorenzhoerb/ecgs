@@ -64,6 +64,35 @@ p {
     color: white;
 }
 
+.constant {
+    background-color: black;
+    color: white;
+}
+
+input[type="number"] {
+    width: 4rem;
+}
+
+div.flex-end-100 {
+    justify-content: end;
+}
+
+.add-note.flex-center {
+    padding: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    gap: 8px;
+    align-items: center;
+}
+
+.add-note > mat-icon {
+    height: 24px;
+}
+
+.add-note:hover {
+    color: rgba(13, 110, 253, 0.55);
+}
+
 .variable,
 .function,
 .constant {

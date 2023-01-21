@@ -30,5 +30,6 @@ public class DataCleaner {
         competitionRepository.deleteAll();
         applicationUserRepository.deleteAll();
         managedByRepository.deleteAll();
+        applicationUserRepository.flush();
     }
 }

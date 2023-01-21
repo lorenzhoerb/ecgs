@@ -1,6 +1,9 @@
+import { registerLocaleData } from '@angular/common';
 import {German} from './de';
 import {Englisch} from './en';
 import {ILanguage, LocalizationKeys, SupportedLanguages} from './language';
+import localeDe from '@angular/common/locales/de';
+import localeDeExtra from '@angular/common/locales/extra/de';
 
 export class LocalizeService extends LocalizationKeys {
     private language: SupportedLanguages;
@@ -9,6 +12,7 @@ export class LocalizeService extends LocalizationKeys {
     constructor() {
         super();
         //const language = navigator.language;
+        registerLocaleData(localeDe, 'de-DE', localeDeExtra);
         this.changeLanguageInternal('de-DE');
 
     }

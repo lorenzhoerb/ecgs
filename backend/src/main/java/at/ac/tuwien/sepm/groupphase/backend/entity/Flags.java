@@ -36,6 +36,11 @@ public class Flags {
         this.name = name;
     }
 
+    public Flags(String name, Set<ManagedBy> clubs) {
+        this.name = name;
+        this.clubs = clubs;
+    }
+
     public Long getId() {
         return id;
     }

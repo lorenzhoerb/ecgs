@@ -6,11 +6,13 @@ public class UserInfoDto {
     private String firstName;
     private String lastName;
     private ApplicationUser.Role role;
+    private String picturePath;
 
-    public UserInfoDto(String firstName, String lastName, ApplicationUser.Role role) {
+    public UserInfoDto(String firstName, String lastName, ApplicationUser.Role role, String picturePath) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.role = role;
+        this.picturePath = picturePath;
     }
 
     public UserInfoDto() {
@@ -44,10 +46,19 @@ public class UserInfoDto {
         this.role = role;
     }
 
+    public String getPicturePath() {
+        return picturePath;
+    }
+
+    public void setPicturePath(String picturePath) {
+        this.picturePath = picturePath;
+    }
+
     public static class UserInfoDtoBuilder {
         private String firstName;
         private String lastName;
         private ApplicationUser.Role role;
+        private String picturePath;
 
         UserInfoDtoBuilder() {
         }
@@ -67,12 +78,18 @@ public class UserInfoDto {
             return this;
         }
 
+        public UserInfoDtoBuilder picturePath(String picturePath) {
+            this.picturePath = picturePath;
+            return this;
+        }
+
         public UserInfoDto build() {
-            return new UserInfoDto(firstName, lastName, role);
+            return new UserInfoDto(firstName, lastName, role, picturePath);
         }
 
         public String toString() {
-            return "UserInfoDto.UserInfoDtoBuilder(firstName=" + this.firstName + ", lastName=" + this.lastName + ", role=" + this.role + ")";
+            return "UserInfoDto.UserInfoDtoBuilder(firstName=" + this.firstName + ", lastName=" + this.lastName + ", role=" + this.role + ", picturePath="
+                + this.picturePath + ")";
         }
     }
 }

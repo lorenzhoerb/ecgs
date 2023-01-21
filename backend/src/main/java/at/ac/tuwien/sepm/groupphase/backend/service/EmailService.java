@@ -9,5 +9,5 @@ import java.io.UnsupportedEncodingException;
 public interface EmailService {
     void sendEmail(String to, String message) throws MessagingException, UnsupportedEncodingException;
 
-    public void sendPasswordResetMail(String recipient, String resetLink) throws MessagingException, UnsupportedEncodingException;
+    void sendPasswordResetMail(String recipient, String resetLink) throws MessagingException, UnsupportedEncodingException;
 }

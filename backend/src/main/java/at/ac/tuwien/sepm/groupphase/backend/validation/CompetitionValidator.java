@@ -39,6 +39,7 @@ public class CompetitionValidator extends Validator<CompetitionDetailDto> {
 
     @Override
     protected void validateCustom(CompetitionDetailDto toValidate) {
+
     }
 
     public void validateSelfRegisterToCompetition(Long competitionId, Long groupPreference) {

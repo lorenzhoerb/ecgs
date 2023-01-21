@@ -11,25 +11,34 @@ div{
 
 .top-bar {
     margin-top: 20px;
-    display: flex;
     justify-content: space-between;
 }
 
 .import-as-csv-button {
     background-color: rgba(171, 245, 255, 0.72);
-    text-align: center;
-    width: 250px;
-    height: 100px;
-    font-size: 28px;
+}
+
+.export-as-csv-button {
+    background-color: rgba(171, 245, 255, 0.72);
+}
+
+.csv-button-img {
+    padding-right: 10px;
 }
 
 .add-new-member-btn {
-    margin-right: 2%;
+    white-space: pre;
     background-color: greenyellow;
 }
 
+.clear-members-btn {
+    margin-right: 2%;
+    background-color: rgb(255, 42, 81);
+    color: white;
+}
+
 .team-content {
-    padding-top: 5%;
+
 }
 
 .save-button {
@@ -55,7 +64,7 @@ div{
 .team-name-label {
     font-size: 35px;
     font-weight: 750;
-    text-align: right;
+    text-align: center;
 }
 
 .member-field-input {
@@ -80,17 +89,17 @@ div{
 
 
 select {
-    -webkit-appearance: auto;
     appearance: auto;
 }
 
 table {
-    margin-top: 30px;
+    //margin-top: 30px;
     border-collapse: separate;
-    border-top: 1px solid black;
-    border-bottom: 1px solid black;
+    align-self: flex-start;
     // border-radius: 8px;
-    padding: 16px;    
+    border-spacing: 1px;
+    padding-left: 16px;    
+    padding-right: 16px;    
     // margin-left: 20%;    
     // margin-right: 20%;    
 }

@@ -6,5 +6,8 @@
         <a class="menu-item" [routerLink]="['/competition', 'create']" *ngIf="this.authService.getUserRole() === 'TOURNAMENT_MANAGER'">
             <mat-icon style="margin-right: 8px;">add_box</mat-icon> {{localize.createTournament}}
         </a>
+      <a class="menu-item" [routerLink]="['/user', 'edit-team']" *ngIf="this.authService.getUserRole() === 'TOURNAMENT_MANAGER' || this.authService.getUserRole() === 'CLUB_MANAGER'">
+        <mat-icon style="margin-right: 8px;">add_box</mat-icon> {{localize.editTeam}}
+      </a>
     </div>
 </div>

@@ -1,15 +1,16 @@
 import {Component, OnInit} from '@angular/core';
 import {CompetitionService} from '../../services/competition.service';
 import {Competition} from '../../dtos/competition';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {SupportedLanguages} from '../../services/localization/language';
 import LocalizationService, {LocalizeService} from '../../services/localization/localization.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {RegisterModalComponent} from './register-modal/register-modal.component';
 import {UserService} from '../../services/user.service';
-import {UserDetail} from '../../dtos/user-detail';
-import {SimpleGradingGroup} from 'src/app/dtos/simple-grading-group';
-import {ToastrService} from 'ngx-toastr';
+import {AuthService} from '../../services/auth.service';
+import {genderMap, UserDetail} from '../../dtos/user-detail';
+import { SimpleGradingGroup } from 'src/app/dtos/simple-grading-group';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-competition-view',
@@ -25,12 +26,18 @@ export class CompetitionComponent implements OnInit {
   canRegister = false;
   participants: UserDetail[];
   groups: SimpleGradingGroup[];
+  isCreator = false;
+  //change this to false when isJudge is implemented
+  isJudge = true;
+  updateCounter = 0;
 
   constructor(private service: CompetitionService,
+              private router: Router,
               private route: ActivatedRoute,
               private modalService: NgbModal,
               private userService: UserService,
-              private toastr: ToastrService) {
+              private toastr: ToastrService,
+              private authService: AuthService) {
     this.localize.changeLanguage(this.currentLanguage);
   }
 
@@ -55,14 +62,25 @@ export class CompetitionComponent implements OnInit {
               error: err => console.log(err)
             });
             this.fetchIsRegistered(this.id);
-            this.fetchParticipants();
+            this.updateParticipants();
           },
           error: error => {
             this.toastr.error(error, 'Error fetching competition information');
           }
         });
+
+        this.service.getCompetitionByIdDetail(this.id).subscribe({
+          next: () => {
+            this.isCreator = true;
+          }
+        });
+
+        this.service.getCompetitionByIdDetail(this.id).subscribe({
+          //check and set permission if logged in user is judge
+        });
       }
     });
+
   }
 
   fetchIsRegistered(id) {
@@ -100,21 +118,26 @@ export class CompetitionComponent implements OnInit {
     modalRef.closed.subscribe(registered => {
       if (registered) {
         this.isRegisteredToCompetition = true;
-        this.fetchParticipants();
+        this.updateParticipants();
       }
     });
   }
 
+  onEdit() {
+    this.router.navigate(['/competition/edit', this.id]);
+  }
 
-  fetchParticipants() {
-    this.service.getParticipants(this.id).subscribe({
-      next: data => {
-        this.participants = data;
-        this.error = null;
-      },
-      error: error => {
-        this.toastr.warning('Teilnehmer könnnen nur geladen werden wenn Sie eingeloggt sind.', 'Nicht eingelogt');
-      }
-    });
+  onGrading() {
+    this.router.navigate(['competition/' + this.id + '/grading']);
+  }
+
+  updateParticipants() {
+    this.updateCounter++;
+  }
+
+  fetchParticipants = () => this.service.getParticipants(this.id);
+
+  mapParticipant(p: UserDetail): any[] {
+    return [p.firstName, p.lastName, genderMap.get(p.gender), p.dateOfBirth.toLocaleDateString()];
   }
 }

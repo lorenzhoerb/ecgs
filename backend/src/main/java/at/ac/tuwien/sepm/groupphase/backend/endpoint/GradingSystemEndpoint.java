@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
-// TODO: Discuss if we should rename it to GradingSystemEndpoint
+
 @RestController
 @RequestMapping(value = GradingSystemEndpoint.BASE_PATH)
 public class GradingSystemEndpoint {

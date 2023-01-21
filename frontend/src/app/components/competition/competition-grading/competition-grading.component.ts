@@ -500,7 +500,6 @@ export class CompetitionGradingComponent implements OnInit, OnDestroy {
     }).bind(this));
 
     this.gradeService.messageErrors$.subscribe(error => {
-      //TODO - differentiate between error types
       this.toastr.error(error.message);
       const existing = this.pendingMessages.findIndex(g => g.uuid == error.uuid);
 

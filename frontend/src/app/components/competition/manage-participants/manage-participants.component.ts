@@ -143,7 +143,6 @@ export class ManageParticipantsComponent implements OnInit {
           },
           error: err => {
             console.log(err);
-            //TODO: error handling
           }
         }
       );

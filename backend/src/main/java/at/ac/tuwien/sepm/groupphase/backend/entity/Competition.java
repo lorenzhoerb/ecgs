@@ -70,7 +70,6 @@ public class Competition {
     @JoinColumn(referencedColumnName = "id")
     private ApplicationUser creator;
 
-    //TODO: Wird hier wirklich der Judge beim Erstellen der Competition als Judge auch angelegt? Manuelle Tests sagen nein
     @ManyToMany(cascade = {})
     @JoinTable(
         name = "Competition_Judge",

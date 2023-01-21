@@ -405,51 +405,6 @@ public class CompetitionServiceTest extends TestDataProvider {
         assertNotNull(result.getJudges()[1].id());
     }
 
-    /*
-    //TODO delete oder fix test
-
-    //TODO: Test for creation of grades with valid judge of the according tournament --> should succeed
-    //TODO: above test, check for exact amount of grades in the system, subsequently again send grades and check if old ones were deleted
-    //TODO: Test for creation of grades with judge of wrong tournament --> should fail
-    @Test
-    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
-    public void givenValidJudgeForCompetitionGrading_thenSendGrades_ShouldSucceed() {
-        assertEquals(1, Stream.of(judgeRepository.findAll()).toList().size());
-        Competition competition = createCompetitionEntity(
-            applicationUserRepository,
-            registerToRepository,
-            gradingGroupRepository,
-            competitionRepository,
-            true,
-            false
-        );
-
-        Optional<ApplicationUser> optApp = applicationUserRepository.findApplicationUserByUserEmail(TEST_USER_COMPETITION_MANAGER_EMAIL);
-        ApplicationUser optional = null;
-        if (optApp.isPresent()) {
-            optional = optApp.get();
-        }
-        Competition competitionLoaded = competitionRepository.findById(competition.getId()).get();
-        Judge toCreate = new Judge();
-        toCreate.setCompetition(competitionLoaded);
-        toCreate.setParticipant(optional);
-        Judge createdJudge = judgeRepository.save(toCreate);
-        List<ParticipantResultDto> resultDtoList = new ArrayList<>();
-        Set<UserDetailDto> participants = competitionService.getParticipants(competitionLoaded.getId());
-        UserDetailDto detailDto = participants.iterator().next();
-        ParticipantResultDto resultDto = new ParticipantResultDto(detailDto.id(),
-            "[{\"gradingGroupId\":5,\"stations\":[{\"stationId\":1,\"variables\":[{\"variableId\":1,\"value\":\"321\"},{\"variableId\":2,\"value\":\"321\"}]}]}]");
-        resultDtoList.add(resultDto);
-
-        competitionService.updateCompetitionResults(resultDtoList, competitionLoaded.getId());
-        assertEquals(2, Stream.of(judgeRepository.findAll()).toList().size());
-        createdJudge = judgeRepository.findById(createdJudge.getId()).get();
-        assertEquals(resultDtoList.size(), createdJudge.getGrades().size());
-    }
-    */
-
-
-
     @Test
     public void givenUnauthenticatedUser_partRegistrationDetails_participantRegistrationList_expectForbidden() {
         assertThrows(ForbiddenException.class, () -> {

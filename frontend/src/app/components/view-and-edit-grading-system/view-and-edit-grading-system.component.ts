@@ -5,9 +5,6 @@ import LocalizationService, {LocalizeService} from 'src/app/services/localizatio
 import {clone, cloneDeep} from 'lodash';
 import { ViewEditGradingGroup, ViewEditGradingGroupSearch, ViewEditGradingGroupSearchType } from 'src/app/dtos/grading-group-detail';
 
-// TODO: do not save editable systems, if u did not change them. + After some visited start removing saved.
-// TODO: rename to reset changes
-
 @Component({
   selector: 'app-view-and-edit-grading-system',
   templateUrl: './view-and-edit-grading-system.component.html',

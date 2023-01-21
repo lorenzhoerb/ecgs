@@ -83,8 +83,6 @@ export class GradeService {
     this.errorSubscription = null;
   }
 
-
-  //TODO - method to restart service clean
   public initialize() {
     this.closeAll();
 
@@ -357,24 +355,6 @@ export class GradeService {
       });
     }
 
-    // TODO - Make sure this can really be removed
-    // const obs = this.stomp.watch(
-    //   `/topic/grades/${competitionId}/${stationName}`,
-    //   this.wsHeader);
-
-    // const subscription = obs.subscribe((msg => {
-    //   this.gradeEvent$.next(JSON.parse(msg.body));
-    // }).bind(this));
-
-    // this.activeSubscriptions.push({
-    //   subscription,
-    //   type: SubscriptionType.grade,
-    //   info: {
-    //     competitionId,
-    //     gradingGroupId,
-    //     stationName
-    //   }
-    // });
   }
 
   /**

@@ -60,7 +60,6 @@ public class WebSocketAuthenticationConfig implements WebSocketMessageBrokerConf
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws/grading").setAllowedOriginPatterns("*");
         registry.setErrorHandler(new StompSubProtocolErrorHandler() {
-            //TODO: create different RuntimeExceptions and handle response that way
             @Override
             public Message<byte[]> handleInternal(StompHeaderAccessor errorHeaderAccessor, byte[] errorPayload, @Nullable java.lang.Throwable cause,
                                                   @Nullable StompHeaderAccessor clientHeaderAccessor) {

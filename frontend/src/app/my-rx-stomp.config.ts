@@ -26,7 +26,6 @@ export const myRxStompConfig: RxStompConfig = {
   // Will log diagnostics on console
   // It can be quite verbose, not recommended in production
   // Skip this key to stop logging to console
-  //TODO: Remove after finished
   debug: (msg: string): void => {
     console.log(new Date(), msg);
   }

@@ -46,7 +46,7 @@ public record ClubManagerTeamMemberImportDto(
                                           // basically min = 1
                                           @Size(max = 255, message = "Last name must be shorter")
                                           @Pattern(regexp = "^[a-zA-Z \\u00C0-\\u017F-]*$", message = "Last name can only include letters, spaces and -")
-                                          String lastName, @NotNull(message = "Gender field is blank") // TODO: Test wrong gender
+                                          String lastName, @NotNull(message = "Gender field is blank")
                                           Gender gender, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
                                           @Past(message = "Date of birth must be in the past")
                                           @NotNull(message = "Date of birth must be given")
@@ -70,7 +70,7 @@ public record ClubManagerTeamMemberImportDto(
                                           // basically min = 1
                                           @Size(max = 255, message = "Last name must be shorter")
                                           @Pattern(regexp = "^[a-zA-Z \\u00C0-\\u017F-]*$", message = "Last name can only include letters, spaces and -")
-                                          String lastName, @NotNull(message = "Gender field is blank") // TODO: Test wrong gender
+                                          String lastName, @NotNull(message = "Gender field is blank")
                                           Gender gender, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
                                           @Past(message = "Date of birth must be in the past")
                                           @NotNull(message = "Date of birth must be given")

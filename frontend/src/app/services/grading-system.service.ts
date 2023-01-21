@@ -32,7 +32,6 @@ export class GradingSystemService {
     return this.httpClient.get<SimpleGradingGroupViewEdit[]>(`${this.gradingSystemBaseUri}/drafts/simple`);
   }
 
-  // TODO: replace any with type
   public updateGradingSystem(gradingSystem: any): Observable<any> {
     return this.httpClient.put<any>(`${this.gradingSystemBaseUri}/drafts`, gradingSystem);
   }

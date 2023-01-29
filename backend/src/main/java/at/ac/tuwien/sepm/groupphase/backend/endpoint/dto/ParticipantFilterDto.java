@@ -17,5 +17,6 @@ public class ParticipantFilterDto {
     public String lastName;
     public ApplicationUser.Gender gender;
     public Long gradingGroupId;
+    public Long flagId;
 }
 

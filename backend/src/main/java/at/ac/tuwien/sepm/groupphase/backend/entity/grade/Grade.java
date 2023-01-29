@@ -9,7 +9,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.With;
 
+import javax.el.MapELResolver;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -22,6 +24,7 @@ import javax.persistence.MapsId;
 @NoArgsConstructor
 @Getter
 @Setter
+@With
 @EqualsAndHashCode
 @Entity
 public class Grade {
@@ -55,5 +58,18 @@ public class Grade {
     @Column(nullable = false)
     private boolean valid;
 
+    public Grade(GradePk gradePk, String grading, boolean valid) {
+        this.gradePk = gradePk;
+        this.grading = grading;
+        this.valid = valid;
+    }
 
+    public Grade(ApplicationUser judge, ApplicationUser participant, Competition competition, GradingGroup gradingGroup, String grading, boolean valid) {
+        this.judge = judge;
+        this.participant = participant;
+        this.competition = competition;
+        this.gradingGroup = gradingGroup;
+        this.grading = grading;
+        this.valid = valid;
+    }
 }

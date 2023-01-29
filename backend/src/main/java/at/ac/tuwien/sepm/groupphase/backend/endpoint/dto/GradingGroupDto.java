@@ -17,8 +17,7 @@ public class GradingGroupDto {
     public GradingGroupDto() {
     }
 
-    public GradingGroupDto(Long id, String title, GradingSystemDetailDto gradingSystemDto) {
-        this.id = id;
+    public GradingGroupDto(String title, GradingSystemDetailDto gradingSystemDto) {
         this.title = title;
         this.gradingSystemDto = gradingSystemDto;
     }

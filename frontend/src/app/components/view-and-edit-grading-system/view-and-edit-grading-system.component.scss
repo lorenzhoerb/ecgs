@@ -143,3 +143,31 @@ app-tournament-header input[type="text"]:focus {
 .turn-header {
     padding: 0 2rem;
 }
+
+.station-settings {
+    padding: 8px 8px;
+    background-color: rgba(59, 53, 97, 0.7); //var(--space-cadet);
+    color: white;
+    border-radius: 8px;
+    display: flex;
+    gap: 32px;
+    align-items: center;
+}
+
+.settings-symbol {
+    display: flex;
+}
+
+.settings-entry {
+    display: flex;
+    width: 100%;
+    gap: 8px;
+}
+
+.small-num-input {
+    max-width: 3em;
+    border-radius: 8px;
+    height: 26px;
+    border: none;
+    padding-left: 8px;
+}

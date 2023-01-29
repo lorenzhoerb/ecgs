@@ -5,6 +5,7 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupWithRegiste
 import at.ac.tuwien.sepm.groupphase.backend.entity.GradingGroup;
 import org.mapstruct.Mapper;
 
+import java.util.List;
 import java.util.Set;
 
 @Mapper
@@ -13,6 +14,6 @@ public interface GradingGroupMapper {
 
     GradingGroup gradingGroupDetailDtoToGradingGroup(GradingGroupDto gradingGroupDetailDto);
 
-    Set<GradingGroupWithRegisterToDto> gradingGroupToGradingGroupRegistrationDto(Set<GradingGroup> gradingGroupSet);
+    List<GradingGroupWithRegisterToDto> gradingGroupToGradingGroupRegistrationDto(List<GradingGroup> gradingGroupSet);
 
 }

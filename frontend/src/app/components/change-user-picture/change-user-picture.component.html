@@ -4,10 +4,13 @@
       <span class="anchor"></span>
       <app-content-card [title]="localize.changeUserPicture">
         <div class="card-body">
-          {{localize.filePictureRestrictions}}
           <div class="spacer"></div>
           <form class="form">
+            <img [src]="imageUrl" style="width: 64px;height: 64px"/>
+            <div class="spacer"></div>
             <input type="file" (change)="selectFile($event)" [required] accept=".png,.jpg,.jpeg"/>
+            <div class="spacer"></div>
+            {{localize.filePictureRestrictions}}
             <div class="spacer"></div>
             <button type="button" (click)="uploadFile()" class="btn btn-success float-right">
               {{localize.uploadUserPicture}}

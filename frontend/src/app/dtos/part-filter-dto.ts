@@ -4,4 +4,5 @@ export interface PartFilterDto {
   gradingGroup?: number;
   gender?: number;
   accepted?: boolean;
+  flagId?: number;
 }

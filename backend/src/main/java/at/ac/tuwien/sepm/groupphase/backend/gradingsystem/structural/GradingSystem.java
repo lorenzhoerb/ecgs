@@ -69,10 +69,28 @@ public class GradingSystem {
         }
     }
 
+    public void validateFormula() {
+        formula.validate();
+    }
+
     public Double evaluate() {
         for (Station station : stations) {
             formula.bind(station.id, station.evaluate());
         }
         return formula.evaluate();
+    }
+
+    public Double evaluateCurrentFormula() {
+        return formula.evaluate();
+    }
+
+    public void bindStation(Long stationId, Double value) {
+        Optional<Station> station = Arrays.stream(stations)
+            .filter(s -> s.id.equals(stationId)).findFirst();
+
+        if (station.isEmpty()) {
+            throw new NotFoundException("station not found");
+        }
+        formula.bind(stationId, value);
     }
 }

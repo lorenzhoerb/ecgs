@@ -1,5 +1,9 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 
+import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.structural.Grade;
+import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.structural.Station;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.With;
 import org.springframework.lang.Nullable;
 
@@ -35,6 +39,9 @@ public record GradeResultDto(
     @NotNull(message = "validity must be given")
     Boolean isValid,
 
-    Double result
+    Double result,
+
+    @JsonIgnore
+    Station savedStationThatCalculatedResult
 ) {
 }

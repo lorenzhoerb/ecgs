@@ -23,4 +23,6 @@ public abstract class Operation {
     public abstract Double evaluate();
 
     public abstract void bind(Long id, Double value);
+
+    public abstract void validate();
 }

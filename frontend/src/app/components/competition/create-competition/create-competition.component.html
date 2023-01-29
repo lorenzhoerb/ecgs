@@ -10,18 +10,24 @@
 <form class="form" [formGroup]="competitionForm" (ngSubmit)="createCompetition()">
   <main>
     <div class="hold-image">
-      <div class="turnier-image">
-        <div>Hier können Sie bald ein eigenes Bild hochladen</div>
-        <!-- <img *ngIf="pictureEmpty()" src="../../../assets/turnier.jpg" alt="turnier bild">
-        <img *ngIf="!pictureEmpty()" [src]="competition.picturePath" alt="turnier bild"> -->
+      <div class="turnier-image" *ngIf="fileSelected()">
+        <img  [src]="imageUrl" alt="turnier bild" style="height: 70%">
+        <button type="button" (click)="clearFileSelection()" class="primary-btn">
+          {{localize.clearFileUpload}}
+        </button>
+      </div>
+      <div class="turnier-image-upload" *ngIf="!fileSelected()">
+        <p>{{localize.uploadCompetitionPictureDisclaimer}}</p>
+        <input type="file" (change)="selectFile($event)" [required] accept=".png,.jpg,.jpeg"/>
+        <p>{{localize.filePictureRestrictions}}</p>
       </div>
     </div>
     <div class="scrollabove">
       <app-competition-header [isEdit]="true">
         <div class="form-group turn-header">
           <input type="text" name="name" formControlName="name" class="form-control"
-            [ngClass]="dynamicCssClassesForInput(competitionForm.controls.name)" id="inputName" autocomplete="off"
-            aria-describedby="name of competition" [placeholder]="localize.title + '...'">
+                 [ngClass]="dynamicCssClassesForInput(competitionForm.controls.name)" id="inputName" autocomplete="off"
+                 aria-describedby="name of competition" [placeholder]="localize.title + '...'">
           <span class="invalid-feedback">
             {{localize.isRequired(localize.title)}}
           </span>
@@ -36,10 +42,12 @@
             <div class="form-group col-6">
               <label for="inputBeginOfCompetition">{{localize.competition}} Start:</label>
               <input type="datetime-local" name="beginOfCompetition" formControlName="beginOfCompetition"
-                class="form-control"
-                [min]="endOfRegistration.value ? inputBeginOfRegistration.value : dateNow | date: 'yyyy-MM-ddTHH:mm'"
-                #beginOfCompetition [ngClass]="dynamicCssClassesForInput(competitionForm.controls.beginOfCompetition)"
-                id="inputBeginOfCompetition" aria-describedby="begin of competition" [placeholder]="localize.beginOfCompetition">
+                     class="form-control"
+                     [min]="endOfRegistration.value ? inputBeginOfRegistration.value : dateNow | date: 'yyyy-MM-ddTHH:mm'"
+                     #beginOfCompetition
+                     [ngClass]="dynamicCssClassesForInput(competitionForm.controls.beginOfCompetition)"
+                     id="inputBeginOfCompetition" aria-describedby="begin of competition"
+                     [placeholder]="localize.beginOfCompetition">
               <div class="invalid-feedback">
                 {{localize.isRequired(localize.beginOfCompetition)}}
               </div>
@@ -47,10 +55,11 @@
             <div class="form-group col-6">
               <label for="inputEndOfCompetition">{{localize.competition}} Ende:</label>
               <input type="datetime-local" name="endOfCompetition" formControlName="endOfCompetition"
-                class="form-control"
-                [min]="beginOfCompetition.value ? beginOfCompetition.value : dateNow | date: 'yyyy-MM-ddTHH:mm'"
-                [ngClass]="dynamicCssClassesForInput(competitionForm.controls.endOfCompetition)"
-                id="inputEndOfCompetition" aria-describedby="end of competition" placeholder="localize.endOfCompetition">
+                     class="form-control"
+                     [min]="beginOfCompetition.value ? beginOfCompetition.value : dateNow | date: 'yyyy-MM-ddTHH:mm'"
+                     [ngClass]="dynamicCssClassesForInput(competitionForm.controls.endOfCompetition)"
+                     id="inputEndOfCompetition" aria-describedby="end of competition"
+                     placeholder="localize.endOfCompetition">
               <div class="invalid-feedback">
                 {{localize.isRequired(localize.endOfCompetition)}}
               </div>
@@ -58,11 +67,11 @@
 
             <div class="spacer"></div>
 
-            <div class="bold">{{localize.contact}}: </div>
+            <div class="bold">{{localize.contact}}:</div>
             <div class="form-group col-6">
               <label for="inputEmail">Email</label>
               <input type="email" name="email" formControlName="email" class="form-control" id="inputEmail"
-                [ngClass]="dynamicCssClassesForInput(competitionForm.controls.email)" aria-describedby="email">
+                     [ngClass]="dynamicCssClassesForInput(competitionForm.controls.email)" aria-describedby="email">
               <div class="invalid-feedback">
                 {{localize.isMalformed('Email')}}
               </div>
@@ -71,7 +80,7 @@
             <div class="form-group col-6">
               <label for="inputPhone">Phone</label>
               <input type="tel" name="phone" formControlName="phone" class="form-control" id="inputPhone"
-                [ngClass]="dynamicCssClassesForInput(competitionForm.controls.phone)" aria-describedby="phone">
+                     [ngClass]="dynamicCssClassesForInput(competitionForm.controls.phone)" aria-describedby="phone">
               <div class="invalid-feedback">
                 {{localize.isMalformed(localize.phoneNumber)}}
               </div>
@@ -82,8 +91,9 @@
         <app-content-card [title]="localize.description">
           <div class="form-group">
             <textarea rows="12" name="description" formControlName="description" class="form-control"
-              id="inputDescription" autocomplete="off" aria-describedby="description" [placeholder]="localize.description + '...'"
-              style="height:auto;">
+                      id="inputDescription" autocomplete="off" aria-describedby="description"
+                      [placeholder]="localize.description + '...'"
+                      style="height:auto;">
           </textarea>
           </div>
         </app-content-card>
@@ -97,10 +107,10 @@
           <div class="form-group col-6">
             <label for="inputBeginOfRegistration">{{localize.beginOfRegistration}}: </label>
             <input type="datetime-local" name="beginOfRegistration" formControlName="beginOfRegistration"
-              class="form-control" min="{{dateNow | date: 'yyyy-MM-ddTHH:mm'}}"
-              [ngClass]="dynamicCssClassesForInput(competitionForm.controls.beginOfRegistration)"
-              id="inputBeginOfRegistration" #inputBeginOfRegistration aria-describedby="begin of registration"
-              placeholder="Begin of registration">
+                   class="form-control" min="{{dateNow | date: 'yyyy-MM-ddTHH:mm'}}"
+                   [ngClass]="dynamicCssClassesForInput(competitionForm.controls.beginOfRegistration)"
+                   id="inputBeginOfRegistration" #inputBeginOfRegistration aria-describedby="begin of registration"
+                   placeholder="Begin of registration">
             <div class="invalid-feedback">
               {{localize.isRequired(localize.beginOfRegistration)}}
             </div>
@@ -108,10 +118,10 @@
           <div class="form-group col-6">
             <label for="inputEndOfRegistration">{{localize.endOfRegistration}}: </label>
             <input type="datetime-local" name="endOfRegistration" formControlName="endOfRegistration"
-              min="{{inputBeginOfRegistration.value ? inputBeginOfRegistration.value : dateNow | date: 'yyyy-MM-ddTHH:mm'}}"
-              class="form-control" #endOfRegistration
-              [ngClass]="dynamicCssClassesForInput(competitionForm.controls.endOfRegistration)"
-              id="inputEndOfRegistration" aria-describedby="end of registration" placeholder="End of registration">
+                   min="{{inputBeginOfRegistration.value ? inputBeginOfRegistration.value : dateNow | date: 'yyyy-MM-ddTHH:mm'}}"
+                   class="form-control" #endOfRegistration
+                   [ngClass]="dynamicCssClassesForInput(competitionForm.controls.endOfRegistration)"
+                   id="inputEndOfRegistration" aria-describedby="end of registration" placeholder="End of registration">
             <div class="invalid-feedback">
               {{localize.isRequired(localize.endOfRegistration)}}
             </div>
@@ -121,7 +131,7 @@
         <div class="form-group col-6">
           <label for="inputCompetitionType">{{localize.competition}} Type</label>
           <select type="datetime-local" name="competitionType" formControlName="public" class="form-select"
-            id="inputCompetitionType" aria-describedby="type of competition">
+                  id="inputCompetitionType" aria-describedby="type of competition">
             <option value="FALSE" selected>{{localize.onlyClubs}}</option>
             <option value="TRUE">{{localize.public}}</option>
           </select>
@@ -130,7 +140,7 @@
         <div class="form-group col-6">
           <label for="inputCompetitionStatus">{{localize.competition}} Status</label>
           <select type="datetime-local" name="competitionType" formControlName="draft" class="form-select"
-            id="inputCompetitionStatus" aria-describedby="status of competition">
+                  id="inputCompetitionStatus" aria-describedby="status of competition">
             <option value="TRUE" selected>Draft</option>
             <option value="FALSE">{{localize.publish}}</option>
           </select>
@@ -141,28 +151,23 @@
 
       <app-content-card [title]="'Wettkampfrichter hinzufügen'">
         <div class="flex-center">
-          <app-autocomplete
-            [textInputClass]="'form-control'"
-            valueNeedsToMatchSuggestion="true"
-            (valueChange)="currentJudge=$event"
-            [formatModel]="formatJudge"
-            [suggestions]="judgeSuggestions"
-            [ngClass]="'flex-grow'"
-          ></app-autocomplete>
+          <app-autocomplete [textInputClass]="'form-control'" valueNeedsToMatchSuggestion="true"
+            (valueChange)="currentJudge=$event" [formatModel]="formatJudge" [suggestions]="judgeSuggestions"
+            [ngClass]="'flex-grow'"></app-autocomplete>
           <button type="button" (click)="addJudge()" class="primary-btn">hinzufügen</button>
         </div>
 
         <table>
           <thead>
-          <th>{{localize.firstname}}</th>
-          <th>{{localize.lastname}}</th>
+            <th>{{localize.firstname}}</th>
+            <th>{{localize.lastname}}</th>
           </thead>
           <tbody>
-          <tr *ngFor="let j of this.judges;let i=index;">
-            <td>{{j.firstName}}</td>
-            <td>{{j.lastName}}</td>
-            <button type="button" (click)="removeJudge(i)" class="primary-btn">entfernen</button>
-          </tr>
+            <tr *ngFor="let j of this.judges;let i=index;">
+              <td>{{j.firstName}}</td>
+              <td>{{j.lastName}}</td>
+              <button type="button" (click)="removeJudge(i)" class="primary-btn">entfernen</button>
+            </tr>
           </tbody>
         </table>
       </app-content-card>
@@ -176,43 +181,72 @@
 
       <div class="second-scrollabove">
         <div class="group-container" *ngFor="let group of gradingGroups; index as id;">
-          <app-content-card [title]="group.title" (titleChange)="updateGroupName(id,$event)" [isEdit]="true" [actions]="['duplicate','delete','collapse','template']"
-            (delete)="deleteGroup(id)" (duplicate)="duplicateGroup(group,id)" (collapsed)="group.collapsed = $event" (templateAction)="handleTemplateAction(id, $event)"
-            [templateState]="group.templateState" [color]="'bc-ming'">
+          <app-content-card [title]="group.title" (titleChange)="updateGroupName(id,$event)" [isEdit]="true"
+                            [actions]="['duplicate','delete','collapse','template']"
+                            (delete)="deleteGroup(id)" (duplicate)="duplicateGroup(group,id)"
+                            (collapsed)="group.collapsed = $event" (templateAction)="handleTemplateAction(id, $event)"
+                            [templateState]="group.templateState" [color]="'bc-ming'">
 
             <div mini class="minimize" *ngIf="group.collapsed">
-              <app-formular-editor [color]="'bc-space'" [collapsed]="true" [vars]="group.stationVariables" [(formula)]="group.formula"></app-formular-editor>
+              <app-formular-editor [color]="'bc-space'" [collapsed]="true" [vars]="group.stationVariables"
+                                   [(formula)]="group.formula"></app-formular-editor>
             </div>
 
             <div [hidden]="group.collapsed">
               <div class="spacer"></div>
 
               <div class="station-container" *ngFor="let station of group.stations; index as stationId;">
-                <app-content-card [title]="station.title" (titleChange)="upadteStationName(id, stationId, $event)" [isEdit]="true"
-                  [actions]="['duplicate','delete','collapse']" (delete)="deleteStation(id, stationId)"
-                  (duplicate)="duplicateStation(id, station, stationId)" (collapsed)="station.collapsed = $event"
-                  [color]="'bc-space'">
+                <app-content-card [title]="station.title" (titleChange)="upadteStationName(id, stationId, $event)"
+                                  [isEdit]="true"
+                                  [actions]="['duplicate','delete','collapse']" (delete)="deleteStation(id, stationId)"
+                                  (duplicate)="duplicateStation(id, station, stationId)"
+                                  (collapsed)="station.collapsed = $event"
+                                  [color]="'bc-space'">
 
                   <div mini class="minimize" *ngIf="station.collapsed">
-                    <app-formular-editor [collapsed]="true" [vars]="station.variables" [(formula)]="station.formula"></app-formular-editor>
+                    <app-formular-editor [collapsed]="true" [vars]="station.variables"
+                                         [(formula)]="station.formula"></app-formular-editor></div>
+
+                  <div class="station-settings">
+                    <div class="settings-symbol">
+                      <mat-icon>settings</mat-icon>
+                    </div>
+                    <div class="settings-entry">
+                      Mindestens <input type="number" class="small-num-input" [(ngModel)]="station.minJudgeCount" [ngModelOptions]="{standalone: true}"> Bewertungsrichter
+                    </div>
                   </div>
 
                   <div class="station-content-head">
                     Variablen:
                   </div>
                   <div class="station-variables">
-                    <div *ngFor="let variable of station.variables">
-                      <input #inputVariables type="text" class="variable" [(ngModel)]="variable.name" (change)="change(station, variable.name)"
-                        [ngModelOptions]="{standalone: true}">
-                    </div>
+                    <input [(ngModel)]="station.selectedVariable.name" type="text" class="variable"
+                      [ngModelOptions]="{standalone: true}">
 
-                    <div class="add-note flex-center" (click)="addStationVariable(station)">
-                      <mat-icon>add_circle_outline</mat-icon> Variable
+                    <select [(ngModel)]="station.selectedVariable.strategy"
+                             [ngModelOptions]="{standalone: true}"><option value="mean">{{localize.meanStrategy}}</option>
+                      <option value="equal">{{localize.equalStrategy}}</option>
+                    </select>
+                    <div class="add-note flex-center" (click)="clearVariable(station)"
+                      *ngIf="station.selectedVariable.value !== -1">
+                      <mat-icon>cancel</mat-icon> Abbrechen
+                    </div>
+                    <div class="add-note flex-center" (click)="addStationVariable(station)"
+                      *ngIf="station.selectedVariable.value !== -1">
+                      <mat-icon>edit</mat-icon> Änderung Speichern
+                    </div>
+                    <div class="add-note flex-center" (click)="addStationVariable(station)"
+                      *ngIf="station.selectedVariable.value === -1">
+                      <mat-icon>add_circle_outline</mat-icon>
+                      Variable
                     </div>
                   </div>
                   <div class="horizontal-line"></div>
                   <div class="station-result">
-                    <app-formular-editor [name]="station.title" [vars]="station.variables" [(formula)]="station.formula"></app-formular-editor>
+                    <app-formular-editor (editVariable)="editVar(station, $event)" [name]="station.title"
+                      [vars]="station.variables"
+                                         [(formula)]="station.formula"
+                      [(constants)]="station.constants"></app-formular-editor>
                   </div>
                 </app-content-card>
                 <div class="spacer"></div>
@@ -221,13 +255,15 @@
               <div class="spacer-2"></div>
 
               <div class="add-group flex-center" (click)="addStation(id)">
-                <mat-icon class="large">add_circle_outline</mat-icon> Station
+                <mat-icon class="large">add_circle_outline</mat-icon>
+                Station
               </div>
 
               <div class="spacer-2"></div>
-              <div class="horizontal-line"></div>
+              <div class="horizontal-line" style="border-bottom: 3px var(--ming) solid"></div>
 
-              <app-formular-editor [name]="group.title" [color]="'bc-space'" [vars]="group.stationVariables" [(formula)]="group.formula"></app-formular-editor>
+              <app-formular-editor [name]="group.title" [color]="'bc-space'" [vars]="group.stationVariables"
+                                   [(formula)]="group.formula"[(constants)]="group.constants"></app-formular-editor>
 
             </div>
 
@@ -239,13 +275,15 @@
 
         <div class="flex-center">
           <div class="add-group flex-center" (click)="addGroup()">
-            <mat-icon class="large">add_circle_outline</mat-icon> {{localize.gradingGroup}}
-          </div> 
+            <mat-icon class="large">add_circle_outline</mat-icon>
+            {{localize.gradingGroup}}
+          </div>
           <h1>
             /
           </h1>
           <div class="add-group flex-center" (click)="openImportGroupDialog()">
-            <mat-icon class="large">view_list</mat-icon>  {{localize.importGradingGroup}}
+            <mat-icon class="large">view_list</mat-icon>
+            {{localize.importGradingGroup}}
           </div>
         </div>
       </div>

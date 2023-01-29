@@ -17,6 +17,8 @@ export class FormularEditorComponent implements OnInit, OnChanges {
     { name: 'Abzug', value: 3, typeHint: 'variableRef', type: 'variable', spaces: 0, priority: 0 },
   ];
 
+  @Input() constants: any[] = [];
+
 
   @Input() formula = {
     valid: false,
@@ -31,6 +33,10 @@ export class FormularEditorComponent implements OnInit, OnChanges {
 
   @Output() formulaChange = new EventEmitter<any>();
   @Output() variablesChange = new EventEmitter<any>();
+  @Output() constantsChange = new EventEmitter<any>();
+
+  @Output() editVariable = new EventEmitter<any>();
+
 
   variables = cloneDeep(this.vars);
 
@@ -43,8 +49,6 @@ export class FormularEditorComponent implements OnInit, OnChanges {
     { name: '/', value: 'div', typeHint: 'div', type: 'function', spaces: 2, priority: 3 },
     //{ name: "mean", type: "function", spaces: 'n', priority: 4 },
   ];
-
-  constants: any[] = [];
 
   calculation: any[][] = [
     []
@@ -61,11 +65,14 @@ export class FormularEditorComponent implements OnInit, OnChanges {
 
     const t = this.calculation.filter(arr => arr.length === 0
       || this.variables.map(v => v.value).includes(arr[0].value)
+      || this.constants.map(v => v.value).includes(arr[0].value)
       || this.functions.map(v => v.value).includes(arr[0].value));
 
     this.calculation = t.map(arr => arr.length === 0 ||
       this.functions.map(
-        v => v.value).includes(arr[0].value) ? arr : arr.map(v => this.variables.find(x => x.value === v.value)));
+        v => v.value).includes(arr[0].value) || (this.constants.map( v => v.value).includes(arr[0].value) && arr[0].type === 'constant')
+        ? arr
+        : arr.map(v => this.variables.find(x => x.value === v.value)));
 
     this.listRebuild();
     this.buildTree();

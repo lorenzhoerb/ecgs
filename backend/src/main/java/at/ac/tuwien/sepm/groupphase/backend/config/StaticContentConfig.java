@@ -14,6 +14,8 @@ public class StaticContentConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         exposeDirectory("user-pictures", registry);
         exposeDirectory("competition-pictures", registry);
+        exposeDirectory("reports", registry);
+        exposeDirectory("test-reports", registry);
     }
 
     private void exposeDirectory(String dirName, ResourceHandlerRegistry registry) {

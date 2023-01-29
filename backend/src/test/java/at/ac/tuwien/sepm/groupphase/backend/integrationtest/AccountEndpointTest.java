@@ -79,7 +79,7 @@ public class AccountEndpointTest implements TestData {
 
     @Test
     @Transactional
-    public void createAccountShouldSuccess() throws Exception {
+    public void createAccount_withValidDto_shouldSuccess_expect201() throws Exception {
         UserRegisterDto userRegisterDto =
             new UserRegisterDto.UserRegisterDtoBuilder().setFirstName("Hans").setLastName("Meyer").setEmail("hans.meyer@gmail.com").setPassword("password187")
                 .setGender(
@@ -112,7 +112,7 @@ public class AccountEndpointTest implements TestData {
 
     @Test
     @Transactional
-    public void createAccountShouldFailMissingName() throws Exception {
+    public void createAccount_withMissingName_shouldFail_expect422() throws Exception {
         UserRegisterDto userRegisterDto =
             new UserRegisterDto.UserRegisterDtoBuilder().setLastName("Mey$$er").setEmail("hans.meyer@gmail.com").setPassword("password187")
                 .setGender(
@@ -133,7 +133,7 @@ public class AccountEndpointTest implements TestData {
 
     @Test
     @Transactional
-    public void createAccountShouldFailWrongPassword() throws Exception {
+    public void createAccount_withWrongPassword_shouldFail_expect422() throws Exception {
         UserRegisterDto userRegisterDto =
             new UserRegisterDto.UserRegisterDtoBuilder().setFirstName("Test Hab").setLastName("Meyer").setEmail("hans.meyer@gmail.com").setPassword("1234")
                 .setGender(
@@ -152,7 +152,7 @@ public class AccountEndpointTest implements TestData {
     }
 
     @Test
-    public void resetPasswordShouldSuccess() throws Exception {
+    public void registerUser_thenLogInAsUser_thenRequestPasswordReset_andReset_expect200() throws Exception {
         UserRegisterDto userRegisterDto =
             new UserRegisterDto.UserRegisterDtoBuilder().setFirstName("Hans").setLastName("Meyer").setEmail("hans.meyer@gmail.com").setPassword("password187")
                 .setGender(
@@ -203,8 +203,43 @@ public class AccountEndpointTest implements TestData {
     }
 
     @Test
+    public void requestPasswordReset_withInvalidEmail_expect404() throws Exception {
+        UserPasswordResetRequestDto userPasswordResetRequestDto = new UserPasswordResetRequestDto();
+        userPasswordResetRequestDto.setEmail("hans.meyer@gmail.com");
+
+        String body = objectMapper.writeValueAsString(userPasswordResetRequestDto);
+
+        MvcResult mvcResult = mockMvc.perform(post(ACCOUNT_REQUEST_PASSWORD_RESET_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
+    }
+
+    @Test
+    public void tryResetPassword_withMissingToken_expect404() throws Exception {
+        UserPasswordResetDto userPasswordResetDto = new UserPasswordResetDto();
+        userPasswordResetDto.setToken(null);
+        userPasswordResetDto.setPassword(passwordEncoder.encode("pass123456"));
+
+        String body = objectMapper.writeValueAsString(userPasswordResetDto);
+
+        MvcResult mvcResult = mockMvc.perform(post(ACCOUNT_RESET_PASSWORD_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
+    }
+
+    @Test
     @Transactional
-    public void changePasswordShouldSuccess() throws Exception {
+    public void registerUser_thenLogInAsUser_thenChangePassword_expect200() throws Exception {
         UserRegisterDto userRegisterDto =
             new UserRegisterDto.UserRegisterDtoBuilder().setFirstName("Hans").setLastName("Meyer").setEmail("hans.meyer@gmail.com").setPassword("password187")
                 .setGender(
@@ -222,7 +257,8 @@ public class AccountEndpointTest implements TestData {
 
         assertEquals(HttpStatus.CREATED.value(), response.getStatus());
 
-        UserLoginDto userLoginDto = UserLoginDto.UserLoginDtoBuilder.anUserLoginDto().withEmail(userRegisterDto.getEmail()).withPassword(userRegisterDto.getPassword()).build();
+        UserLoginDto userLoginDto =
+            UserLoginDto.UserLoginDtoBuilder.anUserLoginDto().withEmail(userRegisterDto.getEmail()).withPassword(userRegisterDto.getPassword()).build();
 
         body = objectMapper.writeValueAsString(userLoginDto);
 
@@ -257,6 +293,70 @@ public class AccountEndpointTest implements TestData {
         assertTrue(passwordEncoder.matches(userCredentialUpdateDto.getPassword(), account.getUser().getPassword()));
     }
 
+    @Test
+    public void changePassword_whenNotLoggedIn_expect403() throws Exception {
+        UserCredentialUpdateDto userCredentialUpdateDto = new UserCredentialUpdateDto();
+        userCredentialUpdateDto.setPassword("pass1234!");
+        userCredentialUpdateDto.setEmail("hans.meyer@gmail.com");
+
+        String body = objectMapper.writeValueAsString(userCredentialUpdateDto);
+        MvcResult mvcResult = mockMvc.perform(post(ACCOUNT_CHANGE_PASSWORD_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
+    }
+
+    @Test
+    public void changePassword_whenLoggedIn_forAnotherUser_expect403() throws Exception {
+        //create the user which the authorizarion token will contain
+        UserRegisterDto userRegisterDto =
+            new UserRegisterDto.UserRegisterDtoBuilder().setFirstName("Hans").setLastName("Meyer").setEmail("hans.meyer@gmail.com").setPassword("password187")
+                .setGender(
+                    ApplicationUser.Gender.MALE).setType(ApplicationUser.Role.CLUB_MANAGER)
+                .setDateOfBirth(new GregorianCalendar(1998, Calendar.FEBRUARY, 11).getTime()).createUserRegisterDto();
+
+        String body = objectMapper.writeValueAsString(userRegisterDto);
+
+        MvcResult mvcResult = mockMvc.perform(post(ACCOUNT_REGISTER_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        assertEquals(HttpStatus.CREATED.value(), response.getStatus());
+
+        //create another user
+        userRegisterDto.setEmail("not_correct@mail.com");
+
+        body = objectMapper.writeValueAsString(userRegisterDto);
+
+        mvcResult = mockMvc.perform(post(ACCOUNT_REGISTER_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+            .andDo(print())
+            .andReturn();
+        response = mvcResult.getResponse();
+
+        assertEquals(HttpStatus.CREATED.value(), response.getStatus());
+
+        UserCredentialUpdateDto userCredentialUpdateDto = new UserCredentialUpdateDto();
+        userCredentialUpdateDto.setPassword("pass1234!");
+        userCredentialUpdateDto.setEmail("not_correct@mail.com");
+
+        body = objectMapper.writeValueAsString(userCredentialUpdateDto);
+        mvcResult = mockMvc.perform(post(ACCOUNT_CHANGE_PASSWORD_URI)
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken("hans.meyer@gmail.com", ADMIN_ROLES))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+            .andDo(print())
+            .andReturn();
+        response = mvcResult.getResponse();
+        assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
+    }
 
 
     @AfterEach

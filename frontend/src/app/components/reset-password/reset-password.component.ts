@@ -28,7 +28,14 @@ export class ResetPasswordComponent implements OnInit {
     });
     this.route.queryParams.subscribe(params => {
       this.token = params['token'];
-      if (this.token.length !== 32) {
+
+      if (this.authService.isLoggedIn()) {
+        this.router.navigate(['/']);
+        this.notification.error('You cant reset your password when logged in');
+        return;
+      }
+
+      if (this.token === null || this.token === undefined || this.token.length !== 32) {
         this.notification.error('Redirected because of malformed token');
         this.router.navigate(['/login']);
       }

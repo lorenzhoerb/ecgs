@@ -1,179 +1,201 @@
 <div class="">
-    <div class="main-menu-2">
-      <!-- HERE -->
-      <div style="display: flex; justify-content: space-between;">
-        <h1 style="padding-bottom: 1em; text-decoration: underline; color: snow">
-          {{localize.manageTemplateGradingSystems}}
-        </h1>
-        <button style="height: 2.5em; background-color: greenyellow; margin-top: 1.5em;" (click)="onCreateGradingGroupClick()">
-          + {{localize.createGradingSystem}}
-        </button>
-      </div>
-      <app-golden-ratio-container>
-        <app-content-card [title]="localize.search">
-          <div class="form-group col-6" style="margin-bottom: 1em;">
-            <label for="searchName">Name:</label>
-            <input type="text" name="name" 
-              class="form-control" id="searchName" 
-              [(ngModel)]="searchParams.name" 
-              >
-          </div>
-          <div class="form-group col-6" style="margin-bottom: 1em;">
-            <label for="editPublic">{{localize.publicType}}:</label>
-            <select 
-            name="editPublic" id="editPublic" class="form-control"
-            [(ngModel)]="searchParams.type"
-            >
-              <option [ngValue]="0">{{localize.publicTypeAll}}</option>
-              <option [ngValue]="1">{{localize.publicTypePublic}}</option>
-              <option [ngValue]="2">{{localize.publicTypePrivate}}</option>
-            </select>
-            <!-- <input style="display: block; border-radius: 8px; width: 1.4em; height: 1.4em;" name="text" type="" [(ngModel)]="searchParams.type"> -->
-          </div>
-          <div class="form-group col-6" style="margin-bottom: 1em;">
-            <label for="editPublic">{{localize.onlyEditables}}:</label>
-            <select 
-            name="editPublic" id="editPublic" class="form-control"
-            [(ngModel)]="searchParams.onlyEditables"
-            >
-              <option [ngValue]="true">{{localize.yes}}</option>
-              <option [ngValue]="false">{{localize.no}}</option>
-            </select>
-            <!-- <input style="display: block; border-radius: 8px; width: 1.4em; height: 1.4em;" name="text" type="" [(ngModel)]="searchParams.type"> -->
-          </div>
-          <div style="display: flex; justify-content: space-between; margin-top: 1em;">
-            <div></div>
-            <button (click)="resetSearchParams()" style="background-color: rgb(255, 42, 81); color: white;">
-              {{localize.reset}}
-            </button>
-          </div>
+  <div class="main-menu-2">
+    <!-- HERE -->
+    <div style="display: flex; justify-content: space-between;">
+      <h1 style="padding-bottom: 1em; text-decoration: underline; color: snow">
+        {{localize.manageTemplateGradingSystems}}
+      </h1>
+      <button style="height: 2.5em; background-color: greenyellow; margin-top: 1.5em;"
+        (click)="onCreateGradingGroupClick()">
+        + {{localize.createGradingSystem}}
+      </button>
+    </div>
+    <app-golden-ratio-container>
+      <app-content-card [title]="localize.search">
+        <div class="form-group col-6" style="margin-bottom: 1em;">
+          <label for="searchName">Name:</label>
+          <input type="text" name="name" class="form-control" id="searchName" [(ngModel)]="searchParams.name">
+        </div>
+        <div class="form-group col-6" style="margin-bottom: 1em;">
+          <label for="editPublic">{{localize.publicType}}:</label>
+          <select name="editPublic" id="editPublic" class="form-control" [(ngModel)]="searchParams.type">
+            <option [ngValue]="0">{{localize.publicTypeAll}}</option>
+            <option [ngValue]="1">{{localize.publicTypePublic}}</option>
+            <option [ngValue]="2">{{localize.publicTypePrivate}}</option>
+          </select>
+          <!-- <input style="display: block; border-radius: 8px; width: 1.4em; height: 1.4em;" name="text" type="" [(ngModel)]="searchParams.type"> -->
+        </div>
+        <div class="form-group col-6" style="margin-bottom: 1em;">
+          <label for="editPublic">{{localize.onlyEditables}}:</label>
+          <select name="editPublic" id="editPublic" class="form-control" [(ngModel)]="searchParams.onlyEditables">
+            <option [ngValue]="true">{{localize.yes}}</option>
+            <option [ngValue]="false">{{localize.no}}</option>
+          </select>
+          <!-- <input style="display: block; border-radius: 8px; width: 1.4em; height: 1.4em;" name="text" type="" [(ngModel)]="searchParams.type"> -->
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-top: 1em;">
+          <div></div>
+          <button (click)="resetSearchParams()" style="background-color: rgb(255, 42, 81); color: white;">
+            {{localize.reset}}
+          </button>
+        </div>
 
-        </app-content-card>
-        <app-content-card [title]="localize.gradingSystems" style="overflow: hidden;
+      </app-content-card>
+      <app-content-card [title]="localize.gradingSystems" style="overflow: hidden;
         overflow-x: hidden;
         overflow-y: auto;">
-          <div class="form-group col-6">
-            <div>
-              <div class="options-menu" style="width: 100%; max-height: 100%;">
-                <div *ngFor="let foundGradingGroup of this.getFoundGradingSystems(); let id = index" 
-                  [class]="getClassForSelected(foundGradingGroup.id)" 
-                  (click)="onGradingGroupSelection(foundGradingGroup.id)" 
-                  [style]="getStyleForSelected(foundGradingGroup.id)"
-                  >
-                  {{foundGradingGroup.name}}
-                </div>
+        <div class="form-group col-6">
+          <div>
+            <div class="options-menu" style="width: 100%; max-height: 100%;">
+              <div *ngFor="let foundGradingGroup of this.getFoundGradingSystems(); let id = index"
+                [class]="getClassForSelected(foundGradingGroup.id)"
+                (click)="onGradingGroupSelection(foundGradingGroup.id)"
+                [style]="getStyleForSelected(foundGradingGroup.id)">
+                {{foundGradingGroup.name}}
               </div>
             </div>
+          </div>
+        </div>
+      </app-content-card>
+    </app-golden-ratio-container>
+  </div>
+  <div *ngIf="this.selectedGradingGroup" class="folding-element"
+    style="margin-bottom: 2em; border-radius: 8px; border-top: 1px solid black;">
+    <div class="sticky-heading heading my-heading">
+      <h1 style="display: flex;">
+        <div style="margin-right: 1em; font-size: 150%;">
+          Name:
+        </div>
+        <input [disabled]="!this.selectedGradingGroup.editable" class="ng-pristine ng-valid ng-touched normal-input"
+          type="text" [(ngModel)]="selectedGradingGroup.name" [ngModelOptions]="{standalone: true}"
+          [style]="!this.selectedGradingGroup.editable ? 'border: 0' : ''">
+      </h1>
+      <div *ngIf="selectedGradingGroup.editable">
+        <button type="button" *ngIf="!createMode" (click)="onDeleteSelectedGradingSystem()" class="primary-btn"
+          style="margin-right: 8em; background-color: rgb(240, 0, 44); color: white;">{{localize.delete}}</button>
+        <button type="button" *ngIf="!createMode" (click)="onResetSelectedGradingSystem()" class="primary-btn"
+          style="background-color: rgb(255, 42, 81); color: white;">{{localize.reset}}</button>
+        <button type="button" (click)="onSaveGradingSystem()" class="primary-btn">{{localize.save}}</button>
+      </div>
+    </div>
+    <div style="padding-left: 2em; padding-right: 2em;">
+      <app-golden-ratio-container>
+        <app-content-card [title]="localize.others" style="margin-bottom: 20px;">
+          <div>
+            <div class="form-group col-6" style="font-size: 160%;">
+              <label for="editPublic">{{localize.public}}:</label>
+              <input [disabled]="!this.selectedGradingGroup.editable"
+                style="display: block; border-radius: 8px; width: 1.4em; height: 1.4em;" name="editPublic"
+                type="checkbox" [(ngModel)]="selectedGradingGroup.public">
+            </div>
+          </div>
+        </app-content-card>
+        <app-content-card [title]="localize.description" style="margin-bottom: 20px;">
+          <div class="form-group">
+            <textarea [disabled]="!this.selectedGradingGroup.editable" rows="8" name="description" class="form-control"
+              [(ngModel)]="selectedGradingGroup.description">{{this.selectedGradingGroup.description}}</textarea>
           </div>
         </app-content-card>
       </app-golden-ratio-container>
-    </div>
-    <div *ngIf="this.selectedGradingGroup" class="folding-element" style="margin-bottom: 2em; border-radius: 8px; border-top: 1px solid black;">
-      <div class="sticky-heading heading my-heading">
-        <h1 style="display: flex;">
-          <div style="margin-right: 1em; font-size: 150%;">
-            Name: 
-          </div>
-          <input [disabled]="!this.selectedGradingGroup.editable" class="ng-pristine ng-valid ng-touched normal-input" type="text" 
-          [(ngModel)]="selectedGradingGroup.name"
-          [ngModelOptions]="{standalone: true}"
-          [style]="!this.selectedGradingGroup.editable ? 'border: 0' : ''"
-          >
-        </h1>
-        <div *ngIf="selectedGradingGroup.editable">
-          <button type="button" *ngIf="!createMode" (click)="onDeleteSelectedGradingSystem()" class="primary-btn" style="margin-right: 8em; background-color: rgb(240, 0, 44); color: white;">{{localize.delete}}</button>
-          <button type="button" *ngIf="!createMode" (click)="onResetSelectedGradingSystem()" class="primary-btn" style="background-color: rgb(255, 42, 81); color: white;">{{localize.reset}}</button>
-          <button type="button" (click)="onSaveGradingSystem()" class="primary-btn">{{localize.save}}</button>
-        </div>
-      </div>
-      <div style="padding-left: 2em; padding-right: 2em;">
-        <app-golden-ratio-container>
-          <app-content-card [title]="localize.others" style="margin-bottom: 20px;">
-            <div>
-              <div class="form-group col-6" style="font-size: 160%;">
-                <label for="editPublic" >{{localize.public}}:</label>
-                <input [disabled]="!this.selectedGradingGroup.editable" style="display: block; border-radius: 8px; width: 1.4em; height: 1.4em;" name="editPublic" type="checkbox" [(ngModel)]="selectedGradingGroup.public">
-              </div>
-            </div>
-          </app-content-card>
-          <app-content-card [title]="localize.description" style="margin-bottom: 20px;">
-            <div class="form-group">
-              <textarea 
-                [disabled]="!this.selectedGradingGroup.editable"
-                rows="8" name="description" class="form-control"
-                [(ngModel)]="selectedGradingGroup.description"
-                >{{this.selectedGradingGroup.description}}</textarea>
-            </div>
-          </app-content-card>
-        </app-golden-ratio-container>
-        <app-content-card [title]="localize.formula">
-          <div class="second-scrollabove" style="margin: 0; padding: 0">
-            <div class="group-container" style="background-color: white;">
-              <!-- <app-content-card [title]="selectedGradingGroup.name" (titleChange)="updateGroupName(id,$event)" [isEdit]="true" [actions]="['delete']"
+      <app-content-card [title]="localize.formula">
+        <div class="second-scrollabove" style="margin: 0; padding: 0">
+          <div class="group-container" style="background-color: white;">
+            <!-- <app-content-card [title]="selectedGradingGroup.name" (titleChange)="updateGroupName(id,$event)" [isEdit]="true" [actions]="['delete']"
                 (delete)="deleteGroup(id)"
               [color]="'bc-ming'"> -->
 
-              <div mini class="minimize" *ngIf="selectedGradingGroup.collapsed">
-                <app-formular-editor [color]="'bc-space'" [collapsed]="true" [vars]="selectedGradingGroup.stationVariables" [(formula)]="selectedGradingGroup.formula" ></app-formular-editor>
-              </div>
+            <div mini class="minimize" *ngIf="selectedGradingGroup.collapsed">
+              <app-formular-editor [color]="'bc-space'" [collapsed]="true"
+                [vars]="selectedGradingGroup.stationVariables"
+                [(formula)]="selectedGradingGroup.formula"></app-formular-editor>
+            </div>
 
-              <div [hidden]="selectedGradingGroup.collapsed">
-                <div class="spacer"></div>
+            <div [hidden]="selectedGradingGroup.collapsed">
+              <div class="spacer"></div>
 
-                <div class="station-container" *ngFor="let station of selectedGradingGroup.stations; index as stationId;">
-                  <app-content-card [title]="station.name" (titleChange)="upadteStationName(stationId, $event)" [isEdit]="selectedGradingGroup.editable"
-                    [actions]="selectedGradingGroup.editable ? ['duplicate','delete','collapse'] : []" (delete)="deleteStation(stationId)"
-                    (duplicate)="duplicateStation(station, stationId)" (collapsed)="station.collapsed = $event"
-                    [color]="'bc-space'" [isCollapsed]="!selectedGradingGroup.editable">
+              <div class="station-container" *ngFor="let station of selectedGradingGroup.stations; index as stationId;">
+                <app-content-card [title]="station.name" (titleChange)="upadteStationName(stationId, $event)"
+                  [isEdit]="selectedGradingGroup.editable"
+                  [actions]="selectedGradingGroup.editable ? ['duplicate','delete','collapse'] : []"
+                  (delete)="deleteStation(stationId)" (duplicate)="duplicateStation(station, stationId)"
+                  (collapsed)="station.collapsed = $event" [color]="'bc-space'"
+                  [isCollapsed]="!selectedGradingGroup.editable">
 
-                    <div mini class="minimize" *ngIf="true">
-                      <app-formular-editor [editable]="selectedGradingGroup.editable" [collapsed]="true" [vars]="station.variables" [(formula)]="station.formula"></app-formular-editor>
-                    </div>
-
-                    <div class="station-content-head">
-                      Variablen:
-                    </div>
-                    <div class="station-variables">
-                      <div *ngFor="let variable of station.variables">
-                        <input #inputVariables type="text" class="variable" [(ngModel)]="variable.name" (change)="change(station, variable.name)"
-                          [ngModelOptions]="{standalone: true}">
-                      </div>
-
-                      <div class="add-note flex-center" (click)="addStationVariable(station)">
-                        <mat-icon>add_circle_outline</mat-icon> Variable
-                      </div>
-                    </div>
-                    <div class="horizontal-line"></div>
-                    <div class="station-result">
-                      <app-formular-editor [name]="station.name" [vars]="station.variables" [(formula)]="station.formula"></app-formular-editor>
-                    </div>
-                  </app-content-card>
-                  <div class="spacer"></div>
-                </div>
-
-                <div class="spacer-2"></div>
-                <div *ngIf="selectedGradingGroup.editable">
-
-                  <div class="add-group flex-center" (click)="addStation()">
-                    <mat-icon class="large">add_circle_outline</mat-icon> Station
+                  <div mini class="minimize" *ngIf="true">
+                    <app-formular-editor [editable]="selectedGradingGroup.editable" [collapsed]="true"
+                      [vars]="station.variables" [(formula)]="station.formula"></app-formular-editor>
                   </div>
-                  
-                  <div class="spacer-2"></div>
+
+                  <div class="station-settings">
+                    <div class="settings-symbol">
+                      <mat-icon>settings</mat-icon>
+                    </div>
+                    <div class="settings-entry">
+                      Mindestens <input type="number" class="small-num-input" [(ngModel)]="station.minJudgeCount" [ngModelOptions]="{standalone: true}"> Bewertungsrichter
+                    </div>
+                  </div>
+
+                  <div class="station-content-head">
+                    Variablen:
+                  </div>
+                  <div class="station-variables">
+
+                    <input [(ngModel)]="station.selectedVariable.name" type="text" class="variable"
+                      [ngModelOptions]="{standalone: true}">
+
+                    <select [(ngModel)]="station.selectedVariable.strategy" [ngModelOptions]="{standalone: true}">
+                      <option value="mean">{{localize.meanStrategy}}</option>
+                      <option value="equal">{{localize.equalStrategy}}</option>
+                    </select>
+                    <div class="add-note flex-center" (click)="clearVariable(station)"
+                      *ngIf="station.selectedVariable.value !== -1">
+                      <mat-icon>cancel</mat-icon> Abbrechen
+                    </div>
+                    <div class="add-note flex-center" (click)="addStationVariable(station)"
+                      *ngIf="station.selectedVariable.value !== -1">
+                      <mat-icon>edit</mat-icon> Änderung Speichern
+                    </div>
+                    <div class="add-note flex-center" (click)="addStationVariable(station)"
+                      *ngIf="station.selectedVariable.value === -1">
+                      <mat-icon>add_circle_outline</mat-icon> Variable
+                    </div>
+                  </div>
                   <div class="horizontal-line"></div>
-                </div>
-
-                <div style="padding-left: 15px;" *ngFor="let _selectedGradingGroup of [selectedGradingGroup]">
-                  <app-formular-editor [editable]="_selectedGradingGroup.editable" [collapsed]="!_selectedGradingGroup.editable" [name]="_selectedGradingGroup.name" [color]="'bc-space'" [vars]="_selectedGradingGroup.stationVariables" [(formula)]="_selectedGradingGroup.formula"></app-formular-editor>
-                </div>
-
+                  <div class="station-result">
+                    <app-formular-editor (editVariable)="editVar(station, $event)" [name]="station.name"
+                      [vars]="station.variables" [(formula)]="station.formula"
+                      [(constants)]="station.constants"></app-formular-editor>
+                  </div>
+                </app-content-card>
+                <div class="spacer"></div>
               </div>
 
               <div class="spacer-2"></div>
+              <div *ngIf="selectedGradingGroup.editable">
+
+                <div class="add-group flex-center" (click)="addStation()">
+                  <mat-icon class="large">add_circle_outline</mat-icon> Station
+                </div>
+
+                <div class="spacer-2"></div>
+                <div class="horizontal-line" style="border-bottom: 3px var(--ming) solid"></div>
+              </div>
+
+              <div style="padding-left: 15px;" *ngFor="let _selectedGradingGroup of [selectedGradingGroup]">
+                <app-formular-editor [editable]="_selectedGradingGroup.editable"
+                  [collapsed]="!_selectedGradingGroup.editable" [name]="_selectedGradingGroup.name" [color]="'bc-space'"
+                  [vars]="_selectedGradingGroup.stationVariables" [(formula)]="_selectedGradingGroup.formula"
+                  [(constants)]="_selectedGradingGroup.constants"></app-formular-editor>
+              </div>
+
+            </div>
+
+            <div class="spacer-2"></div>
             <!-- </app-content-card> -->
             <div class="spacer-2"></div>
           </div>
-          </div>
-        </app-content-card>
-      </div>
+        </div>
+      </app-content-card>
+    </div>
   </div>
 </div>

@@ -5,6 +5,7 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CalenderViewCompetition
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GeneralResponseDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlagsResultDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantCompetitionResultDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantSelfRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
@@ -17,12 +18,10 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlag;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlagsResultDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantSelfRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseParticipantRegistrationDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailFlagDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailSetFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserInfoDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserSearchDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailFilterDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailSetFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleFlagDto;
@@ -30,6 +29,7 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.CompetitionMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionRegistrationService;
 import at.ac.tuwien.sepm.groupphase.backend.service.PictureService;
+import at.ac.tuwien.sepm.groupphase.backend.service.ReportService;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepm.groupphase.backend.service.helprecords.ClubManagerTeamImportResults;
 import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -74,6 +75,7 @@ public class UserEndpoint {
     public static final String BASE_URI = "/api/v1/user";
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final UserService userService;
+    private final ReportService reportService;
     private final UserMapper userMapper;
     static final String BASE_PATH = "/api/v1/user";
     private final CompetitionMapper competitionMapper;
@@ -89,12 +91,14 @@ public class UserEndpoint {
         UserService userService,
         UserMapper userMapper,
         SessionUtils sessionUtils,
+        ReportService reportService,
         CompetitionRegistrationService competitionRegistrationService,
         CompetitionMapper competitionMapper, PictureService pictureService) {
         this.userService = userService;
         this.competitionMapper = competitionMapper;
         this.userMapper = userMapper;
         this.sessionUtils = sessionUtils;
+        this.reportService = reportService;
         this.competitionRegistrationService = competitionRegistrationService;
         this.pictureService = pictureService;
     }
@@ -204,8 +208,16 @@ public class UserEndpoint {
     @Secured({"ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER"})
     @GetMapping(value = "/members")
     @Operation(summary = "Get members of club", security = @SecurityRequirement(name = "apiKey"))
-    public List<UserDetailFlagDto> getMembers() {
+    public Page<UserDetailFlagDto> getMembers(UserDetailFilterDto filter) {
         logger.info("GET {}/members", BASE_PATH);
-        return userService.getMembers();
+        return userService.getMembers(filter);
+    }
+
+    @Secured({"ROLE_PARTICIPANT", "ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER"})
+    @GetMapping(value = "/my-results")
+    @Operation(summary = "Get users results across tournaments", security = @SecurityRequirement(name = "apiKey"))
+    public List<ParticipantCompetitionResultDto> getMyResults() {
+        logger.info("GET {}/my-results", BASE_PATH);
+        return reportService.getParticipantResults();
     }
 }

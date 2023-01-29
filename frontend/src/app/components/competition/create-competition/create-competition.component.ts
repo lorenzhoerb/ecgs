@@ -1,21 +1,27 @@
-import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
-import { AbstractControl, FormControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { UserService } from '../../../services/user.service';
-import { CompetitionService } from '../../../services/competition.service';
-import { GradingSystemService } from '../../../services/grading-system.service';
-import { CompetitionDetail } from '../../../dtos/competition-detail';
-import { ListError } from '../../../dtos/list-error';
-import { cloneDeep } from 'lodash';
-import { ToastrService } from 'ngx-toastr';
-import { UserDetail } from '../../../dtos/user-detail';
-import { of } from 'rxjs';
-import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
-import { TemplateAction, TemplateState } from 'src/app/datatypes/templateAction';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { TemplateDialogComponent } from '../template-dialog/template-dialog.component';
-import { CreateCompetitionSelectGradingSystemDialogComponent }
+import {ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren} from '@angular/core';
+import {AbstractControl, FormControl, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
+import {ActivatedRoute, Router} from '@angular/router';
+import {UserService} from '../../../services/user.service';
+import {CompetitionService} from '../../../services/competition.service';
+import {GradingSystemService} from '../../../services/grading-system.service';
+import {CompetitionDetail} from '../../../dtos/competition-detail';
+import {ListError} from '../../../dtos/list-error';
+import {cloneDeep} from 'lodash';
+import {ToastrService} from 'ngx-toastr';
+import {UserDetail} from '../../../dtos/user-detail';
+import {of} from 'rxjs';
+import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
+import {TemplateAction, TemplateState} from 'src/app/datatypes/templateAction';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {TemplateDialogComponent} from '../template-dialog/template-dialog.component';
+import {CreateCompetitionSelectGradingSystemDialogComponent}
   from '../../create-competition-select-grading-system-dialog/create-competition-select-grading-system-dialog.component';
+import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
+import {HttpResponse} from '@angular/common/http';
+import {Competition} from '../../../dtos/competition';
+import { stat } from 'fs';
+import { DownloadReportDialogComponent } from '../../download-report-dialog/download-report-dialog.component';
+import { Globals } from 'src/app/global/globals';
 
 @Component({
   selector: 'app-create-competition',
@@ -23,8 +29,6 @@ import { CreateCompetitionSelectGradingSystemDialogComponent }
   styleUrls: ['./create-competition.component.scss']
 })
 export class CreateCompetitionComponent implements OnInit {
-
-  @ViewChildren('inputVariables') inputVariables: QueryList<ElementRef>;
 
   id: number = null;
   gradingGroups: any[] = [];
@@ -41,6 +45,9 @@ export class CreateCompetitionComponent implements OnInit {
     errors: null
   };
   submitted = false;
+  selectedFile: File;
+  imageUrl: string | SafeUrl = '../../../assets/turnier.jpg';
+  competitionPictureDummy: Competition;
 
   constructor(
     private formBuilder: UntypedFormBuilder,
@@ -51,7 +58,9 @@ export class CreateCompetitionComponent implements OnInit {
     private competitionService: CompetitionService,
     private gradingSystemService: GradingSystemService,
     private userService: UserService,
-    public dialog: MatDialog) {
+    private globals: Globals,
+    public dialog: MatDialog,
+    private sanitizer: DomSanitizer) {
 
     this.competitionForm = this.formBuilder.group({
       name: ['', [Validators.required]],
@@ -89,6 +98,20 @@ export class CreateCompetitionComponent implements OnInit {
             this.competitionForm.controls['public'].setValue(data.public ? 'TRUE' : 'FALSE');
             this.competitionForm.controls['draft'].setValue(data.draft ? 'TRUE' : 'FALSE');
 
+            this.competitionService.getCompetitionById(params.id).subscribe({
+              next: compPictureData => {
+                  this.competitionPictureDummy = compPictureData;
+                  if (this.competitionPictureDummy.picturePath) {
+                    this.imageUrl = this.globals.backendOrigin + '/' + this.competitionPictureDummy.picturePath;
+                    this.getImageFile(this.imageUrl.toString());
+                    console.log(this.imageUrl);
+                  }
+              },
+              error: error => {
+                this.toastr.error(error, 'Error fetching competition information');
+              }
+            });
+
             if (data.gradingGroups !== null && data.gradingGroups !== undefined) {
               this.gradingGroups = data.gradingGroups;
 
@@ -96,13 +119,19 @@ export class CreateCompetitionComponent implements OnInit {
                 const gradingSystem = JSON.parse(gradingGroup.gradingSystemDto.formula);
                 gradingGroup.stations = gradingSystem.stations.map(station => ({
                   id: station.id,
+                  idCount: Math.max(...station.variables.map(s => s.id)),
+                  minJudgeCount: station.variables.length > 0 ? station.variables[0].minJudgeCount : 1,
                   title: station.displayName,
                   variables: station.variables.map(variable => ({
                     name: variable.displayName,
                     type: 'variable',
                     typeHint: 'variableRef',
+                    strategy: variable.strategy,
                     value: variable.id
                   })),
+                  constants: this.parseConstantsFromFormular(station.formula)
+                                .filter((val, ind, array) => array.findIndex(va => va.value === val.value) === ind),
+                  selectedVariable: {name: '', value: -1, strategy: 'mean'},
                   formula: {
                     valid: true,
                     data: station.formula
@@ -112,6 +141,11 @@ export class CreateCompetitionComponent implements OnInit {
                   valid: true,
                   data: gradingSystem.formula
                 });
+                gradingGroup.templateState = TemplateState.none;
+                gradingGroup.constants = this.parseConstantsFromFormular(gradingSystem.formula)
+                  .filter((val, ind, array) => array.findIndex(va => va.value === val.value) === ind);
+
+                gradingGroup.idCount = Math.max(...gradingSystem.stations.map(s => s.id));
                 gradingGroup.stationVariables = gradingSystem.stations.map(station => ({
                   name: station.displayName,
                   value: station.id,
@@ -132,6 +166,42 @@ export class CreateCompetitionComponent implements OnInit {
         });
       }
     });
+  }
+
+  getImageFile(path: string): Promise<File> {
+    return new Promise((resolve, reject) => {
+      fetch(path)
+        .then(response => response.blob())
+        .then(blob => {
+          const extension = path.split('.').pop();
+          let mimeType = '';
+          if (extension === 'jpg' || extension === 'jpeg') {
+            mimeType = 'image/jpeg';
+          } else if (extension === 'png') {
+            mimeType = 'image/png';
+          }
+          const fileReader = new FileReader();
+          fileReader.onload = (event: any) => {
+            this.selectedFile = new File([event.target.result], 'imageName.' + extension, {type: mimeType});
+            resolve(this.selectedFile);
+          };
+          fileReader.readAsArrayBuffer(blob);
+          console.log('File loaded: ' + this.selectedFile);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  }
+
+  parseConstantsFromFormular(formula: any): any[] {
+    if(['add', 'mult', 'div', 'subt'].includes(formula.typeHint)) {
+      return [...this.parseConstantsFromFormular(formula.left), ...this.parseConstantsFromFormular(formula.right)];
+    } else if (formula.typeHint ==='const') {
+      return [formula];
+    } else {
+      return [];
+    }
   }
 
   checkGradingGroupValid(group): any[] {
@@ -172,6 +242,16 @@ export class CreateCompetitionComponent implements OnInit {
       return;
     }
 
+    if (this.selectedFile.size > 1000000) {
+      this.toastr.error('Datei größer als 1 Megabyte', 'Datei zu groß');
+      return;
+    }
+
+    if (this.selectedFile.size > 1000000) {
+      this.toastr.error('Datei größer als 1 Megabyte', 'Datei zu groß');
+      return;
+    }
+
     if (this.gradingGroups.length !== 0) {
       const invalidErrors = [];
 
@@ -185,8 +265,8 @@ export class CreateCompetitionComponent implements OnInit {
 <ul>
 ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
           `Ungültige Formeln`, {
-          enableHtml: true
-        });
+            enableHtml: true
+          });
 
         return;
       }
@@ -219,6 +299,8 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
             id: station.id,
             variables: station.variables.map(variable => ({
               displayName: variable.name,
+              strategy: variable.strategy,
+              minJudgeCount: station.minJudgeCount,
               id: variable.value
             })),
             formula: station.formula.data
@@ -230,7 +312,6 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
     }
 
 
-
     competition.gradingGroups = this.gradingGroups;
     competition.judges = this.judges;
 
@@ -239,17 +320,28 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
         next: value => {
           if (this.id !== null) {
             this.toastr.success('Turnier erfolgreich bearbeitet!');
+            console.log('test ' + this.selectedFile);
+            if (this.selectedFile !== undefined) {
+              this.uploadFile(value.id);
+            } else {
+              this.router.navigate(['/competition', this.id]);
+            }
           } else {
             this.toastr.success('Turnier erfolgreich erstellt!');
+            console.log('test ' + this.selectedFile);
+            if (this.selectedFile !== undefined) {
+              this.uploadFile(value.id);
+            } else {
+              this.router.navigate(['/competition', this.id]);
+            }
           }
-          this.router.navigate(['/competition', value.id]);
         },
         error: err => {
           console.log(err.error.errors);
           this.toastr.error(
             `<ul>${err.error.errors.map(e => '<li>' + e + '</li>').join('\n')}</ul>`,
             err.error.message,
-            { enableHtml: true });
+            {enableHtml: true});
         }
       });
   }
@@ -263,7 +355,8 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
       title: `Gruppe ${this.gradingGroups.length + 1}`,
       stations: [],
       stationVariables: [],
-      formula: { valid: false, data: {} },
+      constants: [],
+      formula: {valid: false, data: {}},
       idCount: 0,
       templateState: TemplateState.none
     });
@@ -279,7 +372,7 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
         const dialogRef = this.dialog.open(CreateCompetitionSelectGradingSystemDialogComponent, dialogConfig);
 
         dialogRef.afterClosed().subscribe(result => {
-          if(!result.selectedGradingSystemId) {
+          if (!result.selectedGradingSystemId) {
             return;
           }
 
@@ -302,10 +395,13 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
         newGradingGroup.stations = gradingSystem.stations.map(station => ({
           title: station.displayName,
           id: station.id,
+          minJudgeCount: station.variables.length > 0 ? station.variables[0].minJudgeCount : 1,
+          selectedVariable: {name: '', value: -1, strategy: 'mean'},
           variables: station.variables.map(variable => ({
             name: variable.displayName,
             type: 'variable',
             typeHint: 'variableRef',
+            strategy: variable.strategy,
             value: variable.id
           })),
           formula: {
@@ -325,6 +421,8 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
           typeHint: 'variableRef'
         }));
 
+        newGradingGroup.constants = [];
+
         this.gradingGroups.push(newGradingGroup);
       }
     });
@@ -334,7 +432,10 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
     this.gradingGroups[id].stations.push({
       title: `Station ${++this.gradingGroups[id].idCount}`,
       id: this.gradingGroups[id].idCount,
-      variables: [], idCount: 0, formula: { valid: false, data: {} }
+      minJudgeCount: 1,
+      selectedVariable: {name: '', value: -1, strategy: 'mean'},
+      constants: [],
+      variables: [], idCount: 0, formula: {valid: false, data: {}}
     });
 
     this.gradingGroups[id].stationVariables.push({
@@ -349,20 +450,75 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
     this.gradingGroups[id].stationVariables = cloneDeep(this.gradingGroups[id].stationVariables);
   }
 
-  addStationVariable(station) {
-    station.variables.push({
+  editVar(station, variable) {
+    station.selectedVariable = {
+      name: variable.name,
+      strategy: variable.strategy.type,
+      value: variable.value
+    };
+
+  }
+
+  clearVariable(station) {
+    station.selectedVariable = {
       name: '',
-      value: ++station.idCount,
-      type: 'variable',
-      typeHint: 'variableRef',
-      spaces: 0,
-      priority: 0
-    });
+      strategy: 'mean',
+      value: -1
+    };
+  }
+
+  addStationVariable(station) {
+
+    if(station.selectedVariable.name.trim() === '') {
+      return;
+    }
+
+    if(station.selectedVariable.value !== -1) {
+      const existing = station.variables.find(v => v.value === station.selectedVariable.value);
+
+      if(!existing) {
+        this.toastr.error('The world is going to blow up', 'Eins Error');
+        return;
+      }
+
+      if(station.variables.find(va => va.name === station.selectedVariable.name.trim() && va.value !== existing.value) !== undefined) {
+        this.toastr.warning('Variablennamen müssen innerhalb von einer Station einzigartig sein', 'Einzigartiger Name');
+        return;
+      }
+
+      this.toastr.info(`${existing.name} erfolgreich geändert`);
+
+      existing.name = station.selectedVariable.name;
+      existing.strategy = {
+        type: station.selectedVariable.strategy
+      };
+    } else {
+      if(station.variables.find(va => va.name === station.selectedVariable.name.trim()) !== undefined) {
+        this.toastr.warning('Variablennamen müssen innerhalb von einer Station einzigartig sein', 'Einzigartiger Name');
+        return;
+      }
+
+      station.variables.push({
+        name: station.selectedVariable.name.trim(),
+        value: ++station.idCount,
+        strategy: {
+          type: station.selectedVariable.strategy
+        },
+        type: 'variable',
+        typeHint: 'variableRef',
+        spaces: 0,
+        priority: 0
+      });
+    }
+
+    station.selectedVariable = {
+      name: '',
+      strategy: 'mean',
+      value: -1
+    };
+
 
     station.variables = cloneDeep(station.variables);
-
-    this.changeDetectorRef.detectChanges();
-    this.inputVariables.last.nativeElement.focus();
   }
 
   updateGroupName(id, newName) {
@@ -408,7 +564,7 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
       return;
     }
 
-    this.gradingGroups.splice(id + 1, 0, cloneDeep(Object.assign({}, group, { title: group.title + ' Kopie' })));
+    this.gradingGroups.splice(id + 1, 0, cloneDeep(Object.assign({}, group, {title: group.title + ' Kopie'})));
     this.toastr.info(`${this.gradingGroups[id + 1].title} erfolgreich erstellt.`);
   }
 
@@ -420,7 +576,7 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
       return;
     }
     this.gradingGroups[groupId].stations.splice(stationId + 1, 0, cloneDeep(
-      Object.assign({}, station, { title: station.title + ' Kopie', id: ++this.gradingGroups[groupId].idCount })));
+      Object.assign({}, station, {title: station.title + ' Kopie', id: ++this.gradingGroups[groupId].idCount})));
 
     this.gradingGroups[groupId].stationVariables.splice(stationId + 1, 0, {
       name: this.gradingGroups[groupId].stations[stationId + 1].title,
@@ -455,8 +611,8 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
 <ul>
 ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
         `Ungültige Formeln`, {
-        enableHtml: true
-      });
+          enableHtml: true
+        });
 
       return;
     }
@@ -472,6 +628,8 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
           id: station.id,
           variables: station.variables.map(variable => ({
             displayName: variable.name,
+            strategy: variable.strategy,
+            minJudgeCount: station.minJudgeCount,
             id: variable.value
           })),
           formula: station.formula.data
@@ -482,12 +640,12 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
 
     const dialogConfig = new MatDialogConfig();
 
-    dialogConfig.data = { gradingSystem };
+    dialogConfig.data = {gradingSystem};
 
     const dialogRef = this.dialog.open(TemplateDialogComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe(result => {
-      if(!result.save) {
+      if (!result.save) {
         return;
       }
 
@@ -542,5 +700,42 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
 
   removeJudge(index: number) {
     this.judges.splice(index, 1);
+  }
+
+  selectFile(event) {
+    this.selectedFile = event.target.files[0];
+    this.imageUrl = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(event.target.files[0]));
+  }
+
+  uploadFile(id: number) {
+    if (this.selectedFile != null) {
+      const extension = this.selectedFile.name.substring(this.selectedFile.name.lastIndexOf('.'));
+      if (extension === '.png' || extension === '.jpeg' || extension === '.jpg') {
+        this.competitionService.uploadPicture(id, this.selectedFile).subscribe(
+          event => {
+            if (event instanceof HttpResponse) {
+              this.toastr.success('Bild erfolgreich hochgeladen.');
+              this.router.navigate(['/competition', id]);
+            }
+          },
+          (error) => {
+            this.toastr.error(error.error);
+          }, () => {
+          });
+      } else {
+        this.toastr.error('Falscher Dateityp.');
+      }
+    } else {
+      this.toastr.error('Eine Datei muss ausgewählt sein.');
+    }
+  }
+
+  fileSelected() {
+    return !(this.selectedFile == null || false);
+  }
+
+  clearFileSelection() {
+    this.selectedFile = null;
+    this.imageUrl = '../../../assets/turnier.jpg';
   }
 }

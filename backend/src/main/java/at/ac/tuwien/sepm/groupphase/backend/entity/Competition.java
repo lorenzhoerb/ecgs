@@ -70,7 +70,7 @@ public class Competition {
     @JoinColumn(referencedColumnName = "id")
     private ApplicationUser creator;
 
-    @ManyToMany(cascade = {})
+    @ManyToMany(cascade = {}, fetch = FetchType.EAGER)
     @JoinTable(
         name = "Competition_Judge",
         joinColumns = {@JoinColumn(name = "competition_id")},
@@ -224,18 +224,18 @@ public class Competition {
     public String toString() {
         return "Competition{"
             + "id=" + id
-            + ", name='" + name + '\''
-            + ", beginOfRegistration=" + beginOfRegistration
-            + ", endOfRegistration=" + endOfRegistration
-            + ", endOfCompetition=" + endOfCompetition
-            + ", description='" + description + '\''
-            + ", picturePath='" + picturePath + '\''
-            + ", isPublic=" + isPublic
-            + ", draft=" + draft
-            + ", email='" + email + '\''
-            + ", phone='" + phone + '\''
-            + ", competition=" + gradingGroups
-            + ", judges=" + judgings
+            // + ", name='" + name + '\''
+            // + ", beginOfRegistration=" + beginOfRegistration
+            // + ", endOfRegistration=" + endOfRegistration
+            // + ", endOfCompetition=" + endOfCompetition
+            // + ", description='" + description + '\''
+            // + ", picturePath='" + picturePath + '\''
+            // + ", isPublic=" + isPublic
+            // + ", draft=" + draft
+            // + ", email='" + email + '\''
+            // + ", phone='" + phone + '\''
+            // + ", competition=" + gradingGroups
+            // + ", judges=" + judgings
             + '}';
     }
 }

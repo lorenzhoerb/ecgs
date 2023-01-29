@@ -1,8 +1,10 @@
 package at.ac.tuwien.sepm.groupphase.backend.service;
 
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ExcelReportDownloadResponseDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ExcelReportGenerationRequestDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradeDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradeResultDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingSystemDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.LiveResultDto;
 
 import java.util.List;
 
@@ -17,6 +19,10 @@ public interface GradeService {
      * @return unchanged GradeDto on success
      */
     GradeResultDto updateCompetitionResults(Long competitionId, Long gradingGroupId, String stationName, GradeDto grade);
+
+    LiveResultDto getAllResultsForParticipantAtStation(Long competitionId, Long gradingGroupId, Long stationId, Long participantId, Double result);
+
+    List<LiveResultDto> getAllResults(Long competitionId);
 
     Long verifyJudgeAndReturnId(Long competitionId, Long gradingGroupId, Long stationId);
 

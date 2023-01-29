@@ -25,6 +25,7 @@ export class CompetitionGradingStationComponent implements OnInit {
   otherGrades: any[] = [];
   results?: StationResults = null;
   _otherJudges: UserDetail[] = [];
+  isPending = false;
   private hasChanges = false;
 
   constructor() {
@@ -43,6 +44,7 @@ export class CompetitionGradingStationComponent implements OnInit {
     if (!this.hasChanges) {
       this.results = grade;
     }
+    this.isPending = false;
   }
 
   @Input() set otherGrade(other: any[]) {
@@ -63,6 +65,10 @@ export class CompetitionGradingStationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  isHidden() {
+    return (this.participantDetailDto as any).hidden;
   }
 
   gradeForJudge(judge, variableId) {
@@ -86,6 +92,22 @@ export class CompetitionGradingStationComponent implements OnInit {
       return null;
     }
     return parseFloat(this.results.variables.find(v => v.id == variableId).value);
+  }
+
+
+
+  pending() {
+    const pending = (this.participantDetailDto as any).isPending == true ? true : false;
+
+    return pending;
+  }
+
+  getLoaderClass() {
+    const hidden = !this.pending();
+
+    return {
+      hide: hidden
+    };
   }
 
   getResultText() {
@@ -141,7 +163,7 @@ export class CompetitionGradingStationComponent implements OnInit {
   }
 
   sendResults() {
-    if(!this.hasChanges) {
+    if(!this.hasChanges || this.pending()) {
       return;
     }
 
@@ -154,14 +176,14 @@ export class CompetitionGradingStationComponent implements OnInit {
 
   getAcceptState() {
     const error = (this.results as any).hasError === undefined ? false : (this.results as any).hasError;
-    return !this.hasChanges
+    return !this.hasChanges && !this.pending()
       && this.results.variables.find(v => v.value === null) === undefined
       && !error;
   }
 
   getErrorState() {
     const error = (this.results as any).hasError === undefined ? false : (this.results as any).hasError;
-    return !this.hasChanges && error;
+    return !this.hasChanges  && !this.pending() && error;
   }
 
   getErrorMessage() {

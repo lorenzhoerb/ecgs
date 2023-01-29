@@ -1,10 +1,15 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.Objects;
 
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserLoginDto {
 
     @NotNull(message = "Email must not be null")

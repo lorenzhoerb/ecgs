@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {genderMap, UserDetail} from '../../dtos/user-detail';
 import {SimpleFlagDto} from '../../dtos/simpleFlagDto';
 import {CompetitionService} from '../../services/competition.service';
@@ -9,6 +9,10 @@ import LocalizationService, {LocalizeService} from '../../services/localization/
 import {SupportedLanguages} from '../../services/localization/language';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {RegisterToModalComponent} from './register-to-modal/register-to-modal.component';
+import {UserDetailFilterDto} from '../../dtos/userDetailFilterDto';
+import {debounceTime, Subject} from 'rxjs';
+import {Router} from '@angular/router';
+import {ParticipantManageDto} from '../../dtos/participant-manage-dto';
 
 @Component({
   selector: 'app-club-manager-edit',
@@ -17,7 +21,16 @@ import {RegisterToModalComponent} from './register-to-modal/register-to-modal.co
 })
 export class ClubManagerEditComponent implements OnInit {
   currentLanguage = SupportedLanguages.German;
-  updateCounter = 0;
+  page = 1;
+  pageSize = 10;
+  totalElements = 10;
+  participants: UserDetail[] = [];
+  searchParameters: UserDetailFilterDto = {};
+  inputChange: Subject<any> = new Subject();
+  bulkMap: Map<number, UserDetail> = new Map<number, UserDetail>();
+  masterBulked = false;
+  bulkType = 0;
+
   canEditParticipants = false;
   myFlags: Map<number, SimpleFlagDto> = new Map();
   newFlagText = '';
@@ -26,6 +39,7 @@ export class ClubManagerEditComponent implements OnInit {
 
   constructor(private userService: UserService,
               private authService: AuthService,
+              private router: Router,
               private toastr: ToastrService,
               private modalService: NgbModal) {
     this.localize.changeLanguage(this.currentLanguage);
@@ -42,63 +56,79 @@ export class ClubManagerEditComponent implements OnInit {
       this.canEditParticipants = true;
       this.getManagedFlags();
     }
+
+    this.inputChange
+      .pipe(debounceTime(200))
+      .subscribe(e => {
+        this.page = 1;
+        this.getMembers();
+    });
+
+    this.getMembers();
   }
 
-  fetchParticipantsWithFlags = () => this.userService.getMembers();
-
-  bulkAction = (users: any[]) => {
-  };
-
-  addFlag() {
-    this.bulkAction = (users => {
-      this.addFlags(this.deepCopy(users));
+  getMembers() {
+    this.userService
+      .getMembers(
+        this.searchParameters,
+        this.page - 1,
+        this.pageSize).subscribe({
+      next: data => {
+        this.participants = data.content;
+        this.pageSize = data.size;
+        this.totalElements = data.totalElements;
+        this.page = data.pageable.pageNumber + 1;
+      },
+      error: err => {
+        this.router.navigate(['/']);
+      }
     });
   }
 
-  deleteFlag() {
-    this.bulkAction = (users => {
-      this.removeFlags(this.deepCopy(users));
-    });
+  bulkAction(action) {
+    this.masterBulked = false;
+    action(Array.from(this.bulkMap.values()));
+    this.bulkMap.clear();
   }
 
-  addFlags(users: UserDetail[]) {
+  addFlags() {
     const flag = this.myFlags.get(parseInt(this.selectedFlag, 10));
+    const users = Array.from(this.bulkMap.values());
     this.userService.addMemberFlags({flag, users}).subscribe({
       next: data => {
-        this.updateCounter++;
+        this.getMembers();
         this.getManagedFlags();
       },
       error: error => {
         this.toastr.error(error, 'Error setting flags');
-        this.updateCounter++;
+        console.log(error);
       }
     });
   }
 
   registerTo() {
     this.bulkAction = (users => {
-      if(!users || users.length === 0) {
+      if (!users || users.length === 0) {
         this.toastr.error('No members selected to register.');
         return;
       }
       const modalRef = this.modalService.open(RegisterToModalComponent, {size: 'lg'});
       modalRef.componentInstance.participants = users.map(u => ({...u, groupId: null}));
       modalRef.closed.subscribe(registered => {
-
       });
     });
   }
 
-  removeFlags(users: UserDetail[]) {
+  removeFlags() {
     const flag = this.myFlags.get(parseInt(this.selectedFlag, 10));
+    const users = Array.from(this.bulkMap.values());
     this.userService.removeMemberFlags({flag, users}).subscribe({
       next: data => {
-        this.updateCounter++;
+        this.getMembers();
         this.getManagedFlags();
       },
       error: error => {
         this.toastr.error(error, 'Error setting flags');
-        this.updateCounter++;
       }
     });
   }
@@ -134,16 +164,50 @@ export class ClubManagerEditComponent implements OnInit {
     --this.newId;
   }
 
-  mapParticipantWithFlags(p: UserDetail): any[] {
-    return [p.firstName, p.lastName, genderMap.get(p.gender), p.dateOfBirth.toLocaleDateString(),
-      p.flags.map(f => f.name).join(', ')];
+  onBulk(bulked: boolean, record: UserDetail) {
+    if (bulked) {
+      this.bulkMap.set(record.id, this.deepCopy(record));
+    } else {
+      this.bulkMap.delete(record.id);
+    }
+  }
+
+  onMasterBulk(bulked: boolean) {
+    this.participants.forEach(p => {
+      this.onBulk(bulked, p);
+    });
+  }
+
+  onPageChange() {
+    this.getMembers();
+    this.masterBulked = false;
   }
 
   currentFlags(): SimpleFlagDto[] {
     return Array.from(this.myFlags.values());
   }
 
-  deepCopy(x: any) {
+  mapFlags(flags: SimpleFlagDto[]): string {
+    if(flags == null) {
+      return '';
+    }
+
+    return flags.map(f => f.name).join(', ');
+  }
+
+  deepCopy(x: any): any {
     return JSON.parse(JSON.stringify(x));
+  }
+
+  onAddRemoveFlags(modalContent) {
+    this.modalService.open(modalContent, {ariaLabelledBy: 'modal-basic-title'}).result.then(
+      result => {
+        if(result === 'add') {
+          this.addFlags();
+        } else if(result === 'remove') {
+          this.removeFlags();
+        }
+      }
+    );
   }
 }

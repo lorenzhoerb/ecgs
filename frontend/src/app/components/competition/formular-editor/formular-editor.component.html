@@ -7,7 +7,7 @@
             <div class="variables copy" cdkDropList [cdkDropListData]="variables" cdkDropListSortingDisabled
                 (cdkDropListDropped)="drop($event)" (cdkDropListExited)="exitedVars($event)"
                 (cdkDropListEntered)="entered()" [cdkDropListEnterPredicate]="noEnterPredicate">
-                <div class="variable {{color}}" *ngFor="let item of variables;" cdkDrag [cdkDragData]="item">
+                <div (click)="editVariable.next(item)" class="variable {{color}}" *ngFor="let item of variables;" cdkDrag [cdkDragData]="item">
                     {{item.name}}
                 </div>
             </div>

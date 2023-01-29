@@ -1,6 +1,9 @@
 package at.ac.tuwien.sepm.groupphase.backend.specification;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantFilterDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailFilterDto;
+import at.ac.tuwien.sepm.groupphase.backend.entity.ManagedBy;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Flags;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.entity.GradingGroup;
@@ -13,7 +16,9 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import java.lang.invoke.MethodHandles;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ApplicationUserSpecs {
@@ -46,11 +51,104 @@ public class ApplicationUserSpecs {
             listSpecs.add(assignedToGradingGroup(criteria.getGradingGroupId()));
         }
 
+        if (criteria.getFlagId() != null && criteria.getCompetitionId() != null) {
+            listSpecs.add(hasRegisterFlag(criteria.getCompetitionId(), criteria.getFlagId()));
+        }
+
         Specification<ApplicationUser> specs;
         specs = listSpecs.stream().reduce(Specification::and).orElse(null);
 
         return specs;
     }
+
+    public static Specification<ApplicationUser> specs(Long id, UserDetailFilterDto criteria) {
+        LOGGER.debug("specs({})", criteria);
+        List<Specification<ApplicationUser>> listSpecs = new ArrayList<>();
+
+        listSpecs.add(isRegisteredToAndAccepted(id));
+
+        if (criteria.getFirstName() != null) {
+            listSpecs.add(hasFirstName(criteria.getFirstName()));
+        }
+
+        if (criteria.getLastName() != null) {
+            listSpecs.add(hasLastName(criteria.getLastName()));
+        }
+
+        if (criteria.getGender() != null) {
+            listSpecs.add(hasGender(criteria.getGender()));
+        }
+
+        if (criteria.getDateOfBirth() != null) {
+            listSpecs.add(dateIsBeforeOrEquals("dateOfBirth", criteria.getDateOfBirth()));
+        }
+
+        Specification<ApplicationUser> specs;
+        specs = listSpecs.stream().reduce(Specification::and).orElse(null);
+
+        return specs;
+    }
+
+    public static Specification<ApplicationUser> groupSpecs(Long id, UserDetailFilterDto criteria) {
+        LOGGER.debug("groupSpecs({})", criteria);
+        List<Specification<ApplicationUser>> listSpecs = new ArrayList<>();
+
+        listSpecs.add(isRegisteredToGroup(id));
+
+        if (criteria.getFirstName() != null) {
+            listSpecs.add(hasFirstName(criteria.getFirstName()));
+        }
+
+        if (criteria.getLastName() != null) {
+            listSpecs.add(hasLastName(criteria.getLastName()));
+        }
+
+        if (criteria.getGender() != null) {
+            listSpecs.add(hasGender(criteria.getGender()));
+        }
+
+        if (criteria.getDateOfBirth() != null) {
+            listSpecs.add(dateIsBeforeOrEquals("dateOfBirth", criteria.getDateOfBirth()));
+        }
+
+        Specification<ApplicationUser> specs;
+        specs = listSpecs.stream().reduce(Specification::and).orElse(null);
+
+        return specs;
+    }
+
+    public static Specification<ApplicationUser> specsForMembers(Long managerId, UserDetailFilterDto criteria) {
+        LOGGER.debug("specs({})", criteria);
+        List<Specification<ApplicationUser>> listSpecs = new ArrayList<>();
+
+        listSpecs.add(isMember(managerId));
+
+        if (criteria.getFirstName() != null) {
+            listSpecs.add(hasFirstName(criteria.getFirstName()));
+        }
+
+        if (criteria.getLastName() != null) {
+            listSpecs.add(hasLastName(criteria.getLastName()));
+        }
+
+        if (criteria.getGender() != null) {
+            listSpecs.add(hasGender(criteria.getGender()));
+        }
+
+        if (criteria.getDateOfBirth() != null) {
+            listSpecs.add(dateIsBeforeOrEquals("dateOfBirth", criteria.getDateOfBirth()));
+        }
+
+        if (criteria.getFlagId() != null) {
+            listSpecs.add(hasMemberFlag(managerId, criteria.getFlagId()));
+        }
+
+        Specification<ApplicationUser> specs;
+        specs = listSpecs.stream().reduce(Specification::and).orElse(null);
+
+        return specs;
+    }
+
 
     public static Specification<ApplicationUser> assignedToGradingGroup(Long gradingGroup) {
         LOGGER.debug("assignedToGradingGroup({})", gradingGroup);
@@ -68,6 +166,33 @@ public class ApplicationUserSpecs {
             Join<RegisterTo, GradingGroup> gradingGroupJoin = registerToJoin.join("gradingGroup", JoinType.LEFT);
             Join<GradingGroup, Competition> competition = gradingGroupJoin.join("competition", JoinType.LEFT);
             return cb.equal(competition.get("id"), competitionId);
+        };
+    }
+
+    public static Specification<ApplicationUser> isRegisteredToAndAccepted(Long competitionId) {
+        LOGGER.debug("isRegisteredTo({})", competitionId);
+        return (root, query, cb) -> {
+            Join<ApplicationUser, RegisterTo> registerToJoin = root.join("registrations", JoinType.LEFT);
+            Join<RegisterTo, GradingGroup> gradingGroupJoin = registerToJoin.join("gradingGroup", JoinType.LEFT);
+            Join<GradingGroup, Competition> competition = gradingGroupJoin.join("competition", JoinType.LEFT);
+            return cb.and(cb.equal(competition.get("id"), competitionId), cb.equal(registerToJoin.get("accepted"), true));
+        };
+    }
+
+    public static Specification<ApplicationUser> isRegisteredToGroup(Long groupId) {
+        LOGGER.debug("isRegisteredToGroup({})", groupId);
+        return (root, query, cb) -> {
+            Join<ApplicationUser, RegisterTo> registerToJoin = root.join("registrations", JoinType.LEFT);
+            Join<RegisterTo, GradingGroup> gradingGroupJoin = registerToJoin.join("gradingGroup", JoinType.LEFT);
+            return cb.and(cb.equal(gradingGroupJoin.get("id"), groupId), cb.equal(registerToJoin.get("accepted"), true));
+        };
+    }
+
+    public static Specification<ApplicationUser> isMember(Long managerId) {
+        LOGGER.debug("isMember({})", managerId);
+        return (root, query, cb) -> {
+            Join<ApplicationUser, ManagedBy> registerToJoin = root.join("managers", JoinType.LEFT);
+            return cb.equal(registerToJoin.get("manager"), managerId);
         };
     }
 
@@ -103,6 +228,29 @@ public class ApplicationUserSpecs {
         return (root, query, cb) -> {
             Join<ApplicationUser, Competition> usersComp = root.join("competitions");
             return cb.equal(usersComp.get("id"), competitionId);
+        };
+    }
+
+    public static Specification<ApplicationUser> dateIsBeforeOrEquals(String key, Date date) {
+        LOGGER.debug("dateIsBeforeOrEquals({}, {})", key, date);
+        return (root, query, cb) -> cb.lessThanOrEqualTo(root.get(key), date);
+    }
+
+    public static Specification<ApplicationUser> hasMemberFlag(Long managerId, Long flagId) {
+        LOGGER.debug("hasMemberFlag({}, {})", managerId, flagId);
+        return (root, query, cb) -> {
+            Join<ApplicationUser, ManagedBy> managedByJoin = root.join("managers", JoinType.LEFT);
+            Join<ManagedBy, Flags> flagsJoin = managedByJoin.join("flags", JoinType.LEFT);
+            return cb.and(cb.equal(managedByJoin.get("manager"), managerId), cb.equal(flagsJoin.get("id"), flagId));
+        };
+    }
+
+    public static Specification<ApplicationUser> hasRegisterFlag(Long competitionId, Long flagId) {
+        LOGGER.debug("hasRegisterFlag({}, {})", competitionId, flagId);
+        return (root, query, cb) -> {
+            Join<ApplicationUser, RegisterTo> registerToJoin = root.join("registrations", JoinType.LEFT);
+            Join<RegisterTo, Flags> flagsJoin = registerToJoin.join("flags", JoinType.LEFT);
+            return cb.and(cb.equal(registerToJoin.get("gradingGroup").get("competition"), competitionId), cb.equal(flagsJoin.get("id"), flagId));
         };
     }
 }

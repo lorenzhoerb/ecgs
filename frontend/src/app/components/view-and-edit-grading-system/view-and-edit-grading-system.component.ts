@@ -11,7 +11,6 @@ import { ViewEditGradingGroup, ViewEditGradingGroupSearch, ViewEditGradingGroupS
   styleUrls: ['./view-and-edit-grading-system.component.scss']
 })
 export class ViewAndEditGradingSystemComponent implements OnInit {
-  @ViewChildren('inputVariables') inputVariables: QueryList<ElementRef>;
   createMode = false;
   savedGradingGroups = [];
   savedGradingGroupsBackup = [];
@@ -184,12 +183,17 @@ export class ViewAndEditGradingSystemComponent implements OnInit {
             foundGradingGroup.stations = gradingSystem.stations.map(station => ({
               name: station.displayName,
               id: station.id,
+              minJudgeCount: station.variables.length > 0 ? station.variables[0].minJudgeCount : 1,
               variables: station.variables.map(variable => ({
                 name: variable.displayName,
                 type: 'variable',
                 typeHint: 'variableRef',
+                strategy: variable.strategy,
                 value: variable.id
               })),
+              constants: this.parseConstantsFromFormular(station.formula)
+                .filter((val, ind, array) => array.findIndex(va => va.value === val.value) === ind),
+              selectedVariable: {name: '', value: -1, strategy: 'mean'},
               formula: {
                 valid: true,
                 data: station.formula
@@ -206,6 +210,10 @@ export class ViewAndEditGradingSystemComponent implements OnInit {
               type: 'variable',
               typeHint: 'variableRef'
             }));
+            foundGradingGroup.constants =
+              this.parseConstantsFromFormular(gradingSystem.formula)
+                .filter((val, ind, array) => array.findIndex(va => va.value === val.value) === ind);
+
             foundGradingGroup.idCount = Math.max(...foundGradingGroup.stations.map(s => s.id));
             if (foundGradingGroup.editable) {
               this.savedGradingGroupsBackup[foundGradingGroupIndex] = cloneDeep(foundGradingGroup);
@@ -222,11 +230,22 @@ export class ViewAndEditGradingSystemComponent implements OnInit {
     console.log('MEMORY', this.savedGradingGroups, this.savedGradingGroupsBackup);
   }
 
+  parseConstantsFromFormular(formula: any): any[] {
+    if(['add', 'mult', 'div', 'subt'].includes(formula.typeHint)) {
+      return [...this.parseConstantsFromFormular(formula.left), ...this.parseConstantsFromFormular(formula.right)];
+    } else if (formula.typeHint ==='const') {
+      return [formula];
+    } else {
+      return [];
+    }
+  }
+
   public onCreateGradingGroupClick(): void {
     this.createMode = true;
     this.selectedGradingGroup = {
       name: ``,
       stations: [],
+      constants: [],
       stationVariables: [],
       formula: { valid: false, data: {} },
       idCount: 0,
@@ -238,8 +257,16 @@ export class ViewAndEditGradingSystemComponent implements OnInit {
   addStation() {
     const group = this.selectedGradingGroup;
     group.stations.push({name: `Station ${++group.idCount}`,
-      id: group.idCount, variables: [],
-      idCount: 0, formula: {valid: false, data: {} }});
+      id: group.idCount,
+      variables: [],
+      selectedVariable: {name: '', value: -1, strategy: 'mean'},
+      minJudgeCount: 1,
+      constants: [],
+      idCount: 0,
+      formula: {
+        valid: false, data: {}
+      }
+    });
 
       group.stationVariables.push({
       name: `Station ${group.idCount}`,
@@ -253,19 +280,80 @@ export class ViewAndEditGradingSystemComponent implements OnInit {
     group.stationVariables = cloneDeep(group.stationVariables);
   }
 
-  addStationVariable(station) {
-    station.variables.push({
+  editVar(station, variable) {
+    station.selectedVariable = {
+      name: variable.name,
+      strategy: variable.strategy.type,
+      value: variable.value
+    };
+
+  }
+
+  clearVariable(station) {
+    station.selectedVariable = {
       name: '',
-      value: ++station.idCount,
-      type: 'variable',
-      typeHint: 'variableRef',
-      spaces: 0,
-      priority: 0});
+      strategy: 'mean',
+      value: -1
+    };
+  }
+
+  addStationVariable(station) {
+    // station.variables.push({
+    //   name: '',
+    //   value: ++station.idCount,
+    //   type: 'variable',
+    //   typeHint: 'variableRef',
+    //   spaces: 0,
+    //   priority: 0});
+
+    // station.variables = cloneDeep(station.variables);
+
+    // this.changeDetectorRef.detectChanges();
+
+    if(station.selectedVariable.name.trim() === '') {
+      this.toastr.warning('Variablennamen dürfen nicht leer sein', 'Name fehlt');
+      return;
+    }
+
+    if(station.variables.find(va => va.name === station.selectedVariable.name.trim()) !== undefined) {
+      this.toastr.warning('Variablennamen müssen innerhalb von einer Station einzigartig sein', 'Einzigartiger Name');
+      return;
+    }
+
+    if(station.selectedVariable.value !== -1) {
+      const existing = station.variables.find(v => v.value === station.selectedVariable.value);
+
+      if(!existing) {
+        this.toastr.error('The world is going to blow up', 'Eins Error');
+        return;
+      }
+
+      existing.name = station.selectedVariable.name;
+      existing.strategy = {
+        type: station.selectedVariable.strategy
+      };
+    } else {
+      station.variables.push({
+        name: station.selectedVariable.name.trim(),
+        value: ++station.idCount,
+        strategy: {
+          type: station.selectedVariable.strategy
+        },
+        type: 'variable',
+        typeHint: 'variableRef',
+        spaces: 0,
+        priority: 0
+      });
+    }
+
+    station.selectedVariable = {
+      name: '',
+      strategy: 'mean',
+      value: -1
+    };
+
 
     station.variables = cloneDeep(station.variables);
-
-    this.changeDetectorRef.detectChanges();
-    this.inputVariables.last.nativeElement.focus();
   }
 
   upadteStationName(stationId, newName) {
@@ -381,6 +469,8 @@ export class ViewAndEditGradingSystemComponent implements OnInit {
           id: station.id,
           variables: station.variables.map(variable => ({
             displayName: variable.name,
+            strategy: variable.strategy,
+            minJudgeCount: station.minJudgeCount,
             id: variable.value
           })),
           formula: station.formula.data

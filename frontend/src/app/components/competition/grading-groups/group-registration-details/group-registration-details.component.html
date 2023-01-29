@@ -1,0 +1,24 @@
+<ngb-accordion #a="ngbAccordion" activeIds="custom-panel-1">
+  <ngb-panel *ngFor="let gg of gradingGroups" [id]="'group-' + gg.id">
+    <ng-template ngbPanelHeader let-opened="opened">
+      <div style="display: flex; padding: 8px; align-items: center" [class.collapsed]="!opened">
+        <p class="m-0">{{gg.title}}</p>
+        <div style="margin-left: 5px;">
+          <button
+            ngbPanelToggle
+            class="btn btn-outline-secondary"
+            *ngIf="gg.constraints && gg.constraints.length > 0"
+          >{{localize.showRegistrationRequirements}}
+          </button>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template ngbPanelContent>
+      <ul>
+        <li *ngFor="let constraint of gg.constraints">
+          {{constraint.description}}
+        </li>
+      </ul>
+    </ng-template>
+  </ngb-panel>
+</ngb-accordion>

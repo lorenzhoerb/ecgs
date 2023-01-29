@@ -1,0 +1,15 @@
+<div class="row">
+  <div class="col-3"></div>
+  <div class="col-6">
+    <app-content-card title="Grading Groups" >
+      <div class="card" *ngIf="gradingGroups">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item gg-item" *ngFor="let gg of gradingGroups" (click)="onClick(gg.id)">{{gg.title}}</li>
+        </ul>
+      </div>
+      <div class="card" *ngIf="!gradingGroups">
+        <p>No Grading groups present</p>
+      </div>
+    </app-content-card>
+  </div>
+</div>

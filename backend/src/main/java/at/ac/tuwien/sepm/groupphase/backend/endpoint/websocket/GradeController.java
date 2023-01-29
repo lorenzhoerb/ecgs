@@ -2,6 +2,7 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint.websocket;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradeDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradeResultDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.LiveResultDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.MessageErrorDto;
 import at.ac.tuwien.sepm.groupphase.backend.exception.BadWebSocketRequestException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
@@ -71,7 +72,13 @@ public class GradeController {
         try {
             LOGGER.trace("WS Request to: /judge/{}/{}/{} Payload: {}", competitionId, groupId, stationName, gradeDto);
             LOGGER.info("Grade: {}", gradeDto);
-            return this.gradeService.updateCompetitionResults(competitionId, groupId, stationName, gradeDto);
+            GradeResultDto result = this.gradeService.updateCompetitionResults(competitionId, groupId, stationName, gradeDto);
+            if (result.isValid() && result.result() != null && !result.result().isNaN()) {
+                LiveResultDto liveResult = this.gradeService.getAllResultsForParticipantAtStation(competitionId, groupId, result.stationId(), result.participantId(), result.result());
+                LOGGER.trace("Sending to /topic/live-results/{} with Grade: {}", competitionId, gradeDto);
+                this.messagingTemplate.convertAndSend("/topic/live-results/" + competitionId, liveResult);
+            }
+            return result;
         } catch (Exception e) {
             throw new WebSocketMessageException(e.getMessage(), gradeDto.uuid(), e);
         }
@@ -98,9 +105,7 @@ public class GradeController {
             errorType = MessageErrorDto.MessageErrorType.NOT_FOUND;
         } else if (wsException.getCause() instanceof UnauthorizedException) {
             errorType = MessageErrorDto.MessageErrorType.UNAUTHORIZED;
-        } else if (wsException.getCause() instanceof ValidationException) {
-            errorType = MessageErrorDto.MessageErrorType.VALIDATION;
-        } else if (wsException.getCause() instanceof ValidationListException) {
+        } else if (wsException.getCause() instanceof ValidationException || wsException.getCause() instanceof ValidationListException) {
             errorType = MessageErrorDto.MessageErrorType.VALIDATION;
         }
 

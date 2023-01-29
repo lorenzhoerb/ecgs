@@ -14,6 +14,7 @@ export class ContentCardComponent implements OnInit {
   @Input() actions = [];
   @Input() templateState = TemplateState.none;
   @Input() isCollapsed = false;
+  @Input() isLargeExpanded = false;
 
   @Output() titleChange = new EventEmitter<string>();
 
@@ -21,6 +22,7 @@ export class ContentCardComponent implements OnInit {
   @Output() delete = new EventEmitter();
   @Output() collapsed = new EventEmitter<boolean>();
   @Output() templateAction = new EventEmitter<TemplateAction>();
+  @Output() largeExpandChanged = new EventEmitter<boolean>();
 
   public tState = TemplateState;
 
@@ -47,6 +49,12 @@ export class ContentCardComponent implements OnInit {
     this.isCollapsed = !this.isCollapsed;
     this.collapsed.emit(this.isCollapsed);
   }
+
+  expand() {
+    this.isLargeExpanded = !this.isLargeExpanded;
+    this.largeExpandChanged.emit(this.isLargeExpanded);
+  }
+
   templateClicked() {
     this.templateAction.emit(TemplateAction.saveNew);
   }

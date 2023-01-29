@@ -3,8 +3,8 @@
 //Disable the lint because localization keys should not be forced to obey naming conventions
 
 export enum SupportedLanguages {
-    German = 'de-DE',
-    English = 'en-US'
+  German = 'de-DE',
+  English = 'en-US'
 }
 
 export class LocalizationKeys {
@@ -20,12 +20,20 @@ export class LocalizationKeys {
   errRegComp: string;
   competition: string;
   groupPreference: string;
+  registerToAGroup: string;
   noPreference: string;
   forgotPassword: string;
   sendResetLink: string;
   gradingGroup: string;
 
   edit: string;
+  selectAGroup: string;
+  groupHasRegistrationReq: string;
+  showGroupInformation: string;
+  assignAll: string;
+  groups: string;
+
+  calculateCompetitionResults: string;
 
   datesAndContacts: string;
   description: string;
@@ -46,6 +54,11 @@ export class LocalizationKeys {
   public: string;
   onlyClubs: string;
   save: string;
+
+  meanStrategy: string;
+  equalStrategy: string;
+
+  judge: string;
 
   time: string;
   beginAtOrAfter: string;
@@ -110,12 +123,33 @@ export class LocalizationKeys {
   password: string;
   userSettings: string;
   filePictureRestrictions: string;
+  uploadCompetitionPictureDisclaimer: string;
+  clearFileUpload: string;
   changePassword: string;
   changeUserPicture: string;
   uploadUserPicture: string;
   dateOfBirth: string;
   gender: string;
   type: string;
+  showRegistrationRequirements: string;
+  addAnotherCondition: string;
+  manageRegistrationConstraints: string;
+  registerConstraints: string;
+  noConstraints: string;
+  constraints: string;
+  everybodyCanRegisterToThisGroup: string;
+  age: string;
+  equals: string;
+  notEquals: string;
+  greaterThan: string;
+  greaterOrEqualsThan: string;
+  lessThan: string;
+  lessOrEqualsThan: string;
+  bornBefore: string;
+  bornAfter: string;
+
+
+
 
   regMemToComp: string;
   searchAndSelectToRegister: string;
@@ -126,6 +160,9 @@ export class LocalizationKeys {
   back: string;
 
   editTeam: string;
+  addRemoveFlags: string;
+
+  liveResults: string;
 
   enter: (type: string) => string;
   reEnter: (type: string) => string;

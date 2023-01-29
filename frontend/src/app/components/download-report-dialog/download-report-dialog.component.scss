@@ -1,0 +1,101 @@
+div.background {
+    background-color: white;
+    padding: 0em 2em 2em;
+    border-radius: 4px;
+    width: 500px;
+}
+
+h2.dialog-title {
+    box-shadow: var(--shadow);
+    background-color: var(--ming);
+    color: snow;
+    padding: 8px 16px;
+    border-radius: 4px 4px 0 0;
+    margin: 0 -2rem 1rem -2rem;
+}
+
+input[rule="checkbox"] {
+    width: 1.2em;
+}
+
+.dialog-content {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1em;
+    font-size: 1.2rem;
+}
+
+.action-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+}
+
+.left {
+    display: flex;
+}
+
+label {
+    display: flex;
+    align-items: center;
+}
+
+button.close-btn {
+    font-size: 1em;
+    border-radius: 4px;
+}
+
+button.save-btn {
+    font-size: 1em;
+    border-radius: 4px;
+    background-color: var(--ming);
+    color: snow;
+}
+
+.clickable-div {
+    border-radius: 8px;
+    text-align: center;
+    color: white;
+    font-size: 130%;
+    font-weight: bold;
+    margin-bottom: 0.7em;
+    box-sizing: border-box;
+    overflow: clip;
+    text-overflow: ellipsis;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.select-all-grading-groups-btn {
+    overflow-x: hide; 
+    white-space: nowrap; 
+    padding: 0px; 
+    background-color: rgb(59, 53, 97);
+    margin-bottom: 1.5em;
+    color: snow;
+    padding-left: 1em;
+    padding-right: 1em;
+
+}
+
+.clickable-div:hover {
+    cursor: pointer;
+}
+
+.grading-group {
+    background-color: rgba(42, 218, 42, 0.733);
+}
+
+.inclusion-rule {
+    background-color: rgb(97, 236, 229);
+}
+
+.item-selected {
+    outline: 3px solid black;
+}
+
+.disabled-inclusion-rule {
+    background-color: rgb(153, 153, 153);
+    cursor: default !important;
+}

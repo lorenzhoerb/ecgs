@@ -13,4 +13,8 @@ public class ConflictException extends ErrorListException {
     public ConflictException(String messageSummary, List<String> errors) {
         super("Conflicts", messageSummary, errors);
     }
+
+    public ConflictException(String messageSummary) {
+        super("Conflicts", messageSummary, List.of());
+    }
 }

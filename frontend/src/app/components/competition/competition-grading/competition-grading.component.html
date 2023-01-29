@@ -3,7 +3,7 @@
 
   <div [ngClass]="dynamicStyleClass(true)" *ngIf="gradingGroups !== undefined" class="select-stations-header">
     <span>Zeige nur Stationen für Gruppe: </span>
-    <select [(ngModel)]="selectedGroup">
+    <select [(ngModel)]="selectedGroup" (change)="selectionChanged()">
       <option [value]="-1">Alle Gruppen</option>
       <option *ngFor="let group of gradingGroups;let i = index;" [value]="i">
         {{group.title}}

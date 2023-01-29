@@ -13,5 +13,5 @@
 </div>
 <div class="modal-footer d-flex justify-content-between" *ngIf="state === registerState.summary">
   <button type="button" class="btn btn-secondary" (click)="onBack()">{{localize.back}}</button>
-  <button type="button" class="btn btn-primary" (click)="onRegister()">{{localize.register}}</button>
+  <button type="button" class="btn btn-primary" [disabled]="!canRegister" (click)="onRegister()">{{localize.register}}</button>
 </div>

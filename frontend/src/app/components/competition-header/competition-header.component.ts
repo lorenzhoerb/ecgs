@@ -26,6 +26,15 @@ export class CompetitionHeaderComponent implements OnInit, AfterViewInit {
 
   @Output() grading = new EventEmitter<void>();
 
+  @Input() canCalculateCompetitionResults = false;
+
+  @Output() competitionResultsCalculation = new EventEmitter<void>();
+
+  @Input() reportsAreDownloadable = false;
+
+  @Output() downloadReportDialogOpen = new EventEmitter<void>();
+
+
   @ViewChild('header', {read: ElementRef})
   header: ElementRef;
   @ViewChild('ob', {read: ElementRef})
@@ -67,5 +76,13 @@ export class CompetitionHeaderComponent implements OnInit, AfterViewInit {
 
   onGradingClick() {
     this.grading.emit();
+  }
+
+  onCalculateCompetitionResults() {
+    this.competitionResultsCalculation.emit();
+  }
+
+  onDownloadReportClick() {
+    this.downloadReportDialogOpen.emit();
   }
 }

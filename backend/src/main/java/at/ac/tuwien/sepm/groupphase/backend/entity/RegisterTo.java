@@ -7,7 +7,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.ManyToMany;
+import javax.persistence.CascadeType;
 import java.io.Serializable;
+import java.util.Set;
 
 @Entity
 public class RegisterTo implements Serializable {
@@ -24,8 +27,8 @@ public class RegisterTo implements Serializable {
     @JoinColumn(referencedColumnName = "id")
     private GradingGroup gradingGroup;
 
-    // @NOTICE: The relationships to Grade and Flags from the ER-Diagram are not modeled her
-    // as they do not really make sense.
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "registrations")
+    private Set<Flags> flags;
 
     @Column(nullable = false)
     private Boolean accepted;
@@ -37,6 +40,14 @@ public class RegisterTo implements Serializable {
         this.participant = participant;
         this.gradingGroup = gradingGroup;
         this.accepted = accepted;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public ApplicationUser getParticipant() {
@@ -61,6 +72,14 @@ public class RegisterTo implements Serializable {
 
     public void setAccepted(Boolean accepted) {
         this.accepted = accepted;
+    }
+
+    public Set<Flags> getFlags() {
+        return flags;
+    }
+
+    public void setFlags(Set<Flags> flags) {
+        this.flags = flags;
     }
 
     @Override

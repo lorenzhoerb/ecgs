@@ -1,4 +1,4 @@
-<div class="card-container">
+<div class="card-container" *ngIf="!isHidden()">
   <div class="start">
     <h4 style="margin-right: 50px;width: 250px; overflow: hidden">{{participantDetailDto.participant.firstName}}
       {{participantDetailDto.participant.lastName}}</h4>
@@ -15,8 +15,11 @@
       <div [ngClass]="getErrorStyle()" style="display: flex; flex-direction: column; align-items: center; margin-left: 15px; margin-right: 15px;"
         *ngFor="let stationVariable of station.variables">
         <label [for]="stationVariable.displayName">{{stationVariable.displayName}}</label>
-        <input style="text-align: center;" type="text" [id]="stationVariable.id"
+        <input style="text-align: center;" type="text" [id]="stationVariable.id" [disabled]="pending()"
           [name]="stationVariable.displayName" [value]="getModel(stationVariable.id)" (input)="onInputChange($event, station.id, stationVariable.id)">
+      </div>
+      <div [ngClass]="getLoaderClass()" class="load-container">
+        <div class="dot-pulse"></div>
       </div>
       <button class="primary-btn bc-blue" [ngClass]="getAcceptStateClass()" (click)="sendResults()">
         <span *ngIf="!getAcceptState() && !getErrorState()">

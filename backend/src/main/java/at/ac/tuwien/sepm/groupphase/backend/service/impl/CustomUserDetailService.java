@@ -11,30 +11,20 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailSetFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamImportDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ClubManagerTeamMemberImportDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlag;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlagsResultDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserCredentialUpdateDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantSelfRegistrationDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseParticipantRegistrationDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserInfoDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserPasswordResetDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserPasswordResetRequestDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserSearchDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailSetFlagDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailFlagDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleFlagDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseParticipantRegistrationDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserInfoDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailFilterDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.FlagsMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.FlagsMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Flags;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ManagedBy;
+import at.ac.tuwien.sepm.groupphase.backend.entity.RegisterTo;
 import at.ac.tuwien.sepm.groupphase.backend.entity.SecurityUser;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
@@ -45,6 +35,7 @@ import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.FlagsRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.SecurityUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ManagedByRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
@@ -53,6 +44,8 @@ import at.ac.tuwien.sepm.groupphase.backend.service.EmailService;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import at.ac.tuwien.sepm.groupphase.backend.service.helprecords.ClubManagerTeamImportResults;
+import at.ac.tuwien.sepm.groupphase.backend.service.helprecords.FlagUtils;
+import at.ac.tuwien.sepm.groupphase.backend.specification.ApplicationUserSpecs;
 import at.ac.tuwien.sepm.groupphase.backend.util.PasswordGenerator;
 import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
 import at.ac.tuwien.sepm.groupphase.backend.validation.ClubManagerTeamImportDtoValidator;
@@ -62,14 +55,16 @@ import at.ac.tuwien.sepm.groupphase.backend.validation.PasswordChangeValidator;
 import at.ac.tuwien.sepm.groupphase.backend.validation.RegistrationValidator;
 import at.ac.tuwien.sepm.groupphase.backend.validation.UserSetFlagValidator;
 import at.ac.tuwien.sepm.groupphase.backend.validation.SimpleFlagValidator;
-import at.ac.tuwien.sepm.groupphase.backend.validation.ForgotPasswordValidator;
-import at.ac.tuwien.sepm.groupphase.backend.validation.ImportManyFlagsValidator;
-import at.ac.tuwien.sepm.groupphase.backend.validation.PasswordChangeValidator;
-import at.ac.tuwien.sepm.groupphase.backend.validation.RegistrationValidator;
 import net.bytebuddy.utility.RandomString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
@@ -89,14 +84,10 @@ import java.lang.invoke.MethodHandles;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.HashSet;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -119,6 +110,7 @@ public class CustomUserDetailService implements UserService {
     private final ForgotPasswordValidator forgotPasswordValidator;
     private final UserMapper userMapper;
     private final FlagsMapper flagsMapper;
+    private final FlagUtils flagUtils;
 
     private final EmailService emailService;
 
@@ -134,7 +126,12 @@ public class CustomUserDetailService implements UserService {
     private final ImportManyFlagsValidator flagsValidator;
     private final FlagsRepository flagsRepository;
 
+    private final RegisterToRepository registerToRepository;
+
     private final CompetitionService competitionService;
+
+    @Value("${resetBaseUri}")
+    private String resetBaseUri;
 
     @Autowired
     public CustomUserDetailService(ApplicationUserRepository userRepository,
@@ -142,6 +139,7 @@ public class CustomUserDetailService implements UserService {
                                    PasswordEncoder passwordEncoder,
                                    JwtTokenizer jwtTokenizer,
                                    ManagedByRepository managedByRepository,
+                                   RegisterToRepository registerToRepository,
                                    ClubManagerTeamImportDtoValidator teamValidator,
                                    EmailService emailService, UserMapper userMapper, SessionUtils sessionUtils,
                                    UserSetFlagValidator userSetFlagValidator, SimpleFlagValidator simpleFlagValidator,
@@ -150,7 +148,8 @@ public class CustomUserDetailService implements UserService {
                                    PasswordChangeValidator passwordChangeValidator,
                                    ForgotPasswordValidator forgotPasswordValidator,
                                    CompetitionRegistrationService competitionRegistrationService,
-                                   ImportManyFlagsValidator flagsValidator, FlagsRepository flagsRepository, CompetitionRepository competitionRepository,
+                                   ImportManyFlagsValidator flagsValidator,
+                                   FlagsRepository flagsRepository, CompetitionRepository competitionRepository,
                                    FlagsMapper flagsMapper) {
         this.userRepository = userRepository;
         this.securityUserRepository = securityUserRepository;
@@ -172,6 +171,8 @@ public class CustomUserDetailService implements UserService {
         this.simpleFlagValidator = simpleFlagValidator;
         this.competitionRegistrationService = competitionRegistrationService;
         this.competitionRepository = competitionRepository;
+        this.flagUtils = new FlagUtils(flagsMapper, flagsRepository);
+        this.registerToRepository = registerToRepository;
     }
 
     @Override
@@ -185,11 +186,7 @@ public class CustomUserDetailService implements UserService {
 
         // Grouping because of how entity flags are defined
         Map<String, List<ImportFlag>> groupedByFlagNamesMap = flags.stream().collect(groupingBy(ImportFlag::getFlag));
-        var optThisUsersManagedByes = managedByRepository.findAllByManagerIs(sessionUtils.getSessionUser());
-        List<ManagedBy> thisUsersManagedByes = null;
-        if (optThisUsersManagedByes.isPresent()) {
-            thisUsersManagedByes = optThisUsersManagedByes.get();
-        }
+        var thisUsersManagedByes = managedByRepository.findAllByManagerIs(sessionUtils.getSessionUser());
         if (thisUsersManagedByes != null && !thisUsersManagedByes.isEmpty()) {
             Map<String, ManagedBy> emailToManagedByMap = new HashMap<>();
             for (ManagedBy managedby : thisUsersManagedByes) {
@@ -252,7 +249,7 @@ public class CustomUserDetailService implements UserService {
         try {
             String token = RandomString.make(32);
             this.updateResetPasswordToken(userPasswordResetRequestDto.getEmail(), token);
-            String resetLink = "http://localhost:4200/#/reset?token=" + token;
+            String resetLink = this.resetBaseUri + "/#/reset?token=" + token;
             emailService.sendPasswordResetMail(userPasswordResetRequestDto.getEmail(), resetLink);
         } catch (NotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No entry found for given email: " + userPasswordResetRequestDto.getEmail());
@@ -337,7 +334,40 @@ public class CustomUserDetailService implements UserService {
 
         final var endOfSelectedWeek = beginOfSelectedWeek.plusDays(7).minusSeconds(1);
 
-        var competitions = user.getCompetitions();
+        Set<Competition> competitions = null;
+
+        switch (sessionUtils.getApplicationUserRole()) {
+            case PARTICIPANT:
+                ApplicationUser participant = findApplicationUserByEmail(sessionUtils.getSessionUser().getUser().getEmail());
+                List<RegisterTo> registerToList;
+                if (registerToRepository.findAllByParticipantId(participant.getId()).isPresent()) {
+                    competitions = new HashSet<>();
+                    registerToList = registerToRepository.findAllByParticipantId(participant.getId()).get();
+                    for (RegisterTo registerTo : registerToList) {
+                        Competition toAdd = competitionRepository.findById(registerTo.getGradingGroup().getCompetitions().getId()).get();
+                        competitions.add(toAdd);
+                    }
+                }
+                break;
+            case CLUB_MANAGER:
+                competitions = new HashSet<>();
+                List<RegisterTo> registrationList;
+                for (ManagedBy manageBy : user.getMembers()) {
+                    if (registerToRepository.findAllByParticipantId(manageBy.getMember().getId()).isPresent()) {
+                        registrationList = registerToRepository.findAllByParticipantId(manageBy.getMember().getId()).get();
+                        for (RegisterTo registerTo : registrationList) {
+                            Competition toAdd = competitionRepository.findById(registerTo.getGradingGroup().getCompetitions().getId()).get();
+                            competitions.add(toAdd);
+                        }
+                    }
+                }
+                break;
+            case TOURNAMENT_MANAGER:
+                competitions = user.getCompetitions();
+                break;
+            default:
+                break;
+        }
 
         var kek = userRepository.findAll();
         var k2k = competitionRepository.findAll();
@@ -410,7 +440,7 @@ public class CustomUserDetailService implements UserService {
                 participantToRegister.setPassword(generatedPassword);
                 participantToRegister.setType(ApplicationUser.Role.PARTICIPANT);
                 teamMember = registerUser(participantToRegister);
-                try {
+                /*try {
                     emailService.sendEmail(clubManagerTeamMemberImportDto.email(),
                         String.format("You were automatically registered by your club clubManager\n"
                             + "Use current email and following password to log in: %s", generatedPassword));
@@ -418,7 +448,7 @@ public class CustomUserDetailService implements UserService {
                     throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "The mail could not been sent with the given properties!");
                 } catch (UnsupportedEncodingException e) {
                     throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Unsupported encoding for Payload");
-                }
+                }*/
             }
 
 
@@ -613,60 +643,18 @@ public class CustomUserDetailService implements UserService {
         return relOpt.get();
     }
 
-    private void userFlagValidation(UserDetailSetFlagDto members) {
+    @Override
+    public void addFlagsForUsers(UserDetailSetFlagDto members) {
         if (!sessionUtils.isCompetitionManager() && !sessionUtils.isClubManager()) {
             throw new ForbiddenException("Not authorized");
         }
 
         this.userSetFlagValidator.validate(members);
-        this.simpleFlagValidator.validate(members.getFlag());
-
-        for (UserDetailDto user : members.getUsers()) {
-            if (user == null) {
-                throw new ValidationListException("User was null",
-                    List.of("User was null"));
-            }
-
-            if (user.id() == null) {
-                throw new ValidationListException("User id was null",
-                    List.of("User id was null"));
-            }
-        }
-
-    }
-
-    @Override
-    public void addFlagsForUsers(UserDetailSetFlagDto members) {
-        userFlagValidation(members);
 
         List<ApplicationUser> users =
             userRepository.findAllById(members.getUsers().stream().map(UserDetailDto::id).toList());
         Set<Long> myFlagIds = getManagedFlags().stream().map(SimpleFlagDto::id).collect(Collectors.toSet());
-        Flags flag = flagsMapper.simpleFlagDtoToFlags(members.getFlag());
-
-        if (flag == null) {
-            throw new ValidationListException("Invalid flag was passed",
-                List.of("Invalid flag was passed"));
-        }
-
-        if (flag.getId() < 0) {
-            flagsRepository.save(flag);
-            flag.setClubs(new HashSet<>());
-        } else {
-            if (!myFlagIds.contains(flag.getId())) {
-                throw new ValidationListException("Unmanaged flag was passed",
-                    List.of("Unmanaged flag was passed"));
-            }
-
-            Optional<Flags> found = flagsRepository.findById(flag.getId());
-
-            if (found.isEmpty()) {
-                throw new ValidationListException("Invalid flag was passed",
-                    List.of("Invalid flag was passed"));
-            }
-
-            flag = found.get();
-        }
+        Flags flag = flagUtils.verifyOrCreate(members.getFlag(), myFlagIds);
 
         ApplicationUser sessionUser = sessionUtils.getSessionUser();
         List<Long> ids = flag.getClubs().stream().map(ManagedBy::getId).toList();
@@ -674,11 +662,9 @@ public class CustomUserDetailService implements UserService {
         for (ApplicationUser m : users) {
             ManagedBy rel = checkUserIsManaged(sessionUser, m);
 
-            if (ids.contains(rel.getId())) {
-                continue;
+            if (!ids.contains(rel.getId())) {
+                flag.getClubs().add(rel);
             }
-
-            flag.getClubs().add(rel);
         }
 
         flagsRepository.save(flag);
@@ -687,29 +673,14 @@ public class CustomUserDetailService implements UserService {
 
     @Override
     public void removeFlagsForUsers(UserDetailSetFlagDto members) {
-        userFlagValidation(members);
+        if (!sessionUtils.isCompetitionManager() && !sessionUtils.isClubManager()) {
+            throw new ForbiddenException("Not authorized");
+        }
+
+        this.userSetFlagValidator.validate(members);
 
         Set<Long> myFlagIds = getManagedFlags().stream().map(SimpleFlagDto::id).collect(Collectors.toSet());
-        Flags flag = flagsMapper.simpleFlagDtoToFlags(members.getFlag());
-
-        if (flag == null) {
-            throw new ValidationListException("Invalid flag was passed",
-                List.of("Invalid flag was passed"));
-        }
-
-        if (flag.getId() < 0 || !myFlagIds.contains(flag.getId())) {
-            throw new ValidationListException("Unmanaged flag was passed",
-                List.of("Unmanaged flag was passed"));
-        }
-
-        Optional<Flags> found = flagsRepository.findById(flag.getId());
-
-        if (found.isEmpty()) {
-            throw new ValidationListException("Invalid flag was passed",
-                List.of("Invalid flag was passed"));
-        }
-
-        flag = found.get();
+        Flags flag = flagUtils.verify(members.getFlag(), myFlagIds);
 
         ApplicationUser sessionUser = sessionUtils.getSessionUser();
         List<ApplicationUser> users =
@@ -719,55 +690,60 @@ public class CustomUserDetailService implements UserService {
         for (ApplicationUser m : users) {
             ManagedBy rel = checkUserIsManaged(sessionUser, m);
 
-            if (!ids.contains(rel.getId())) {
-                continue;
+            if (ids.contains(rel.getId())) {
+                flag.getClubs().removeIf(x -> x.getId().equals(rel.getId()));
             }
-
-            flag.getClubs().removeIf(x -> x.getId().equals(rel.getId()));
         }
 
         flagsRepository.save(flag);
     }
 
-    private int compare(Object o1, Object o2) {
-        UserDetailFlagDto p1 = (UserDetailFlagDto) o1;
-        UserDetailFlagDto p2 = (UserDetailFlagDto) o2;
-        int res =  p1.getLastName().compareToIgnoreCase(p2.getLastName());
-        if (res != 0) {
-            return res;
-        }
-        return p1.getFirstName().compareToIgnoreCase(p2.getFirstName());
-    }
-
     @Override
-    public List<UserDetailFlagDto> getMembers() {
+    public Page<UserDetailFlagDto> getMembers(UserDetailFilterDto filter) {
         LOGGER.debug("List members");
 
-        if (sessionUtils.getApplicationUserRole() == ApplicationUser.Role.PARTICIPANT) {
+        if (sessionUtils.getApplicationUserRole() != ApplicationUser.Role.CLUB_MANAGER
+            && sessionUtils.getApplicationUserRole() != ApplicationUser.Role.TOURNAMENT_MANAGER) {
             throw new ForbiddenException("No Permission to get participants with flags");
+        }
+
+        int page = 0;
+        int size = 10;
+
+        if (filter == null) {
+            filter = new UserDetailFilterDto();
+        }
+
+        if (filter.getPage() != null && filter.getPage() >= 0) {
+            page = filter.getPage();
+        }
+
+        if (filter.getSize() != null && filter.getSize() >= 0) {
+            size = filter.getSize();
         }
 
         ApplicationUser applicationUser = sessionUtils.getSessionUser();
 
-        if (sessionUtils.isClubManager()) {
-            ArrayList<UserDetailFlagDto> result = new ArrayList<>();
+        Specification<ApplicationUser> specification = ApplicationUserSpecs.specsForMembers(applicationUser.getId(), filter);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ApplicationUser> partPage = userRepository.findAll(specification, pageable);
 
-            for (ManagedBy m : applicationUser.getMembers()) {
-                ApplicationUser current = m.getMember();
-                UserDetailFlagDto mp = userMapper.applicationUserToUserDetailFlagDto(current);
-                List<Flags> flags = new ArrayList<>(m.getFlags().stream().toList());
-                flags.sort(Comparator.comparing(Flags::getName));
+        List<UserDetailFlagDto> result = new ArrayList<>();
 
-                mp.setFlags(flagsMapper.flagsListToSimpleFlagDtoList(flags));
-                result.add(mp);
-            }
-            result.sort(this::compare);
-
-            return result;
-
-        } else {
-            throw new ConflictException("Unknown Role", List.of("Unknown Role"));
+        for (ApplicationUser a : partPage.getContent()) {
+            UserDetailFlagDto curr = userMapper.applicationUserToUserDetailFlagDto(a);
+            List<Flags> flags = a.getManagers().stream()
+                .filter(m -> m.getManager().getId().equals(applicationUser.getId()))
+                .findFirst()
+                .orElseThrow(() -> new ConflictException("No Manager set", List.of("No Manager set")))
+                .getFlags()
+                .stream()
+                .toList();
+            curr.setFlags(flagsMapper.flagsListToSimpleFlagDtoList(flags));
+            result.add(curr);
         }
+
+        return new PageImpl<>(result, pageable, partPage.getTotalElements());
     }
 
 }

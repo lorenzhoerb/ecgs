@@ -16,11 +16,19 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.GradingGroup;
 import at.ac.tuwien.sepm.groupphase.backend.entity.RegisterTo;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.GradeRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.GradingSystemRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.JudgeRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.ManagedByRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterConstraintRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.ReportFileRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.ReportRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -79,15 +87,58 @@ public class CompetitionRegistrationEndpointTest extends TestDataProvider {
     @Autowired
     private JwtTokenizer jwtTokenizer;
 
+    @Autowired
+    private GradeRepository gradeRepository;
+
+    @Autowired
+    private ReportRepository reportRepository;
+
+    @Autowired
+    private ReportFileRepository reportFileRepository;
+
+    @Autowired
+    private ManagedByRepository managedByRepository;
+
+    @Autowired
+    private RegisterConstraintRepository registerConstraintRepository;
+
+    @Autowired
+    private GradingSystemRepository gradingSystemRepository;
+
+    @Autowired
+    private JudgeRepository judgeRepository;
+
     @BeforeEach
     public void beforeEach() {
-        competitionRepository.deleteAll();
-        applicationUserRepository.deleteAll();
-        gradingGroupRepository.deleteAll();
+        registerConstraintRepository.deleteAll();
+        gradeRepository.deleteAll();
+        reportRepository.deleteAll();
+        reportFileRepository.deleteAll();
+        managedByRepository.deleteAll();
         registerToRepository.deleteAll();
+        applicationUserRepository.deleteAll();
+        competitionRepository.deleteAll();
+        gradingGroupRepository.deleteAll();
+        gradingSystemRepository.deleteAll();
+        judgeRepository.deleteAll();
         setUpCompetitionUser();
         setUpParticipantUser();
         setUpClubManagerUser();
+    }
+
+    @AfterEach
+    public void afterEach() {
+        registerConstraintRepository.deleteAll();
+        gradeRepository.deleteAll();
+        reportRepository.deleteAll();
+        reportFileRepository.deleteAll();
+        managedByRepository.deleteAll();
+        registerToRepository.deleteAll();
+        applicationUserRepository.deleteAll();
+        competitionRepository.deleteAll();
+        gradingGroupRepository.deleteAll();
+        gradingSystemRepository.deleteAll();
+        judgeRepository.deleteAll();
     }
 
     @Test
@@ -97,45 +148,6 @@ public class CompetitionRegistrationEndpointTest extends TestDataProvider {
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
         assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
-    }
-
-    @Test
-    public void selfRegistrationToDefaultComp_withValidData_expect201() throws Exception {
-        Competition c = getValidCompetitionEntity();
-        c.setPublic(true);
-        c.setDraft(false);
-        c.setBeginOfRegistration(LocalDateTime.now().minusDays(2));
-        c.setEndOfRegistration(LocalDateTime.now().plusDays(4));
-        GradingGroup g1 = new GradingGroup("G1");
-        GradingGroup g2 = new GradingGroup("G2");
-        g1.setCompetitions(c);
-        g2.setCompetitions(c);
-        c.setGradingGroups(Set.of(g1, g2));
-
-        Competition cc = competitionRepository.save(c);
-        GradingGroup gc1 = gradingGroupRepository.save(g1);
-        GradingGroup gc2 = gradingGroupRepository.save(g2);
-
-        Long defaultGroup = gc1.getId() < gc2.getId() ? gc1.getId() : gc2.getId();
-
-        MvcResult mvcResult = this.mockMvc.perform(post(COMPETITION_SELF_REGISTRATION_BASE_URI + cc.getId())
-                .header(
-                    securityProperties.getAuthHeader(),
-                    jwtTokenizer.getAuthToken(
-                        TEST_USER_COMPETITION_MANAGER_EMAIL,
-                        List.of("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)
-                    )))
-            .andDo(print())
-            .andReturn();
-        MockHttpServletResponse response = mvcResult.getResponse();
-        ResponseParticipantRegistrationDto result = objectMapper
-            .readerFor(ResponseParticipantRegistrationDto.class)
-            .readValue(response.getContentAsByteArray());
-
-
-        assertEquals(HttpStatus.CREATED.value(), response.getStatus());
-        assertEquals(defaultGroup, result.getGroupPreference());
-        assertEquals(cc.getId(), result.getCompetitionId());
     }
 
     @Test
@@ -281,12 +293,11 @@ public class CompetitionRegistrationEndpointTest extends TestDataProvider {
         GradingGroup gc1 = gradingGroupRepository.save(g1);
         GradingGroup gc2 = gradingGroupRepository.save(g2);
 
-        GradingGroup defaultGroup = gradingGroupRepository.findFirstByCompetitionIdOrderByIdAsc(cc.getId()).get();
 
         clubManagerWithManagedUsers(participantsToRegister);
         ApplicationUser clubManager = applicationUserRepository
             .findApplicationUserByUserEmail(TEST_USER_CLUB_MANAGER_EMAIL).get();
-        List<ParticipantRegistrationDto> registrations = getParticipantRegistrationDto(clubManager.getId());
+        List<ParticipantRegistrationDto> registrations = getParticipantRegistrationDto(clubManager.getId(), gc1.getId());
         String body = objectMapper.writeValueAsString(registrations);
 
         MvcResult mvcResult = this.mockMvc.perform(post(COMPETITION_BASE_URI + "/" + cc.getId() + "/participants")
@@ -314,7 +325,7 @@ public class CompetitionRegistrationEndpointTest extends TestDataProvider {
         List<ParticipantRegistrationDto> registeredParticipants = result.getRegisteredParticipants();
         for (int i = 0; i < participantsToRegister; i++) {
             assertEquals(registrations.get(i).getUserId(), registeredParticipants.get(i).getUserId());
-            assertEquals(defaultGroup.getId(), registeredParticipants.get(i).getGroupPreference());
+            assertEquals(gc1.getId(), registeredParticipants.get(i).getGroupPreference());
         }
     }
 

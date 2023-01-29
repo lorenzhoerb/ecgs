@@ -18,10 +18,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.StreamSupport;
 
@@ -231,5 +233,101 @@ public class CustomUserDetailServiceTest extends TestDataProvider {
         assertThat(vle_exception.getMessage()).contains("Some emails are not managed by you");
         assertThat(vle_exception.errors().get(0))
             .contains("#1 - nonexisting@alo.com");
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void addFlagsForUsers_addFlagForNullUsers_shouldThrowValidationException() {
+        SimpleFlagDto flag = new SimpleFlagDto(-1L, "new");
+
+        UserDetailSetFlagDto dto = new UserDetailSetFlagDto();
+        dto.setFlag(flag);
+        dto.setUsers(null);
+
+        ValidationListException e = assertThrows(ValidationListException.class, () -> {
+            userDetailService.addFlagsForUsers(dto);
+        });
+        assertThat(e.getMessage()).contains("users must be set");
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void addFlagsForUsers_addFlagForUsersWithNullObjects_shouldThrowValidationException() {
+        SimpleFlagDto flag = new SimpleFlagDto(-1L, "new");
+
+        HashSet<UserDetailDto> set = new HashSet<>();
+        set.add(null);
+
+        UserDetailSetFlagDto dto = new UserDetailSetFlagDto();
+        dto.setFlag(flag);
+        dto.setUsers(set);
+
+        ValidationListException e = assertThrows(ValidationListException.class, () -> {
+            userDetailService.addFlagsForUsers(dto);
+        });
+        assertThat(e.getMessage()).contains("User was null");
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void addFlagsForUsers_addFlagForUsersWithNullIds() {
+        SimpleFlagDto flag = new SimpleFlagDto(-1L, "new");
+
+        HashSet<UserDetailDto> set = new HashSet<>();
+        set.add(new UserDetailDto(null, "", "", ApplicationUser.Gender.FEMALE, new Date(), ""));
+
+        UserDetailSetFlagDto dto = new UserDetailSetFlagDto();
+        dto.setFlag(flag);
+        dto.setUsers(set);
+
+        ValidationListException e = assertThrows(ValidationListException.class, () -> {
+            userDetailService.addFlagsForUsers(dto);
+        });
+        assertThat(e.getMessage()).contains("User id was null");
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void addFlagsForUsers_addFlagForNullName_shouldThrowValidationException() {
+        SimpleFlagDto flag = new SimpleFlagDto(-1l, null);
+
+        UserDetailSetFlagDto dto = new UserDetailSetFlagDto();
+        dto.setFlag(flag);
+        dto.setUsers(new HashSet<>());
+
+        ValidationListException e = assertThrows(ValidationListException.class, () -> {
+            userDetailService.addFlagsForUsers(dto);
+        });
+        assertThat(e.getMessage()).contains("Flag must be specified");
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void addFlagsForUsers_addFlagForEmptyName_shouldThrowValidationException() {
+        SimpleFlagDto flag = new SimpleFlagDto(-1L, "");
+
+        UserDetailSetFlagDto dto = new UserDetailSetFlagDto();
+        dto.setFlag(flag);
+        dto.setUsers(new HashSet<>());
+
+        ValidationListException e = assertThrows(ValidationListException.class, () -> {
+            userDetailService.addFlagsForUsers(dto);
+        });
+        assertThat(e.getMessage()).contains("Flag must be specified");
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void addFlagsForUsers_addFlagForName256_shouldThrowValidationException() {
+        SimpleFlagDto flag = new SimpleFlagDto(-1L, "A".repeat(256));
+
+        UserDetailSetFlagDto dto = new UserDetailSetFlagDto();
+        dto.setFlag(flag);
+        dto.setUsers(new HashSet<>());
+
+        ValidationListException e = assertThrows(ValidationListException.class, () -> {
+            userDetailService.addFlagsForUsers(dto);
+        });
+        assertThat(e.getMessage()).contains("Flag is too long");
     }
 }

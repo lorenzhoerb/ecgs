@@ -11,13 +11,14 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.FlagsMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.GradingSystemMapper;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.entity.GradingGroup;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ManagedBy;
 import at.ac.tuwien.sepm.groupphase.backend.entity.RegisterTo;
 import at.ac.tuwien.sepm.groupphase.backend.entity.SecurityUser;
+import at.ac.tuwien.sepm.groupphase.backend.entity.grade.Grade;
+import at.ac.tuwien.sepm.groupphase.backend.entity.grade.GradePk;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Add;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Constant;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Divide;
@@ -31,24 +32,39 @@ import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.structural.Variable;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.FlagsRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.GradeRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingSystemRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ManagedByRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.SecurityUserRepository;
+import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
+import at.ac.tuwien.sepm.groupphase.backend.service.GradeService;
+import at.ac.tuwien.sepm.groupphase.backend.service.ReportService;
 import at.ac.tuwien.sepm.groupphase.backend.service.impl.CustomUserDetailService;
+import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Month;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -61,10 +77,16 @@ public abstract class TestDataProvider {
     private CustomUserDetailService customUserDetailService;
 
     @Autowired
+    private GradingGroupRepository gradingGroupRepository;
+
+    @Autowired
     private ManagedByRepository managedByRepository;
 
     @Autowired
     private FlagsRepository flagsRepository;
+
+    @Autowired
+    private GradeService gradeService;
 
     @Autowired
     private GradingSystemRepository gradingSystemRepository;
@@ -79,10 +101,32 @@ public abstract class TestDataProvider {
     private GradingSystemMapper gradingSystemMapper;
 
     @Autowired
+    private CompetitionService competitionService;
+
+    @Autowired
+    private CompetitionRepository competitionRepository;
+
+    @Autowired
+    private RegisterToRepository registerToRepository;
+
+    @Autowired
+    private ReportService reportService;
+
+    @Autowired
+    private GradeRepository gradeRepository;
+
+    @Autowired
+    private SessionUtils sessionUtils;
+
+    @Autowired
     private FlagsMapper flagsMapper;
 
     protected static final String BASE_URI = "/api/v1";
     protected static final String COMPETITION_URI = "/competitions";
+    protected static final String GRADING_GROUP_URI = "/groups";
+    protected static final String GRADING_GROUPS_BASE_URI = BASE_URI + GRADING_GROUP_URI;
+
+    protected static final String GRADES_BASE_URI = BASE_URI + "/grades";
     protected static final String COMPETITION_BASE_URI = BASE_URI + COMPETITION_URI;
     protected static final String GRADING_GROUP_BASE_URI = BASE_URI + "/grading-systems";
     protected static final String USER_URI = "/user";
@@ -101,7 +145,7 @@ public abstract class TestDataProvider {
             "firstNameTest",
             "lastNameTest",
             ApplicationUser.Gender.FEMALE,
-            new Date(),
+            new Date(99, 3, 1),
             ApplicationUser.Role.TOURNAMENT_MANAGER);
     }
 
@@ -112,7 +156,7 @@ public abstract class TestDataProvider {
             "Firsname",
             "Lastname",
             ApplicationUser.Gender.MALE,
-            new Date(),
+            new Date(99, 3, 2),
             ApplicationUser.Role.PARTICIPANT);
     }
 
@@ -123,7 +167,7 @@ public abstract class TestDataProvider {
             "Firsname",
             "Lastname",
             ApplicationUser.Gender.MALE,
-            new Date(),
+            new Date(99, 3, 3),
             ApplicationUser.Role.CLUB_MANAGER);
     }
 
@@ -194,8 +238,8 @@ public abstract class TestDataProvider {
     }
 
     protected ApplicationUser createValidJudgeUser(ApplicationUserRepository applicationUserRepository,
-                                                   SecurityUserRepository securityUserRepository) {
-        SecurityUser securityUser = new SecurityUser("duplicate@email.com", "password");
+                                                   SecurityUserRepository securityUserRepository, String email) {
+        SecurityUser securityUser = new SecurityUser(email, "password");
 
         ApplicationUser applicationUser = new ApplicationUser(
             ApplicationUser.Role.PARTICIPANT,
@@ -238,12 +282,12 @@ public abstract class TestDataProvider {
         managedByRepository.save(new ManagedBy(manager, createdUser, team));
     }
 
-    protected List<ParticipantRegistrationDto> getParticipantRegistrationDto(Long managerId) {
+    protected List<ParticipantRegistrationDto> getParticipantRegistrationDto(Long managerId, Long groupId) {
         List<ParticipantRegistrationDto> registrations = new ArrayList<>();
         List<ManagedBy> managedBy = managedByRepository.findByManagerId(managerId);
         return managedBy
             .stream()
-            .map(e -> new ParticipantRegistrationDto(e.getMember().getId(), null))
+            .map(e -> new ParticipantRegistrationDto(e.getMember().getId(), groupId))
             .toList();
     }
 
@@ -265,6 +309,14 @@ public abstract class TestDataProvider {
     protected ApplicationUser setUpCompetitionUser() {
         return customUserDetailService
             .registerUser(getValidRegistrationDtoForCompetitionManager());
+    }
+
+    protected ApplicationUser setUpAlternateCompetitionUser(String username, String password) {
+        UserRegisterDto toRegister = getValidRegistrationDtoForCompetitionManager();
+        toRegister.setEmail(username);
+        toRegister.setPassword(password);
+        return customUserDetailService
+            .registerUser(toRegister);
     }
 
     protected void setUpParticipantUser() {
@@ -295,7 +347,7 @@ public abstract class TestDataProvider {
         CompetitionRepository competitionRepository,
         boolean accepted,
         boolean draft,
-        ApplicationUser judge,
+        Set<ApplicationUser> judges,
         GradingSystemRepository gradingSystemRepository
     ) throws JsonProcessingException {
         Competition competition = new Competition(
@@ -313,8 +365,8 @@ public abstract class TestDataProvider {
 
         );
 
-        if(judge != null) {
-            competition.setJudges(Set.of(judge));
+        if(judges != null) {
+            competition.setJudges(judges);
         }
 
         ApplicationUser user = new ApplicationUser(
@@ -325,7 +377,19 @@ public abstract class TestDataProvider {
             ""
         );
 
+
+        ApplicationUser creator = new ApplicationUser(
+            ApplicationUser.Role.TOURNAMENT_MANAGER,
+            "first", "last",
+            ApplicationUser.Gender.MALE,
+            new Date(2000, 10, 10),
+            ""
+        );
+
         applicationUserRepository.save(user);
+        applicationUserRepository.save(creator);
+
+        competition.setCreator(creator);
 
         GradingGroup group = new GradingGroup("group 1");
 
@@ -855,4 +919,720 @@ public abstract class TestDataProvider {
         return out;
     }
 
+    protected GradingGroupDto[] reportTests_setupGradingGroups() {
+        var gradingGroups = new GradingGroupDto[2];
+        gradingGroups[0] = new GradingGroupDto(
+            "GG1", new GradingSystemDetailDto("GS1", "GS1DESC", false, false,
+            "{\"stations\":[{\"id\":1,\"displayName\":\"GG1_S1\",\"variables\":[{\"id\":1,\"displayName\":\"GG1_S1_V1\",\"minJudgeCount\":2,\"strategy\":{\"type\":\"mean\"},\"values\":[]},{\"id\":2,\"displayName\":\"GG1_S1_V2\",\"minJudgeCount\":1,\"strategy\":{\"type\":\"mean\"},\"values\":[]}],\"formula\":{\"typeHint\":\"add\",\"left\":{\"typeHint\":\"variableRef\",\"value\":1},\"right\":{\"typeHint\":\"variableRef\",\"value\":2}}},{\"id\":2,\"displayName\":\"GG1_S2\",\"variables\":[{\"id\":1,\"displayName\":\"GG1_S2_V1\",\"minJudgeCount\":2,\"strategy\":{\"type\":\"mean\"},\"values\":[]}],\"formula\":{\"typeHint\":\"div\",\"left\":{\"typeHint\":\"variableRef\",\"value\":1},\"right\":{\"typeHint\":\"const\",\"value\":2}}}],\"formula\":{\"typeHint\":\"add\",\"left\":{\"typeHint\":\"variableRef\",\"value\":1},\"right\":{\"typeHint\":\"variableRef\",\"value\":2}}}"
+        ));
+        gradingGroups[1] = new GradingGroupDto(
+            "GG2", new GradingSystemDetailDto("GS2", "GS2DESC", false, false,
+            "{\"stations\":[{\"id\":1,\"displayName\":\"GG2_S1\",\"variables\":[{\"id\":1,\"displayName\":\"GG2_S1_V1\",\"minJudgeCount\":2,\"strategy\":{\"type\":\"mean\"},\"values\":[]},{\"id\":2,\"displayName\":\"GG2_S1_V2\",\"minJudgeCount\":1,\"strategy\":{\"type\":\"mean\"},\"values\":[]}],\"formula\":{\"typeHint\":\"add\",\"left\":{\"typeHint\":\"variableRef\",\"value\":1},\"right\":{\"typeHint\":\"variableRef\",\"value\":2}}},{\"id\":2,\"displayName\":\"GG2_S2\",\"variables\":[{\"id\":1,\"displayName\":\"GG2_S2_V1\",\"minJudgeCount\":2,\"strategy\":{\"type\":\"mean\"},\"values\":[]}],\"formula\":{\"typeHint\":\"div\",\"left\":{\"typeHint\":\"variableRef\",\"value\":1},\"right\":{\"typeHint\":\"const\",\"value\":2}}}],\"formula\":{\"typeHint\":\"mult\",\"left\":{\"typeHint\":\"variableRef\",\"value\":1},\"right\":{\"typeHint\":\"variableRef\",\"value\":2}}}"
+        ));
+
+        return gradingGroups;
+    }
+
+    protected UserDetailDto[] reportTests_getJudges() {
+        var judges = new UserDetailDto[3];
+        judges[0] = userMapper.applicationUserToUserDetailDto(customUserDetailService.registerUser(new UserRegisterDto(
+            "judge1@report.test",
+            "12345678",
+            "JUDGEoneFN",
+            "JUDGEoneLN",
+            ApplicationUser.Gender.MALE,
+            new Date(),
+            ApplicationUser.Role.PARTICIPANT
+        )));
+        judges[1] = userMapper.applicationUserToUserDetailDto(customUserDetailService.registerUser(new UserRegisterDto(
+            "judge2@report.test",
+            "12345678",
+            "JUDGEtwoFN",
+            "JUDGEtwoLN",
+            ApplicationUser.Gender.MALE,
+            new Date(),
+            ApplicationUser.Role.PARTICIPANT
+        )));
+        judges[2] = userMapper.applicationUserToUserDetailDto(customUserDetailService.registerUser(new UserRegisterDto(
+            "judge3@report.test",
+            "12345678",
+            "JUDGEthreeFN",
+            "JUDGEthreeLN",
+            ApplicationUser.Gender.MALE,
+            new Date(),
+            ApplicationUser.Role.PARTICIPANT
+        )));
+
+        return judges;
+    }
+
+    protected ApplicationUser[] reportTests_getNonRegisteredToCompetitonParticipants() {
+        var participants = new ApplicationUser[5];
+        participants[0] = customUserDetailService.registerUser(new UserRegisterDto(
+            "participant1@report.test",
+            "12345678",
+            "PARTICIPANToneFN",
+            "PARTICIPANToneLN",
+            ApplicationUser.Gender.MALE,
+            new GregorianCalendar(2000, Calendar.MARCH, 1).getTime(),
+            ApplicationUser.Role.PARTICIPANT
+        ));
+        participants[1] = customUserDetailService.registerUser(new UserRegisterDto(
+            "participant2@report.test",
+            "12345678",
+            "PARTICIPANTtwoFN",
+            "PARTICIPANTtwoLN",
+            ApplicationUser.Gender.MALE,
+            new GregorianCalendar(2000, Calendar.MARCH, 2).getTime(),
+            ApplicationUser.Role.PARTICIPANT
+        ));
+        participants[2] = customUserDetailService.registerUser(new UserRegisterDto(
+            "participant3@report.test",
+            "12345678",
+            "PARTICIPANTthreeFN",
+            "PARTICIPANTthreeLN",
+            ApplicationUser.Gender.MALE,
+            new GregorianCalendar(2000, Calendar.MARCH, 3).getTime(),
+            ApplicationUser.Role.PARTICIPANT
+        ));
+        participants[3] = customUserDetailService.registerUser(new UserRegisterDto(
+            "participant4@report.test",
+            "12345678",
+            "PARTICIPANTfourFN",
+            "PARTICIPANTfourLN",
+            ApplicationUser.Gender.MALE,
+            new GregorianCalendar(2000, Calendar.MARCH, 4).getTime(),
+            ApplicationUser.Role.PARTICIPANT
+        ));
+        participants[4] = customUserDetailService.registerUser(new UserRegisterDto(
+            "participant5@report.test",
+            "12345678",
+            "PARTICIPANTfiveFN",
+            "PARTICIPANTfiveLN",
+            ApplicationUser.Gender.MALE,
+            new GregorianCalendar(2000, Calendar.MARCH, 5).getTime(),
+            ApplicationUser.Role.PARTICIPANT
+        ));
+
+        return participants;
+    }
+
+    protected ApplicationUser[] reportTests_getClubManagers() {
+        var clubManagers = new ApplicationUser[4];
+        clubManagers[0] = customUserDetailService.registerUser(new UserRegisterDto(
+            "club_manager1@report.test",
+            "12345678",
+            "CLUBMANAGERoneFN",
+            "CLUBMANAGERoneLN",
+            ApplicationUser.Gender.MALE,
+            new GregorianCalendar(2000, Calendar.FEBRUARY, 1).getTime(),
+            ApplicationUser.Role.CLUB_MANAGER
+        ));
+        clubManagers[1] = customUserDetailService.registerUser(new UserRegisterDto(
+            "club_manager2@report.test",
+            "12345678",
+            "CLUBMANAGERtwoFN",
+            "CLUBMANAGERtwoLN",
+            ApplicationUser.Gender.MALE,
+            new GregorianCalendar(2000, Calendar.FEBRUARY, 2).getTime(),
+            ApplicationUser.Role.CLUB_MANAGER
+        ));
+        clubManagers[2] = customUserDetailService.registerUser(new UserRegisterDto(
+            "club_manager3@report.test",
+            "12345678",
+            "CLUBMANAGERthreeFN",
+            "CLUBMANAGERthreeLN",
+            ApplicationUser.Gender.MALE,
+            new GregorianCalendar(2000, Calendar.FEBRUARY, 3).getTime(),
+            ApplicationUser.Role.CLUB_MANAGER
+        ));
+        clubManagers[3] = customUserDetailService.registerUser(new UserRegisterDto(
+            "club_manager4@report.test",
+            "12345678",
+            "CLUBMANAGERfourFN",
+            "CLUBMANAGERfourLN",
+            ApplicationUser.Gender.MALE,
+            new GregorianCalendar(2000, Calendar.FEBRUARY, 4).getTime(),
+            ApplicationUser.Role.CLUB_MANAGER
+        ));
+
+        return clubManagers;
+    }
+
+    protected ApplicationUser reportTests_setupCompetitionUser() {
+        customUserDetailService
+            .registerUser(new UserRegisterDto(
+                "comp_manager2@report.test",
+                "12345678",
+                "COMPMANAGERtwoFN",
+                "COMPMANAGERtwoLN",
+                ApplicationUser.Gender.FEMALE,
+                new GregorianCalendar(2000, Calendar.JANUARY, 1).getTime(),
+                ApplicationUser.Role.TOURNAMENT_MANAGER)
+            );
+
+        return customUserDetailService
+            .registerUser(new UserRegisterDto(
+                "comp_manager1@report.test",
+                "12345678",
+                "COMPMANAGERoneFN",
+                "COMPMANAGERoneLN",
+                ApplicationUser.Gender.FEMALE,
+                new GregorianCalendar(2000, Calendar.JANUARY, 1).getTime(),
+                ApplicationUser.Role.TOURNAMENT_MANAGER)
+            );
+    }
+
+    protected Competition beforeEachReportTest() {
+        var authBefore = SecurityContextHolder.getContext().getAuthentication();
+        var compManager = new User("comp_manager1@report.test", "12345678", Arrays.asList(new SimpleGrantedAuthority("ROLE_" + ApplicationUser.Role.TOURNAMENT_MANAGER)));
+        Authentication auth = new UsernamePasswordAuthenticationToken(
+            compManager,
+            null,
+            compManager.getAuthorities());
+
+        // Set the security context for the current test
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        reportTests_setupCompetitionUser();
+        var compEntity = reportTests_setupCompetition();
+        reportService.calculateResultsOfCompetition(compEntity.getId());
+
+        SecurityContextHolder.getContext().setAuthentication(authBefore);
+        return compEntity;
+    }
+
+    @Transactional
+    @WithMockUser
+    protected Competition reportTests_setupCompetition() {
+        //reportTests_setupCompetitionUser();
+        var gradingGroups = reportTests_setupGradingGroups();
+
+        var competition = new CompetitionDetailDto();
+        competition.setName("TESTNAMECOMP");
+        competition.setDescription("TESTDESCCOMP");
+        competition.setBeginOfRegistration(LocalDateTime.of(2023, Month.APRIL, 15, 12, 0));
+        competition.setEndOfRegistration(LocalDateTime.of(2023, Month.APRIL, 17, 12, 0));
+        competition.setBeginOfCompetition(LocalDateTime.of(2023, Month.APRIL, 18, 12, 0));
+        competition.setEndOfCompetition(LocalDateTime.of(2023, Month.APRIL, 19, 12, 0));
+        competition.setPublic(true);
+        competition.setEmail("alooo@dont.care");
+        competition.setPhone("+55555555555");
+        competition.setGradingGroups(gradingGroups);
+        competition.setJudges(reportTests_getJudges());
+        var comp = competitionService.create(competition);
+        var compEntity = competitionRepository.findById(comp.getId()).get();
+        var clubManagers = reportTests_getClubManagers();
+        var participantsToRegister = reportTests_getNonRegisteredToCompetitonParticipants();
+        var gg1 = gradingGroupRepository.findFirstByTitleIs("GG1").get();
+        var gg2 = gradingGroupRepository.findFirstByTitleIs("GG2").get();
+
+        registerToRepository.save(new RegisterTo(
+            participantsToRegister[0],
+            gg1,
+            true
+        ));
+        registerToRepository.save(new RegisterTo(
+            participantsToRegister[1],
+            gg1,
+            true
+        ));
+        registerToRepository.save(new RegisterTo(
+            participantsToRegister[2],
+            gg1,
+            true
+        ));
+
+        registerToRepository.save(new RegisterTo(
+            participantsToRegister[1],
+            gg2,
+            true
+        ));
+        registerToRepository.save(new RegisterTo(
+            participantsToRegister[2],
+            gg2,
+            true
+        ));
+        registerToRepository.save(new RegisterTo(
+            participantsToRegister[3],
+            gg2,
+            true
+        ));
+
+        // registerToRepository.save(new RegisterTo(
+        //     participantsToRegister[3],
+        //     gg2,
+        //     true
+        // ));
+
+        registerToRepository.save(new RegisterTo(
+            clubManagers[2],
+            gg1,
+            true
+        ));
+
+
+        managedByRepository.save(new ManagedBy(
+            clubManagers[0],
+            participantsToRegister[0],
+            "TEAMNAME"
+        ));
+        managedByRepository.save(new ManagedBy(
+            clubManagers[0],
+            participantsToRegister[1],
+            "TEAMNAME"
+        ));
+        managedByRepository.save(new ManagedBy(
+            clubManagers[0],
+            participantsToRegister[4],
+            "TEAMNAME"
+        ));
+        managedByRepository.save(new ManagedBy(
+            clubManagers[1],
+            participantsToRegister[1],
+            "TEAMNAME2"
+        ));
+
+        var judgeIter = compEntity.getJudges().iterator();
+        var judges = new ApplicationUser[] {
+            judgeIter.next(), judgeIter.next(), judgeIter.next()
+        };
+
+        // PARTICIPANT 1
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[0].getId(),
+                participantsToRegister[0].getId(),
+                compEntity.getId(),
+                gg1.getId(),
+                1L
+            ),
+            judges[0],
+            participantsToRegister[0],
+            compEntity,
+            gg1,
+            "{\"grades\":[{\"id\":1,\"value\":4},{\"id\":2,\"value\":5}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[1].getId(),
+                participantsToRegister[0].getId(),
+                compEntity.getId(),
+                gg1.getId(),
+                1L
+            ),
+            judges[1],
+            participantsToRegister[0],
+            compEntity,
+            gg1,
+            "{\"grades\":[{\"id\":1,\"value\":9},{\"id\":2,\"value\":1}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[0].getId(),
+                participantsToRegister[0].getId(),
+                compEntity.getId(),
+                gg1.getId(),
+                2L
+            ),
+            judges[0],
+            participantsToRegister[0],
+            compEntity,
+            gg1,
+            "{\"grades\":[{\"id\":1,\"value\":12}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[2].getId(),
+                participantsToRegister[0].getId(),
+                compEntity.getId(),
+                gg1.getId(),
+                2L
+            ),
+            judges[2],
+            participantsToRegister[0],
+            compEntity,
+            gg1,
+            "{\"grades\":[{\"id\":1,\"value\":8}]}",
+            true
+        ));
+
+
+        // PATRITIPANT 2
+        // GG1
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[0].getId(),
+                participantsToRegister[1].getId(),
+                compEntity.getId(),
+                gg1.getId(),
+                1L
+            ),
+            judges[0],
+            participantsToRegister[1],
+            compEntity,
+            gg1,
+            "{\"grades\":[{\"id\":1,\"value\":4},{\"id\":2,\"value\":5}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[1].getId(),
+                participantsToRegister[1].getId(),
+                compEntity.getId(),
+                gg1.getId(),
+                1L
+            ),
+            judges[1],
+            participantsToRegister[1],
+            compEntity,
+            gg1,
+            "{\"grades\":[{\"id\":1,\"value\":9},{\"id\":2,\"value\":1}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[0].getId(),
+                participantsToRegister[1].getId(),
+                compEntity.getId(),
+                gg1.getId(),
+                2L
+            ),
+            judges[0],
+            participantsToRegister[1],
+            compEntity,
+            gg1,
+            "{\"grades\":[{\"id\":1,\"value\":12}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[2].getId(),
+                participantsToRegister[1].getId(),
+                compEntity.getId(),
+                gg1.getId(),
+                2L
+            ),
+            judges[2],
+            participantsToRegister[1],
+            compEntity,
+            gg1,
+            "{\"grades\":[{\"id\":1,\"value\":8}]}",
+            true
+        ));
+        // GG2
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[0].getId(),
+                participantsToRegister[1].getId(),
+                compEntity.getId(),
+                gg2.getId(),
+                1L
+            ),
+            judges[0],
+            participantsToRegister[1],
+            compEntity,
+            gg2,
+            "{\"grades\":[{\"id\":1,\"value\":5},{\"id\":2,\"value\":4}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[1].getId(),
+                participantsToRegister[1].getId(),
+                compEntity.getId(),
+                gg2.getId(),
+                1L
+            ),
+            judges[1],
+            participantsToRegister[1],
+            compEntity,
+            gg2,
+            "{\"grades\":[{\"id\":1,\"value\":2.2},{\"id\":2,\"value\":4}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[0].getId(),
+                participantsToRegister[1].getId(),
+                compEntity.getId(),
+                gg2.getId(),
+                2L
+            ),
+            judges[0],
+            participantsToRegister[1],
+            compEntity,
+            gg2,
+            "{\"grades\":[{\"id\":1,\"value\":4}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[2].getId(),
+                participantsToRegister[1].getId(),
+                compEntity.getId(),
+                gg2.getId(),
+                2L
+            ),
+            judges[2],
+            participantsToRegister[1],
+            compEntity,
+            gg2,
+            "{\"grades\":[{\"id\":1,\"value\":6}]}",
+            true
+        ));
+
+        // PATRITIPANT 3
+        // GG1
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[0].getId(),
+                participantsToRegister[2].getId(),
+                compEntity.getId(),
+                gg1.getId(),
+                1L
+            ),
+            judges[0],
+            participantsToRegister[2],
+            compEntity,
+            gg1,
+            "{\"grades\":[{\"id\":1,\"value\":1.4},{\"id\":2,\"value\":2}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[1].getId(),
+                participantsToRegister[2].getId(),
+                compEntity.getId(),
+                gg1.getId(),
+                1L
+            ),
+            judges[1],
+            participantsToRegister[2],
+            compEntity,
+            gg1,
+            "{\"grades\":[{\"id\":1,\"value\":5},{\"id\":2,\"value\":6}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[0].getId(),
+                participantsToRegister[2].getId(),
+                compEntity.getId(),
+                gg1.getId(),
+                2L
+            ),
+            judges[0],
+            participantsToRegister[2],
+            compEntity,
+            gg1,
+            "{\"grades\":[{\"id\":1,\"value\":12}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[2].getId(),
+                participantsToRegister[2].getId(),
+                compEntity.getId(),
+                gg1.getId(),
+                2L
+            ),
+            judges[2],
+            participantsToRegister[2],
+            compEntity,
+            gg1,
+            "{\"grades\":[{\"id\":1,\"value\":10}]}",
+            true
+        ));
+        // GG2
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[0].getId(),
+                participantsToRegister[2].getId(),
+                compEntity.getId(),
+                gg2.getId(),
+                1L
+            ),
+            judges[0],
+            participantsToRegister[2],
+            compEntity,
+            gg2,
+            "{\"grades\":[{\"id\":1,\"value\":5},{\"id\":2,\"value\":3}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[1].getId(),
+                participantsToRegister[2].getId(),
+                compEntity.getId(),
+                gg2.getId(),
+                1L
+            ),
+            judges[1],
+            participantsToRegister[2],
+            compEntity,
+            gg2,
+            "{\"grades\":[{\"id\":1,\"value\":1},{\"id\":2,\"value\":1}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[0].getId(),
+                participantsToRegister[2].getId(),
+                compEntity.getId(),
+                gg2.getId(),
+                2L
+            ),
+            judges[0],
+            participantsToRegister[2],
+            compEntity,
+            gg2,
+            "{\"grades\":[{\"id\":1,\"value\":23}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[2].getId(),
+                participantsToRegister[2].getId(),
+                compEntity.getId(),
+                gg2.getId(),
+                2L
+            ),
+            judges[2],
+            participantsToRegister[2],
+            compEntity,
+            gg2,
+            "{\"grades\":[{\"id\":1,\"value\":3}]}",
+            true
+        ));
+
+        // PARTICIPANT 4
+        // GG2
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[0].getId(),
+                participantsToRegister[3].getId(),
+                compEntity.getId(),
+                gg2.getId(),
+                1L
+            ),
+            judges[0],
+            participantsToRegister[3],
+            compEntity,
+            gg2,
+            "{\"grades\":[{\"id\":1,\"value\":4},{\"id\":2,\"value\":12}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[1].getId(),
+                participantsToRegister[3].getId(),
+                compEntity.getId(),
+                gg2.getId(),
+                1L
+            ),
+            judges[1],
+            participantsToRegister[3],
+            compEntity,
+            gg2,
+            "{\"grades\":[{\"id\":1,\"value\":31},{\"id\":2,\"value\":3.5}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[0].getId(),
+                participantsToRegister[3].getId(),
+                compEntity.getId(),
+                gg2.getId(),
+                2L
+            ),
+            judges[0],
+            participantsToRegister[3],
+            compEntity,
+            gg2,
+            "{\"grades\":[{\"id\":1,\"value\":7}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[2].getId(),
+                participantsToRegister[3].getId(),
+                compEntity.getId(),
+                gg2.getId(),
+                2L
+            ),
+            judges[2],
+            participantsToRegister[3],
+            compEntity,
+            gg2,
+            "{\"grades\":[{\"id\":1,\"value\":9}]}",
+            true
+        ));
+
+        // CLUB MANAGER 3
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[0].getId(),
+                clubManagers[2].getId(),
+                compEntity.getId(),
+                gg1.getId(),
+                1L
+            ),
+            judges[0],
+            clubManagers[2],
+            compEntity,
+            gg1,
+            "{\"grades\":[{\"id\":1,\"value\":5},{\"id\":2,\"value\":7}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[1].getId(),
+                clubManagers[2].getId(),
+                compEntity.getId(),
+                gg1.getId(),
+                1L
+            ),
+            judges[1],
+            clubManagers[2],
+            compEntity,
+            gg1,
+            "{\"grades\":[{\"id\":1,\"value\":7},{\"id\":2,\"value\":7}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[0].getId(),
+                clubManagers[2].getId(),
+                compEntity.getId(),
+                gg1.getId(),
+                2L
+            ),
+            judges[0],
+            clubManagers[2],
+            compEntity,
+            gg1,
+            "{\"grades\":[{\"id\":1,\"value\":8}]}",
+            true
+        ));
+        gradeRepository.save(new Grade(
+            new GradePk(
+                judges[2].getId(),
+                clubManagers[2].getId(),
+                compEntity.getId(),
+                gg1.getId(),
+                2L
+            ),
+            judges[2],
+            clubManagers[2],
+            compEntity,
+            gg1,
+            "{\"grades\":[{\"id\":1,\"value\":2}]}",
+            true
+        ));
+
+        return compEntity;
+    }
 }

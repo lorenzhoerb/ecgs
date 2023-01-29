@@ -13,12 +13,13 @@ import LocalizationService, {LocalizeService} from '../../../../services/localiz
 export class ReigistrationSummaryComponent implements OnInit {
 
   @Input() competition: SimpleCompetitionListEntryDto;
-  @Input()  participants: UserRegisterDetail[];
+  @Input() participants: UserRegisterDetail[];
 
   @Output() groupChange = new EventEmitter<UserRegisterDetail[]>();
 
   gradingGroups: SimpleGradingGroup[];
   displayParticipants: UserDetail[];
+  showGroupInformation = false;
 
   page = 1;
   pageSize = 5;
@@ -36,7 +37,7 @@ export class ReigistrationSummaryComponent implements OnInit {
   }
 
   refreshCountries() {
-    this.displayParticipants = this.participants.map((country, i) => ({ id: i + 1, ...country })).slice(
+    this.displayParticipants = this.participants.map((country, i) => ({id: i + 1, ...country})).slice(
       (this.page - 1) * this.pageSize,
       (this.page - 1) * this.pageSize + this.pageSize,
     );
@@ -47,13 +48,35 @@ export class ReigistrationSummaryComponent implements OnInit {
     this.groupChange.emit(this.participants);
   }
 
+  assignAll(value) {
+    console.log(value);
+    this.participants.forEach(p => {
+      if (value === 'null') {
+        p.groupId = null;
+      } else {
+        p.groupId = value;
+      }
+    });
+    this.refreshCountries();
+    this.groupChange.emit(this.participants);
+  }
+
   fetchGroups() {
     this.competitionService.getGroups(this.competition.id)
       .subscribe({
-        next: data => this.gradingGroups = data,
+        next: data => {
+          this.gradingGroups = data;
+          this.participants.forEach(p => {
+            p.groupId = null;
+          });
+        },
         error: err => {
           console.error(err);
         }
       });
+  }
+
+  toggleGroupInformation() {
+    this.showGroupInformation = !this.showGroupInformation;
   }
 }

@@ -2,6 +2,7 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradeDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradeResultDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.LiveResultDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserPasswordResetRequestDto;
 import at.ac.tuwien.sepm.groupphase.backend.service.GradeService;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
@@ -44,6 +45,14 @@ public class GradesEndpoint {
     public List<GradeResultDto> getAllGrades(@PathVariable Long competitionId, @PathVariable Long gradingGroupId, @PathVariable Long stationId) {
         LOGGER.info("GET {}/{}/{}/{}", BASE_PATH, competitionId, gradingGroupId, stationId);
         return this.gradeService.getAllGradesForStation(competitionId, gradingGroupId, stationId);
+    }
+
+    @PermitAll
+    @GetMapping("/live-results/{competitionId}")
+    @Operation(summary = "Get all grades for a station in given GradingGroup", security = @SecurityRequirement(name = "apiKey"))
+    public List<LiveResultDto> getAllLiveResults(@PathVariable Long competitionId) {
+        LOGGER.info("GET {}/live-results/{}", BASE_PATH, competitionId);
+        return this.gradeService.getAllResults(competitionId);
     }
 
 }

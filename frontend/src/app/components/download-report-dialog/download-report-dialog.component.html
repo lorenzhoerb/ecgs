@@ -1,0 +1,85 @@
+<div class="background">
+    <h2 class="dialog-title" mat-dialog-title>Download Report</h2>
+
+    <mat-dialog-content>
+        <div>
+            <h2 style="text-align: center; margin-bottom: 1em;">
+                Select participants to include:
+            </h2>
+            <div 
+                class="clickable-div inclusion-rule" 
+                (click)="onChangeInclusionRuleClick(downloadReportRequestInclusionRule.allParticipants)" 
+                [class]="getClassForSelectedInclusionRule(downloadReportRequestInclusionRule.allParticipants)"
+                >
+                Everyone
+            </div>
+
+            <div
+                [matTooltip]="'You don\'t have any members registered'"
+                [matTooltipDisabled]="this.reportDownloadInclusionRuleOptionsDto?.canGenerateReportForTeam"
+                [matTooltipPosition]="'right'"
+                >
+                <div 
+                    class="clickable-div inclusion-rule" 
+                    (click)="onChangeInclusionRuleClick(downloadReportRequestInclusionRule.onlyYourTeam)" 
+                    [class]="getClassForSelectedInclusionRule(downloadReportRequestInclusionRule.onlyYourTeam)"
+                    mat-button>
+                    Only your team
+                </div>
+            </div>
+
+            <div
+            [matTooltip]="'You are not registered'"
+            [matTooltipDisabled]="this.reportDownloadInclusionRuleOptionsDto?.canGenerateReportForSelf"
+            [matTooltipPosition]="'right'"
+            >
+            <div 
+                class="clickable-div inclusion-rule" 
+                (click)="onChangeInclusionRuleClick(downloadReportRequestInclusionRule.onlyYou)" 
+                [class]="getClassForSelectedInclusionRule(downloadReportRequestInclusionRule.onlyYou)"
+                mat-button>
+                Only you
+            </div>
+            </div>
+        </div>
+        <div class="spacer-2"></div>
+        <hr>
+        <div *ngIf="downloadRequestDto.inclusionRule !== downloadReportRequestInclusionRule.allParticipants">
+            <h2 style="text-align: center; margin-bottom: 1em;">
+                Select grading groups:
+            </h2>
+            <div class="spacer-2"></div>
+            <button 
+                class="select-all-grading-groups-btn"
+                (click)="onSelectAllClick()"
+                >Select/Unselect all</button>
+            <div 
+                *ngFor="let gradingGroup of fetchedGradingGroups" 
+                class="clickable-div grading-group"
+                (click)="onSelectGradingGroup(gradingGroup.id)"
+                [class]="getClassForSelectedGradingGroup(gradingGroup.id)"
+            >
+                {{gradingGroup.title}}
+            </div>
+            <button
+            [disabled]="true"
+            mat-button type="button" class="button">
+            <span
+                [matTooltip]="'Info about why the button is disabled.'"
+                [matTooltipDisabled]="false">
+                <mat-icon>save</mat-icon>
+                Action
+            </span>
+            </button>
+        </div>
+    </mat-dialog-content>
+
+    <div class="spacer-2"></div>
+
+    <mat-dialog-actions>
+        <div class="action-row">
+            <button style="border-radius: 8px;background-color: rgb(54, 158, 33); color: white; border: none;" (click)="downloadReport()">Download Report</button>
+            <button class="close-btn" style="border-radius: 8px;background-color: rgb(255, 42, 81); color: white; border: none;" (click)="closeDialog()">{{localize.close}}</button>
+        </div>
+    </mat-dialog-actions>
+</div>

@@ -30,7 +30,7 @@ import { cloneDeep } from 'lodash';
 export class CompetitionGradingComponent implements OnInit, OnDestroy {
   id: number;
   gradingGroups: any[];
-  selectedGroup = 0;
+  selectedGroup = -1;
   selectedStation = 0;
   stations: Station[];
   formula: any;
@@ -141,6 +141,20 @@ export class CompetitionGradingComponent implements OnInit, OnDestroy {
     this.gradeService.closeAll();
   }
 
+  selectionChanged() {
+    if(this.selectedGroup == -1) {
+      this.uniqueStations =
+              this.gradingGroups
+                .flatMap(x => x.stations)
+                .filter((value, index, self) => index === self.findIndex(t => t.displayName === value.displayName));
+    } else {
+      this.uniqueStations = this.gradingGroups[this.selectedGroup].stations
+          .filter((value, index, self) => index === self.findIndex(t => t.displayName === value.displayName));
+    }
+
+
+  }
+
   loggoutFromStation() {
     for (const groupId of this.loggedInGroupIds) {
       this.gradeService.leaveStation(this.id, groupId, this.loggedInStationId, this.uniqueStations[this.selectedStation].displayName);
@@ -236,8 +250,27 @@ export class CompetitionGradingComponent implements OnInit, OnDestroy {
       this.gradingGroups
         .filter(this.includeGroup.bind(this))
         .map(this.removeUuidFromExisting.bind(this))
-        .map(this.filterParticipants.bind(this))
-        .filter(grp => (grp as any).registrations.length !== 0);
+        .map(this.newFilterTest.bind(this))
+        .filter(grp => (grp as any).registrations.filter(reg => !reg.hidden).length !== 0);
+  }
+
+  newFilterTest(group: any) {
+    for (const part of group.registrations) {
+      if(this.filterName.trim() === '') {
+        part.hidden = false;
+        continue;
+      }
+      const ok = `${part.participant.firstName.toLowerCase()} ${part.participant.lastName.toLowerCase()}`
+        .includes(this.filterName);
+
+      if (!ok) {
+        part.hidden = true;
+      } else {
+        part.hidden = false;
+      }
+    }
+
+    return group;
   }
 
   filterParticipants(group: any): any {
@@ -327,6 +360,8 @@ export class CompetitionGradingComponent implements OnInit, OnDestroy {
       return;
     }
 
+    reg.isPending = false;
+
     const station = reg.stations.find(s => s.id == grade.stationId);
     if (station === null) {
       return;
@@ -399,6 +434,11 @@ export class CompetitionGradingComponent implements OnInit, OnDestroy {
       stationId: value.result.stationId,
       grade: JSON.stringify({ grades: value.result.variables })
     };
+
+    this.gradingGroups
+      .find(grp => grp.id == value.gradingGroupId)
+      .registrations.find(reg => reg.participant.id == value.participantId)
+      .isPending = true;
 
     this.pendingMessages.push(grade);
     console.log('SENDING GRADE: ');
@@ -510,8 +550,9 @@ export class CompetitionGradingComponent implements OnInit, OnDestroy {
         this.setGrade(grade);
         this.onFilterInputChanged();
       } else {
-        this.toastr.error('We don\'t know the origin of this error oO');
-        console.log('We don\'t know the origin of this error oO');
+        //this.toastr.error('We don\'t know the origin of this error oO');
+        //console.log('We don\'t know the origin of this error oO');
+        console.log('Judging error');
       }
     });
 

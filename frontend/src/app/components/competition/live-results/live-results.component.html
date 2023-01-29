@@ -1,0 +1,123 @@
+<div [ngClass]="getSizeClass()" class="my-container">
+
+    <div *ngIf="!small">
+        <div class="filter-row">
+            <div class="filter-inputs">
+            <div class="stack">
+              <label for="byname">Teilnehmer</label>
+              <input name="byname" type="text" [(ngModel)]="filterNameModel" (input)="onFilterInputChanged()">
+            </div>
+        
+            <div class="stack">
+              <label for="bygroup">Gruppe</label>
+              <input name="bygroup" type="text" [(ngModel)]="filterGroupModel" (input)="onFilterInputChanged()">
+            </div>
+
+            <div class="stack">
+                <label for="byflag">Station</label>
+                <input name="byflag" type="text" [(ngModel)]="filterStationModel" (input)="onFilterInputChanged()">
+              </div>
+
+          </div>
+          <button *ngIf="filterNameModel !== '' || filterStationModel !== ''  || filterGroupModel !== ''" matTooltip="Filter zurücksetzen" matTooltipPosition="above" class="primary-btn clear" (click)="clearFilter()">
+            <mat-icon>clear</mat-icon>
+          </button>
+          </div>
+    </div>
+
+    <div class="load-container">
+        <div class="dot-pulse"></div>
+    </div>
+
+    <div class="result-container">
+        <div *ngFor="let result of getResults()" class="result-entry-cont">
+            <div class="pulsating-circle" *ngIf="result.updated === true">
+
+            </div>
+
+            <div class="result-entry" [ngClass]="{new: result.new}">
+                <div class="part-name">
+                    <span>{{getParticipantName(result)}}</span>
+                    <div class="expand-icon" (click)="openModal(result)">
+                        <mat-icon>summarize</mat-icon>
+                    </div>
+                </div>
+
+                <div class="secon-grp">
+                    <div class="tags">
+                        <div class="part-group">
+                            <span>{{getGradingGroupTitle(result)}}</span>
+                        </div>
+                        <div class="part-station">
+                            <span>{{getStationName(result)}}</span>
+                        </div>
+                    </div>
+                    <div class="part-result">
+                        <span>{{getResult(result)}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="grade-modal" *ngIf="result.modal === true" (click)="closeModal(result)">
+                <div class="grade-container" (click)="$event.stopPropagation()">
+
+                    <div class="result-entry">
+                        <div class="part-name">
+                            <span>{{getParticipantName(result)}}</span>
+                        </div>
+        
+                        <div class="secon-grp">
+                            <div class="tags">
+                                <div class="part-group">
+                                    <span>{{getGradingGroupTitle(result)}}</span>
+                                </div>
+                                <div class="part-station">
+                                    <span>{{getStationName(result)}}</span>
+                                </div>
+                            </div>
+                            <div class="part-result">
+                                <span>{{getResult(result)}}</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="grade-header">
+                        <div class="judge-header">
+                            {{localize.judge}}
+                        </div>
+                        <div class="secnd-cont">
+                            <div class="grade" *ngFor="let h of getGradeHeader(result)">
+                                {{h}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="part-grades" *ngFor="let grade of getGrades(result)">
+                        <div class="user judge">
+                            <img src="../../../assets/user_image.jpg" alt="User image">
+                            {{grade.judge?.firstName}} {{grade.judge?.lastName}}
+                        </div>
+                        <div class="secnd-cont">
+                            <div class="grade" *ngFor="let vars of grade.variables.grades">
+                                {{vars.value}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="previous" *ngIf="result.updated === true">
+                        Alte Bewertung:
+                        <div class="part-grades" *ngFor="let grade of getPreviousGrades(result)">
+                            <div class="user judge">
+                                <img src="../../../assets/user_image.jpg" alt="User image">
+                                {{grade.judge?.firstName}} {{grade.judge?.lastName}}
+                            </div>
+                            <div class="secnd-cont">
+                                <div class="grade" *ngFor="let vars of grade.variables.grades">
+                                    {{vars.value}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>

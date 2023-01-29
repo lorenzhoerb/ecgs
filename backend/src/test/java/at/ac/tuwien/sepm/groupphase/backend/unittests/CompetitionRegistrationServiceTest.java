@@ -2,6 +2,7 @@ package at.ac.tuwien.sepm.groupphase.backend.unittests;
 
 import at.ac.tuwien.sepm.groupphase.backend.basetest.TestDataProvider;
 import at.ac.tuwien.sepm.groupphase.backend.datagenerator.UserProvider;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.BasicRegisterConstraintDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantManageDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseMultiParticipantRegistrationDto;
@@ -11,6 +12,7 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseParticipantRegi
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.entity.GradingGroup;
+import at.ac.tuwien.sepm.groupphase.backend.entity.RegisterConstraint;
 import at.ac.tuwien.sepm.groupphase.backend.entity.RegisterTo;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
@@ -18,19 +20,31 @@ import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationBulkException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.GradeRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.GradingSystemRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.JudgeRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ManagedByRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterConstraintRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.ReportFileRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.ReportRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionRegistrationService;
+import at.ac.tuwien.sepm.groupphase.backend.service.ReportFileService;
+import at.ac.tuwien.sepm.groupphase.backend.service.GradingGroupService;
+import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
 import org.aspectj.weaver.ast.Not;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,6 +60,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 public class CompetitionRegistrationServiceTest extends TestDataProvider {
 
     @Autowired
@@ -67,18 +82,66 @@ public class CompetitionRegistrationServiceTest extends TestDataProvider {
     private SessionUtils sessionUtils;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private ManagedByRepository managedByRepository;
+
+    @Autowired
+    GradingGroupService gradingGroupService;
+
+    @Autowired
+    RegisterConstraintRepository registerConstraintRepository;
+
+    @Autowired
+    private GradeRepository gradeRepository;
+
+    @Autowired
+    private ReportFileRepository reportFileRepository;
+
+    @Autowired
+    private ReportRepository reportRepository;
+
+    @Autowired
+    private GradingSystemRepository gradingSystemRepository;
+
+    @Autowired
+    private JudgeRepository judgeRepository;
 
     @BeforeEach
     public void beforeEach() {
-        competitionRepository.deleteAll();
+        registerConstraintRepository.deleteAll();
+        gradeRepository.deleteAll();
+        reportRepository.deleteAll();
+        reportFileRepository.deleteAll();
+        managedByRepository.deleteAll();
+        registerToRepository.deleteAll();
         applicationUserRepository.deleteAll();
+        competitionRepository.deleteAll();
         gradingGroupRepository.deleteAll();
+        gradingSystemRepository.deleteAll();
+        judgeRepository.deleteAll();
         registerToRepository.deleteAll();
         managedByRepository.deleteAll();
+        registerConstraintRepository.deleteAll();
         setUpCompetitionUser();
         setUpParticipantUser();
         setUpClubManagerUser();
+    }
+
+    @AfterEach
+    public void afterEach() {
+        registerConstraintRepository.deleteAll();
+        gradeRepository.deleteAll();
+        reportRepository.deleteAll();
+        reportFileRepository.deleteAll();
+        managedByRepository.deleteAll();
+        registerToRepository.deleteAll();
+        applicationUserRepository.deleteAll();
+        competitionRepository.deleteAll();
+        gradingGroupRepository.deleteAll();
+        gradingSystemRepository.deleteAll();
+        judgeRepository.deleteAll();
     }
 
     @Test
@@ -92,7 +155,7 @@ public class CompetitionRegistrationServiceTest extends TestDataProvider {
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
     public void selfRegistration_whenUnknownCompetitionId_expectNotFound() {
         NotFoundException ex = assertThrows(NotFoundException.class, () -> {
-            competitionRegistrationService.selfRegisterParticipant(1L, null);
+            competitionRegistrationService.selfRegisterParticipant(1L, 1L);
         });
         assertEquals("Unknown competition 1", ex.getMessage());
     }
@@ -101,7 +164,7 @@ public class CompetitionRegistrationServiceTest extends TestDataProvider {
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
     public void selfRegistration_whenCompetitionIsNull_expectValidationException() {
         ValidationListException ex = assertThrows(ValidationListException.class, () -> {
-            competitionRegistrationService.selfRegisterParticipant(null, null);
+            competitionRegistrationService.selfRegisterParticipant(null, 1L);
         });
         assertEquals("Competition id must be given", ex.errors().get(0));
     }
@@ -116,7 +179,7 @@ public class CompetitionRegistrationServiceTest extends TestDataProvider {
         assertNotNull(created);
         assertNotNull(created.getId());
         ForbiddenException ex = assertThrows(ForbiddenException.class, () -> {
-            competitionRegistrationService.selfRegisterParticipant(created.getId(), null);
+            competitionRegistrationService.selfRegisterParticipant(created.getId(), 1L);
         });
         assertEquals("Registration forbidden.", ex.getMessage());
     }
@@ -131,7 +194,7 @@ public class CompetitionRegistrationServiceTest extends TestDataProvider {
         assertNotNull(created);
         assertNotNull(created.getId());
         ForbiddenException ex = assertThrows(ForbiddenException.class, () -> {
-            competitionRegistrationService.selfRegisterParticipant(created.getId(), null);
+            competitionRegistrationService.selfRegisterParticipant(created.getId(), 1L);
         });
         assertEquals("Registration forbidden.", ex.getMessage());
     }
@@ -148,7 +211,7 @@ public class CompetitionRegistrationServiceTest extends TestDataProvider {
         assertNotNull(created);
         assertNotNull(created.getId());
         ForbiddenException ex = assertThrows(ForbiddenException.class, () -> {
-            competitionRegistrationService.selfRegisterParticipant(created.getId(), null);
+            competitionRegistrationService.selfRegisterParticipant(created.getId(), 1L);
         });
         assertEquals("Registration for competition " + created.getId() + " is closed.", ex.getMessage());
     }
@@ -165,14 +228,15 @@ public class CompetitionRegistrationServiceTest extends TestDataProvider {
         assertNotNull(created);
         assertNotNull(created.getId());
         NotFoundException ex = assertThrows(NotFoundException.class, () -> {
-            competitionRegistrationService.selfRegisterParticipant(created.getId(), null);
+            competitionRegistrationService.selfRegisterParticipant(created.getId(), 1L);
         });
-        assertEquals("Registration failed. Could not assign to grading group.", ex.getMessage());
+        assertEquals("Registration failed. Unknown group of competition.", ex.getMessage());
     }
 
     @Test
-    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
-    public void selfRegistrationToDefault_whenValidInput_expectCreated() {
+    @Transactional(Transactional.TxType.NEVER)
+    @WithMockUser(username = TEST_USER_PARTICIPANT_EMAIL)
+    public void selfRegistrationToDefault_whenValidInput_expectCreated_ThenGettingCalendarSizeOne() {
         Competition c = getValidCompetitionEntity();
         c.setPublic(true);
         c.setDraft(false);
@@ -195,21 +259,21 @@ public class CompetitionRegistrationServiceTest extends TestDataProvider {
         ApplicationUser sessionUser = sessionUtils.getSessionUser();
         assertNotNull(sessionUser);
 
-        Long defaultGroup = gc1.getId() < gc2.getId() ? gc1.getId() : gc2.getId();
 
         ResponseParticipantRegistrationDto reg = competitionRegistrationService
-            .selfRegisterParticipant(cc.getId(), null);
+            .selfRegisterParticipant(cc.getId(), gc1.getId());
         assertNotNull(reg);
         assertEquals(cc.getId(), reg.getCompetitionId());
         assertEquals(sessionUser.getId(), reg.getUserId());
-        assertEquals(defaultGroup, reg.getGroupPreference());
 
         Optional<RegisterTo> oRegTo = registerToRepository
             .findByGradingGroupCompetitionIdAndParticipantId(cc.getId(), sessionUser.getId());
         assertTrue(oRegTo.isPresent());
         RegisterTo regTo = oRegTo.get();
         assertFalse(regTo.getAccepted());
-        assertEquals(defaultGroup, regTo.getGradingGroup().getId());
+        assertEquals(sessionUser.getCompetitions().size(), userService.getCompetitionsForCalendar(2023, 45).size());
+        assertEquals(gc1.getId(), regTo.getGradingGroup().getId());
+        assertEquals(sessionUser.getCompetitions().size(), userService.getCompetitionsForCalendar(2023,45).size());
     }
 
     @Test
@@ -282,7 +346,7 @@ public class CompetitionRegistrationServiceTest extends TestDataProvider {
             competitionRegistrationService
                 .selfRegisterParticipant(cc.getId(), invalidGroupForComp);
         });
-        assertEquals("Registration failed. Could not assign to grading group.", ex.getMessage());
+        assertEquals("Registration failed. Unknown group of competition.", ex.getMessage());
     }
 
     @Test
@@ -387,11 +451,10 @@ public class CompetitionRegistrationServiceTest extends TestDataProvider {
         Competition cc = competitionRepository.save(c);
         GradingGroup gc1 = gradingGroupRepository.save(g1);
         GradingGroup gc2 = gradingGroupRepository.save(g2);
-        GradingGroup defaultGradingGroup = gradingGroupRepository.findFirstByCompetitionIdOrderByIdAsc(c.getId()).get();
 
         ApplicationUser clubManager = applicationUserRepository.findApplicationUserByUserEmail(TEST_USER_CLUB_MANAGER_EMAIL).get();
         clubManagerWithManagedUsers(5);
-        List<ParticipantRegistrationDto> registrations = getParticipantRegistrationDto(clubManager.getId());
+        List<ParticipantRegistrationDto> registrations = getParticipantRegistrationDto(clubManager.getId(), gc1.getId());
         registrations.get(0).setGroupPreference(gc1.getId());
 
         ResponseMultiParticipantRegistrationDto response = competitionRegistrationService.registerParticipants(cc.getId(), registrations);
@@ -405,7 +468,7 @@ public class CompetitionRegistrationServiceTest extends TestDataProvider {
         // test with default group
         for (int i = 1; i < 5; i++) {
             assertEquals(registrations.get(i).getUserId(), response.getRegisteredParticipants().get(i).getUserId());
-            assertEquals(defaultGradingGroup.getId(), response.getRegisteredParticipants().get(i).getGroupPreference());
+            assertEquals(gc1.getId(), response.getRegisteredParticipants().get(i).getGroupPreference());
         }
     }
 
@@ -428,8 +491,8 @@ public class CompetitionRegistrationServiceTest extends TestDataProvider {
         GradingGroup gc2 = gradingGroupRepository.save(g2);
 
         List<ParticipantRegistrationDto> registrations = new ArrayList<>();
-        registrations.add(new ParticipantRegistrationDto(-1L, null));
-        registrations.add(new ParticipantRegistrationDto(-2L, null));
+        registrations.add(new ParticipantRegistrationDto(-1L, gc1.getId()));
+        registrations.add(new ParticipantRegistrationDto(-2L, gc1.getId()));
 
         ValidationBulkException ex = assertThrows(ValidationBulkException.class, () -> {
             competitionRegistrationService.registerParticipants(cc.getId(), registrations);
@@ -464,7 +527,7 @@ public class CompetitionRegistrationServiceTest extends TestDataProvider {
         GradingGroup gc2 = gradingGroupRepository.save(g2);
 
         clubManagerWithManagedUsers(3);
-        List<ParticipantRegistrationDto> registrations = getParticipantRegistrationDto(clubManager.getId());
+        List<ParticipantRegistrationDto> registrations = getParticipantRegistrationDto(clubManager.getId(), -4L);
         registrations.get(0).setGroupPreference(gc1.getId());
         registrations.get(0).setGroupPreference(555L);
 
@@ -594,5 +657,46 @@ public class CompetitionRegistrationServiceTest extends TestDataProvider {
         assertThrows(ForbiddenException.class, () -> {
             competitionRegistrationService.updateParticipants(cc.getId(), participantManageDtos);
         });
+    }
+
+    @Test
+    @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
+    public void selfRegister_toGradingGroup_whenConstraintsAreNotValid_expectValidationException() {
+        ApplicationUser a = applicationUserRepository.findApplicationUserByUserEmail(TEST_USER_COMPETITION_MANAGER_EMAIL).get();
+        Competition c = getValidCompetitionEntity();
+        c.setBeginOfRegistration(LocalDateTime.now().minusDays(2));
+        c.setEndOfRegistration(LocalDateTime.now().plusDays(2));
+        c.setPublic(true);
+        c.setDraft(false);
+        c.setCreator(a);
+
+        Competition c1 = competitionRepository.save(c);
+
+        GradingGroup g = new GradingGroup("G1");
+        g.setCompetitions(c1);
+        GradingGroup g1 = gradingGroupRepository.save(g);
+
+        c1.setGradingGroups(Set.of(g1));
+
+
+        gradingGroupService.setConstraints(
+            g1.getId(),
+            List.of(
+                new BasicRegisterConstraintDto(
+                    RegisterConstraint.ConstraintType.GENDER,
+                    RegisterConstraint.Operator.EQUALS,
+                    "FEMALE"),
+                new BasicRegisterConstraintDto(
+                    RegisterConstraint.ConstraintType.AGE,
+                    RegisterConstraint.Operator.GREATER_EQUALS_THAN,
+                    "30")
+            ));
+
+        var ex = assertThrows(ValidationListException.class, () -> {
+            competitionRegistrationService
+                .selfRegisterParticipant(c1.getId(), g1.getId());
+        });
+        assertEquals(1, ex.errors().size());
+        assertTrue(ex.errors().get(0).contains("You must be older than"));
     }
 }

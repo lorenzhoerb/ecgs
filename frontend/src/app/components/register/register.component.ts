@@ -76,10 +76,10 @@ export class RegisterComponent implements OnInit {
           console.log('error.error object: ' , error.error);
           const parsedError = JSON.parse(error.error);
           console.log(parsedError);
-          parsedError.errors.map(err => {
-            this.notification.error(err);
-            console.log(err);
-          });
+          this.notification.error(
+            `<ul>${parsedError.errors.map(e => '<li>' + e + '</li>').join('\n')}</ul>`,
+            parsedError.message,
+            {enableHtml: true});
         }
       }
     });

@@ -12,15 +12,22 @@
   </ul>
 
   <div class="form-group col-6" *ngIf="groups">
-    <label for="groupPreference">{{localize.groupPreference}}</label>
+    <label for="groupPreference">{{localize.registerToAGroup}}</label>
     <select name="groupPreference" class="form-select"
-            id="groupPreference" aria-describedby="Group Preference" [(ngModel)]="groupPreference">
-      <option value="-1" selected>{{localize.noPreference}}</option>
-      <option *ngFor="let group of groups" [value]="group.id">{{group.title}}</option>
+            id="groupPreference" aria-describedby="Group" [(ngModel)]="groupPreference">
+      <option [ngValue]="null" selected disabled>{{localize.selectAGroup}}</option>
+      <option *ngFor="let group of groups" [ngValue]="group.id">{{group.title}}</option>
     </select>
+  </div>
+
+  <div *ngIf="getSelectedGroup() !== null && getSelectedGroup().constraints.length > 0" class="alert alert-secondary mt-3" role="alert">
+    <h3>{{localize.groupHasRegistrationReq}}</h3>
+    <ul>
+      <li *ngFor="let constraint of getSelectedGroup().constraints">{{constraint.description}}</li>
+    </ul>
   </div>
 
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-primary" (click)="onSubmit()">{{localize.register}}</button>
+  <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="groupPreference === null">{{localize.register}}</button>
 </div>

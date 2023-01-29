@@ -6,6 +6,7 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailSetFlagDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailGradeDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -35,4 +36,6 @@ public interface UserMapper {
     List<ApplicationUser> userDetailSetFlagDtoListToApplicationUserList(List<UserDetailSetFlagDto> users);
 
     Set<ApplicationUser> userDetailDtoSetToApplicationUserSet(Set<UserDetailDto> users);
+
+    List<UserDetailGradeDto> userDetailDtoToUserDetailGradeDto(List<UserDetailDto> users);
 }

@@ -11,6 +11,7 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
         MessageSecurityMetadataSourceRegistry messages) {
         messages
             .simpDestMatchers("/grade/**", "/judge/**", "/goodbye-judge/**").authenticated()
+            .simpSubscribeDestMatchers("/topic/live-results").permitAll()
             .anyMessage().authenticated();
     }
 

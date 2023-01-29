@@ -1,0 +1,71 @@
+<div class="my-page">
+
+    <div class="result-header">
+        Du hast bereits an {{results.length}} Turnieren teilgenommen. Hier siehst du deine Ergebnisse:
+    </div>
+
+    <div class="resultHolder">
+        <div *ngFor="let result of results" class="result">
+            <div class="result-competition" [routerLink]="'/competition/' + result.competition.id">
+                <div class="result-place">{{result.place}}. Platz</div>
+                <div class="info">
+                    <div>{{result.competition.name}}</div>
+                    <div>{{result.competition.beginOfCompetition}} - {{result.competition.endOfCompetition}}</div>
+                </div>
+
+            </div>
+            <div class="result-group">{{result.gradingGroupName}}</div>
+            <div>{{result.overAllPoints}} Punkte
+                <div class="expand-icon" (click)="openModal(result)">
+                    <mat-icon>summarize</mat-icon>
+                </div>
+            </div>
+
+            <div class="grade-modal" *ngIf="result.modal === true" (click)="closeModal(result)">
+
+                <div class="grade-container"
+                    (click)="$event.stopPropagation()">
+                    <div class="part-name">
+                        <span>{{result.competition.name}} Details: </span>
+                    </div>
+
+                    <div *ngFor="let ranking of result.stationRankingResults" class="holds-res">
+                        <div class="result-entry">
+                            <div class="secon-grp">
+                                <div class="tags">
+                                    <div class="part-group">
+                                        <span>{{result.gradingGroupName}}</span>
+                                    </div>
+                                    <div class="part-station">
+                                        <span>{{ranking.name}}</span>
+                                    </div>
+                                </div>
+                                <div class="part-result">
+                                    <span>{{ranking.results}}</span>
+                                </div>
+                            </div>
+    
+                            <div class="grades-all">
+                                <div class="vars">
+                                    <div class="grade" *ngFor="let h of getResultHeaders(ranking)">
+                                        {{h}}
+                                    </div>
+                                </div>
+    
+                                <div class="values">
+                                    <div class="" *ngFor="let grade of getResultValues(ranking)">
+                                        <div class="">
+                                            {{grade}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+    
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

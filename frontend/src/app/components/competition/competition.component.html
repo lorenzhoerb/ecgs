@@ -1,12 +1,18 @@
 <main *ngIf="competition !== null">
   <div class="hold-image">
     <div class="turnier-image">
-      <img *ngIf="pictureEmpty()" src="../../../assets/turnier.jpg" alt="turnier bild">
-      <img *ngIf="!pictureEmpty()" [src]="competition.picturePath" alt="turnier bild">
+      <img  [src]="imageUrl" alt="turnier bild" style="height: 90%;">
     </div>
   </div>
   <div class="scrollabove">
-    <app-competition-header [title]="competition.name" (register)="onRegister()" [isRegistered]="isRegisteredToCompetition" [canRegister]="canRegister"></app-competition-header>
+    <app-competition-header [title]="competition.name"
+                            (register)="onRegister()" [isRegistered]="isRegisteredToCompetition" [canRegister]="canRegister"
+                            (edit)="onEdit()" [canEdit]="isCreator" (grading)="onGrading()"
+                            [canGrade]="isJudge"
+                            (competitionResultsCalculation)="onReportResultsCalculation()" [canCalculateCompetitionResults]="isCreator"
+                            (downloadReportDialogOpen)="onDownloadReportClick()" [reportsAreDownloadable]="reportsAreDownloadable"
+
+    ></app-competition-header>
 
     <div class="spacer-2"></div>
 
@@ -28,25 +34,183 @@
           {{competition.description}}
         </div>
       </app-content-card>
-
       <div class="spacer-2"></div>
-
     </app-golden-ratio-container>
+
+    <app-content-card [ngClass]="isLargeResults()" [title]="localize.liveResults" [actions]="['expandable']" (largeExpandChanged)="largeResults($event)">
+      <app-live-results [small]="!lResults" [competitionId]="id"></app-live-results>
+    </app-content-card>
+
+    <div class="spacer-2"></div>
+
+    <div class="spacer-2"></div>
+    <app-content-card [title]="localize.gradingGroup" *ngIf="groups && groups.length > 0">
+      <app-group-registration-details [gradingGroups]="groups"></app-group-registration-details>
+    </app-content-card>
 
     <div class="spacer-2"></div>
 
     <app-content-card [title]="localize.participants" >
-      <app-bulk-editor
-        [header]="[localize.firstname,localize.lastname,localize.gender,localize.dateOfBirth]"
-        [recordsPerPage]="25"
-        [enablePagination]="true"
-        [fetchData]="fetchParticipants"
-        [mapRecord]="mapParticipant"
-        [disableCheckBox]="true"
-        [disableDelete]="true"
-        [updateCounter]="this.updateCounter"
-      ></app-bulk-editor>
+      <form #form="ngForm" class="d-flex flex-row w-auto mb-3">
+        <button type="submit" hidden="true">submit</button>
+        <div class="flex-grow-2">
+          <label for="firstName" class="col-form-label">
+            {{localize.firstname}}
+          </label>
+          <input type="text" name="firstName" id="firstName"
+                 class="form-control"
+                 [(ngModel)]="searchParameters.firstName"
+                 (ngModelChange)="this.inputChange.next($event)">
+        </div>
+        <div class="ms-2">
+          <label for="lastName" class="col-form-label">
+            {{localize.lastname}}
+          </label>
+          <input type="text" name="lastName" id="lastName"
+                 class="form-control"
+                 [(ngModel)]="searchParameters.lastName"
+                 (ngModelChange)="this.inputChange.next($event)">
+        </div>
+        <div class="ms-1">
+          <label for="sex" class="col-form-label">
+            {{localize.gender}}
+          </label>
+          <select name="sex" id="sex"
+                  class="form-select"
+                  [(ngModel)]="searchParameters.gender"
+                  (ngModelChange)="this.inputChange.next($event)">
+            <option></option>
+            <option value="FEMALE">{{localize.genderWoman}}</option>
+            <option value="MALE">{{localize.genderMan}}</option>
+            <option value="OTHER">{{localize.genderOther}}</option>
+          </select>
+        </div>
+      </form>
+
+      <div class="row">
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">{{localize.firstname}}</th>
+            <th scope="col">{{localize.lastname}}</th>
+            <th scope="col">{{localize.dateOfBirth}}</th>
+            <th scope="col">{{localize.gender}}</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let record of this.participants; let i = index">
+            <th>{{i + 1 + (page - 1) * pageSize}}</th>
+            <td>{{record.firstName}}</td>
+            <td>{{record.lastName}}</td>
+            <td>{{record.dateOfBirth | date: 'dd.MM.YYYY'}}</td>
+            <td>{{record.gender | gender}}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="row">
+        <div style="display: flex; justify-content: center">
+          <ngb-pagination
+            [collectionSize]="totalElements"
+            [(page)]="page"
+            [pageSize]="pageSize"
+            (pageChange)="fetchParticipants()"
+            [maxSize]="5"
+            aria-label="Default pagination"
+          ></ngb-pagination>
+        </div>
+      </div>
     </app-content-card>
+
+    <div class="spacer-2"></div>
+
+    <div *ngIf="reportsAreDownloadable" class="content-card description">
+      <div class="content-card-heading bc-space">
+        <h3>
+          <select class="form-select"
+                  [(ngModel)]="this.selectedId"
+                  (ngModelChange)="groupinputChange.next($event)">
+            <option *ngFor="let group of this.groups" [value]="group.id">{{group.title}}</option>
+          </select>
+        </h3>
+      </div>
+      <div class="content-card-content">
+      <form #form="ngForm" class="d-flex flex-row w-auto mb-3">
+        <button type="submit" hidden="true">submit</button>
+        <div class="flex-grow-2">
+          <label for="firstName" class="col-form-label">
+            {{localize.firstname}}
+          </label>
+          <input type="text" name="firstName"
+                 class="form-control"
+                 [(ngModel)]="groupsearchParameters.firstName"
+                 (ngModelChange)="groupinputChange.next($event)">
+        </div>
+        <div class="ms-2">
+          <label for="lastName" class="col-form-label">
+            {{localize.lastname}}
+          </label>
+          <input type="text" name="lastName"
+                 class="form-control"
+                 [(ngModel)]="groupsearchParameters.lastName"
+                 (ngModelChange)="groupinputChange.next($event)">
+        </div>
+        <div class="ms-1">
+          <label for="sex" class="col-form-label">
+            {{localize.gender}}
+          </label>
+          <select name="sex"
+                  class="form-select"
+                  [(ngModel)]="groupsearchParameters.gender"
+                  (ngModelChange)="groupinputChange.next($event)">
+            <option></option>
+            <option value="FEMALE">{{localize.genderWoman}}</option>
+            <option value="MALE">{{localize.genderMan}}</option>
+            <option value="OTHER">{{localize.genderOther}}</option>
+          </select>
+        </div>
+      </form>
+
+      <div class="row h-scroll">
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">{{localize.firstname}}</th>
+            <th scope="col">{{localize.lastname}}</th>
+            <th scope="col">{{localize.dateOfBirth}}</th>
+            <th scope="col">{{localize.gender}}</th>
+            <th *ngFor="let g of groupparticipants[0].grades">{{g.title}}</th>
+            <th>{{localize.all}}</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let record of groupparticipants; let i = index">
+            <th>{{i + 1 + (grouppage - 1) * grouppageSize}}</th>
+            <td>{{record.firstName}}</td>
+            <td>{{record.lastName}}</td>
+            <td>{{record.dateOfBirth | date: 'dd.MM.YYYY'}}</td>
+            <td>{{record.gender | gender}}</td>
+            <td *ngFor="let g of record.grades">{{g.value | number:'1.0-2'}}</td>
+            <td>{{record.finalResult | number:'1.0-2'}}</td>
+          </tr>
+          </tbody>
+        </table>
+
+        <div style="display: flex; justify-content: center">
+          <ngb-pagination
+            [collectionSize]="grouptotalElements"
+            [(page)]="grouppage"
+            [pageSize]="grouppageSize"
+            (pageChange)="fetchResults()"
+            [maxSize]="5"
+            aria-label="Default pagination"
+          ></ngb-pagination>
+        </div>
+      </div>
+      </div>
+    </div>
 
   </div>
 </main>

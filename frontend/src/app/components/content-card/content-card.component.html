@@ -15,6 +15,10 @@
                 (click)="templateClicked()">bookmark_outline</mat-icon>
             <mat-icon *ngIf="actions.includes('delete')" (click)="deleteClicked()">delete</mat-icon>
             <mat-icon *ngIf="actions.includes('duplicate')" (click)="duplicateClicked()">content_copy</mat-icon>
+
+            <mat-icon *ngIf="actions.includes('expandable') && !isLargeExpanded" (click)="expand()">open_in_full</mat-icon>
+            <mat-icon *ngIf="actions.includes('expandable') && isLargeExpanded" (click)="expand()">close_fullscreen</mat-icon>
+
             <mat-icon *ngIf="actions.includes('collapse') && !isCollapsed" (click)="collapse()">expand_less</mat-icon>
             <mat-icon *ngIf="actions.includes('collapse') && isCollapsed" (click)="collapse()">expand_more</mat-icon>
         </div>

@@ -50,6 +50,18 @@
               <option value="OTHER">{{localize.genderOther}}</option>
             </select>
           </div>
+          <div class="ms-1">
+            <label for="flag" class="col-form-label">
+              {{localize.flag}}
+            </label>
+            <select name="flag" id="flag"
+                    class="form-select"
+                    [(ngModel)]="searchParameters.flagId"
+                    (ngModelChange)="this.inputChange.next($event)">
+              <option></option>
+              <option *ngFor="let flag of currentFlags()" [value]="flag.id">{{flag.name}}</option>
+            </select>
+          </div>
         </form>
         <div class="row">
           <div
@@ -80,6 +92,7 @@
               <div ngbDropdownMenu>
                 <button ngbDropdownItem (click)="onSetActive(setStatusModal)">{{localize.editStatus}}</button>
                 <button ngbDropdownItem (click)="onSetGroup(setGroupModal)">{{localize.editGradingGroup}}</button>
+                <button ngbDropdownItem (click)="onEditFlags(editFlags)">{{localize.addRemoveFlags}}</button>
               </div>
             </div>
 
@@ -99,6 +112,7 @@
               <th scope="col">{{localize.gender}}</th>
               <th scope="col">{{localize.gradingGroup}}</th>
               <th scope="col">{{localize.status}}</th>
+              <th scope="col">{{localize.flag}}</th>
             </tr>
             </thead>
             <tbody>
@@ -108,7 +122,7 @@
                 type="checkbox"
                 class="form-check-input"
                 (change)="onBulk($event.target.checked, record)"
-                [(ngModel)]="bulkStates[i]"
+                [checked]="bulkMap.get(record.id) !== undefined"
               ></td>
               <td>{{record.firstName}}</td>
               <td>{{record.lastName}}</td>
@@ -119,6 +133,7 @@
                 <span class="badge" [ngClass]="record.accepted ? 'badge-success' : 'badge-error'">
                   {{getAcceptedText(record.accepted)}}
                 </span></td>
+              <td>{{mapFlags(record.flags)}}</td>
             </tr>
             </tbody>
           </table>
@@ -192,4 +207,34 @@
   </div>
 </ng-template>
 
+<ng-template #editFlags let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="edit-flags">{{localize.addRemoveFlags}}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group mb-3">
+      <label class="mx-2" for="new-flags">{{localize.createFlag}}</label>
+      <div class="d-flex flex-row col-6">
+        <input [(ngModel)]="newFlagText" class="mx-2 form-control" id="new-flags" type="text">
+        <button class="mx-2" type="button" (click)="newFlag()" class="primary-btn bc-ming">{{localize.create}}</button>
+      </div>
+
+      <div class="spacer-2"></div>
+
+      <label class="mx-2" for="flags">{{localize.flag}}</label>
+      <div class="d-flex flex-row col-6">
+        <select [(ngModel)]="selectedFlag" class="form-select mx-2" name="my-flags" id="flags" aria-describedby="flags you already used">
+          <option *ngFor="let flag of currentFlags()" [value]="flag.id">{{flag.name}}</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="modal.dismiss('Canel')">{{localize.cancel}}</button>
+    <button class="mx-2 primary-btn bc-ming" type="button" (click)="modal.close('add')">{{localize.add}}</button>
+    <button class="mx-2 primary-btn bc-sizzling-red" type="button" (click)="modal.close('remove')">{{localize.delete}}</button>
+  </div>
+</ng-template>
 

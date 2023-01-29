@@ -1,8 +1,10 @@
+import { HttpClient } from '@angular/common/http';
 import {Component, OnInit} from '@angular/core';
 import {ToastrService} from 'ngx-toastr';
 import {CompetitionSearchDto} from 'src/app/dtos/competitionSearchDto';
 import {SimpleCompetitionListDto} from 'src/app/dtos/simpleCompetitionListDto';
 import {CompetitionService} from 'src/app/services/competition.service';
+import { GradeService } from 'src/app/services/grade.service';
 import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
 
 @Component({
@@ -17,7 +19,8 @@ export class CompetitionListViewComponent implements OnInit {
 
   constructor(
     private competitionService: CompetitionService,
-    private notification: ToastrService
+    private notification: ToastrService,
+    private http: HttpClient,
   ) { }
 
 

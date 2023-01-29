@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { filter, interval, Observable, Subject, Subscription } from 'rxjs';
+import { filter, first, interval, Observable, Subject, Subscription } from 'rxjs';
 import { GradeDto } from '../dtos/gradeDto';
 import { MessageErrorDto, MessageErrorType } from '../dtos/messageErrorDto';
 import { Globals } from '../global/globals';
@@ -39,13 +39,6 @@ export class GradeService {
     this.initialize();
   }
 
-  private get wsHeader() {
-    return {
-      //eslint-disable-next-line @typescript-eslint/naming-convention
-      Authorization: this.authService.getToken()
-    };
-  }
-
   /////////////////////////////
   ////SECTION - HTTP
   /////////////////////////////
@@ -58,6 +51,10 @@ export class GradeService {
   getAllGrades(competitionId: number, gradingGroupId: number, stationId: number): Observable<GradeDto[]> {
     console.log(`Load all grades for ${competitionId}/${gradingGroupId}/${stationId}`);
     return this.httpClient.get<GradeDto[]>(`${this.gradBaseUri}/${competitionId}/${gradingGroupId}/${stationId}`);
+  }
+
+  kekus(): Observable<GradeDto[]> {
+    return this.httpClient.get<GradeDto[]>(`${this.gradBaseUri}/kek`);
   }
 
   /////////////////////////////
@@ -81,17 +78,24 @@ export class GradeService {
       this.errorSubscription.unsubscribe();
     }
     this.errorSubscription = null;
+
+    this.stomp.stop();
   }
 
   public initialize() {
-    this.closeAll();
+    this.stomp.start();
 
-    this.errorSubscription = this.stomp.watch(
-      `/user/queue/error`,
-      this.wsHeader).subscribe(err => {
-        console.log(err);
-        this.messageErrors$.next(JSON.parse(err.body));
-      });
+    this.stomp.started$.pipe(
+      filter(val => val),
+      first()
+    ).subscribe(_ => {
+      this.errorSubscription = this.stomp.watch(
+        `/user/queue/error`,
+        this.wsHeader()).subscribe(err => {
+          console.log(err);
+          this.messageErrors$.next(JSON.parse(err.body));
+        });
+    });
   }
 
 
@@ -142,7 +146,7 @@ export class GradeService {
 
     this.stomp.publish(
       {
-        headers: this.wsHeader,
+        headers: this.wsHeader(),
         destination: `/app/judge/${competitionId}/${gradingGroupId}/${stationId}`
       }
     );
@@ -172,7 +176,7 @@ export class GradeService {
     }
 
     this.stomp.publish({
-      headers: this.wsHeader,
+      headers: this.wsHeader(),
       destination: `/app/grade/${grade.competitionId}/${grade.gradingGroupId}/${stationName}`,
       body: JSON.stringify(grade)
     });
@@ -182,14 +186,14 @@ export class GradeService {
     //return this.activeSubscriptions.find()
     if ('stationName' in info) {
       return this.activeSubscriptions.find(active => active.type === SubscriptionType.grade
-          && (active.info as GradeSubscription).competitionId === info.competitionId
-          && (active.info as GradeSubscription).gradingGroupId === info.gradingGroupId
-          && (active.info as GradeSubscription).stationName === info.stationName) !== undefined;
+        && (active.info as GradeSubscription).competitionId === info.competitionId
+        && (active.info as GradeSubscription).gradingGroupId === info.gradingGroupId
+        && (active.info as GradeSubscription).stationName === info.stationName) !== undefined;
     } else if ('stationId' in info) {
       return this.activeSubscriptions.find(active => active.type === SubscriptionType.judge
-          && (active.info as JudgeSubscription).competitionId === info.competitionId
-          && (active.info as JudgeSubscription).gradingGroupId === info.gradingGroupId
-          && (active.info as JudgeSubscription).stationId === info.stationId) !== undefined;
+        && (active.info as JudgeSubscription).competitionId === info.competitionId
+        && (active.info as JudgeSubscription).gradingGroupId === info.gradingGroupId
+        && (active.info as JudgeSubscription).stationId === info.stationId) !== undefined;
     }
 
     return false;
@@ -223,7 +227,7 @@ export class GradeService {
   private watchJudges(competitionId: number, gradingGroupId: number, stationId: number): void {
     const obs1 = this.stomp.watch(
       `/topic/judge/${competitionId}/${gradingGroupId}/${stationId}`,
-      this.wsHeader);
+      this.wsHeader());
 
     const subs1 = obs1.subscribe((msg => {
       this.judgeEvent$.next({
@@ -249,7 +253,7 @@ export class GradeService {
 
     const obs2 = this.stomp.watch(
       `/topic/goodbye-judge/${competitionId}/${gradingGroupId}/${stationId}`,
-      this.wsHeader);
+      this.wsHeader());
 
     const subs2 = obs2.subscribe((msg => {
       this.judgeEvent$.next({
@@ -301,7 +305,7 @@ export class GradeService {
   private unWatchJudges(competitionId: number, gradingGroupId: number, stationId: number): void {
     this.stomp.publish(
       {
-        headers: this.wsHeader,
+        headers: this.wsHeader(),
         destination: `/app/goodbye-judge/${competitionId}/${gradingGroupId}/${stationId}`
       }
     );
@@ -337,7 +341,7 @@ export class GradeService {
     if (gradingGroupId !== null) {
       const obser = this.stomp.watch(
         `/topic/grades/${competitionId}/${gradingGroupId}/${stationName}`,
-        this.wsHeader
+        this.wsHeader()
       );
 
       const subs = obser.subscribe((msg => {
@@ -458,6 +462,13 @@ export class GradeService {
   /////////////////////////////
   ////!SECTION - WEBSOCKETS
   /////////////////////////////
+
+  private wsHeader() {
+    return {
+      //eslint-disable-next-line @typescript-eslint/naming-convention
+      Authorization: this.authService.getToken()
+    };
+  }
 }
 
 

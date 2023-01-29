@@ -42,6 +42,9 @@ public class Variable {
     }
 
     public Double evaluate() {
+        if (strategy == null) {
+            strategy = new Mean();
+        }
         strategy.verify(values, minJudgeCount);
         return strategy.evaluate(values);
     }

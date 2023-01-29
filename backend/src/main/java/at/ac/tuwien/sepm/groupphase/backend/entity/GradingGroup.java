@@ -3,6 +3,7 @@ package at.ac.tuwien.sepm.groupphase.backend.entity;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -10,10 +11,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity
-public class GradingGroup {
+public class GradingGroup implements Comparable<GradingGroup> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +25,7 @@ public class GradingGroup {
     @Column(nullable = false, length = 4095)
     private String title;
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "gradingGroup")
+    @OneToOne(cascade = CascadeType.MERGE, mappedBy = "gradingGroup")
     private Report report;
 
     @ManyToOne()
@@ -35,6 +38,9 @@ public class GradingGroup {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "gradingGroup")
     private Set<RegisterTo> registrations;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "gradingGroup", fetch = FetchType.EAGER, orphanRemoval = true)
+    private List<RegisterConstraint> registerConstraints = new ArrayList<>();
 
     public GradingGroup() {
     }
@@ -91,15 +97,39 @@ public class GradingGroup {
         this.registrations = registrations;
     }
 
+    public Competition getCompetition() {
+        return competition;
+    }
+
+    public GradingGroup setCompetition(Competition competition) {
+        this.competition = competition;
+        return this;
+    }
+
+    public List<RegisterConstraint> getRegisterConstraints() {
+        return registerConstraints;
+    }
+
+    public GradingGroup setRegisterConstraints(List<RegisterConstraint> constraints) {
+        this.registerConstraints.clear();
+        this.registerConstraints.addAll(constraints);
+        return this;
+    }
+
     @Override
     public String toString() {
         return "GradingGroup{"
             + "id=" + id
-            + ", title='" + title + '\''
-            + ", report=" + report
-            + ", gradingSystems=" + gradingSystem
-            + ", competitions=" + competition
-            + ", registrations=" + registrations
+            // + ", title='" + title + '\''
+            // + ", report=" + report
+            // + ", gradingSystems=" + gradingSystem
+            // + ", competitions=" + competition
+            // + ", registrations=" + registrations
             + '}';
+    }
+
+    @Override
+    public int compareTo(GradingGroup o) {
+        return this.id.compareTo(o.id);
     }
 }

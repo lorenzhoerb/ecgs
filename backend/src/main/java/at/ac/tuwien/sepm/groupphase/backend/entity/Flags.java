@@ -29,6 +29,14 @@ public class Flags {
     )
     private Set<ManagedBy> clubs;
 
+    @ManyToMany(cascade = {CascadeType.ALL})
+    @JoinTable(
+        name = "flag_registerTo",
+        joinColumns = {@JoinColumn(referencedColumnName = "id")},
+        inverseJoinColumns = {@JoinColumn(referencedColumnName = "id")}
+    )
+    private Set<RegisterTo> registrations;
+
     public Flags() {
     }
 
@@ -63,6 +71,14 @@ public class Flags {
 
     public void setClubs(Set<ManagedBy> clubs) {
         this.clubs = clubs;
+    }
+
+    public Set<RegisterTo> getRegistrations() {
+        return registrations;
+    }
+
+    public void setRegistrations(Set<RegisterTo> registrations) {
+        this.registrations = registrations;
     }
 
     @Override

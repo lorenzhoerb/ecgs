@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepm.groupphase.backend.service;
 
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailFilterDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlag;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ImportFlagsResultDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantSelfRegistrationDto;
@@ -27,6 +28,7 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.entity.SecurityUser;
 import at.ac.tuwien.sepm.groupphase.backend.service.helprecords.ClubManagerTeamImportResults;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -207,5 +209,5 @@ public interface UserService extends UserDetailsService {
      *
      * @return members of team
      */
-    List<UserDetailFlagDto> getMembers();
+    Page<UserDetailFlagDto> getMembers(UserDetailFilterDto filter);
 }

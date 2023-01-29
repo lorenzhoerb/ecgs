@@ -9,7 +9,11 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupWithRegiste
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.PageableDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantFilterDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ReportDownloadInclusionRuleOptionsDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailFilterDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleFlagDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailSetFlagDto;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -47,9 +51,10 @@ public interface CompetitionService {
      * Get participants for competition.
      *
      * @param id id of competition
+     * @param filter filter for users
      * @return Users registered to competition
      */
-    List<UserDetailDto> getParticipants(Long id);
+    Page<UserDetailDto> getParticipants(Long id, UserDetailFilterDto filter);
 
     /**
      * Get the grading groups of a competition with their Participants.
@@ -57,7 +62,7 @@ public interface CompetitionService {
      * @param competitionId to get the grading groups from
      * @return the GradingGroups WithRegistrations
      */
-    Set<GradingGroupWithRegisterToDto> getCompetitionGradingGroupsWithParticipants(Long competitionId);
+    List<GradingGroupWithRegisterToDto> getCompetitionGradingGroupsWithParticipants(Long competitionId);
 
 
     /**
@@ -85,4 +90,31 @@ public interface CompetitionService {
      * @return Paginated result of competitions
      */
     Page<CompetitionListDto> searchCompetitionsAdvanced(AdvanceCompetitionSearchDto searchDto);
+
+    /**
+     * Get flags in use by club manager .
+     *
+     * @param id id of competition
+     * @return flags managed by a club manager
+     */
+    List<SimpleFlagDto> getManagedFlags(Long id);
+
+    /**
+     * Add flags for participants.
+     *
+     * @param id id of competition
+     * @param participants set flags for participants
+     */
+    void addFlagsForUsers(Long id, UserDetailSetFlagDto participants);
+
+    /**
+     * Remove flags for participants.
+     *
+     * @param id id of competition
+     * @param participants set flags for participants
+    */
+    void removeFlagsForUsers(Long id, UserDetailSetFlagDto participants);
+
+
+    ReportDownloadInclusionRuleOptionsDto getCurrentUserReportDownloadInclusionRuleOptions(Long competitionId);
 }

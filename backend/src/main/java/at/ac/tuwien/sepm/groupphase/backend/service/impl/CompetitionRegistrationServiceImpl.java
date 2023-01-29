@@ -1,21 +1,25 @@
 package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
+import at.ac.tuwien.sepm.groupphase.backend.constraint.operator.ConstraintOperator;
+import at.ac.tuwien.sepm.groupphase.backend.constraint.parser.RegisterConstraintParser;
+import at.ac.tuwien.sepm.groupphase.backend.constraint.validator.RegisterConstraintValidator;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantManageDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegistrationDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseMultiParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseMultiParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ResponseParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.entity.GradingGroup;
+import at.ac.tuwien.sepm.groupphase.backend.entity.RegisterConstraint;
 import at.ac.tuwien.sepm.groupphase.backend.entity.RegisterTo;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ConstraintParserException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterConstraintRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionRegistrationService;
 import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
@@ -29,8 +33,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class CompetitionRegistrationServiceImpl implements CompetitionRegistrationService {
@@ -42,6 +44,9 @@ public class CompetitionRegistrationServiceImpl implements CompetitionRegistrati
     private final RegisterToRepository registerToRepository;
     private final GradingGroupRepository gradingGroupRepository;
     private final BulkRegistrationValidator bulkRegistrationValidator;
+    private final RegisterConstraintParser registerConstraintParser;
+    private final RegisterConstraintValidator registerConstraintValidator;
+    private final RegisterConstraintRepository registerConstraintRepository;
 
     public CompetitionRegistrationServiceImpl(
         CompetitionRepository competitionRepository,
@@ -49,13 +54,16 @@ public class CompetitionRegistrationServiceImpl implements CompetitionRegistrati
         ApplicationUserRepository applicationUserRepository,
         RegisterToRepository registerToRepository,
         GradingGroupRepository gradingGroupRepository,
-        BulkRegistrationValidator bulkRegistrationValidator) {
+        BulkRegistrationValidator bulkRegistrationValidator, RegisterConstraintParser registerConstraintParser, RegisterConstraintValidator registerConstraintValidator, RegisterConstraintRepository registerConstraintRepository) {
         this.competitionRepository = competitionRepository;
         this.sessionUtils = sessionUtils;
         this.applicationUserRepository = applicationUserRepository;
         this.registerToRepository = registerToRepository;
         this.gradingGroupRepository = gradingGroupRepository;
         this.bulkRegistrationValidator = bulkRegistrationValidator;
+        this.registerConstraintParser = registerConstraintParser;
+        this.registerConstraintValidator = registerConstraintValidator;
+        this.registerConstraintRepository = registerConstraintRepository;
     }
 
     @Override
@@ -69,18 +77,21 @@ public class CompetitionRegistrationServiceImpl implements CompetitionRegistrati
             throw new ValidationListException("Validation errors while register to competition", "Competition id must be given");
         }
 
+        if (groupPreference == null) {
+            throw new ValidationListException("Validation errors while register to competition", "Group preference id must be given");
+        }
+
         Competition competition = competitionRepository.findById(competitionId)
             .orElseThrow(() -> new NotFoundException("Unknown competition " + competitionId));
 
         checkCompetitionRegistrationAccess(competition, true);
+
         ApplicationUser sessionUser = sessionUtils.getSessionUser();
+        GradingGroup gradingGroup = gradingGroupRepository
+            .findByIdAndCompetitionId(groupPreference, competitionId)
+            .orElseThrow(() -> new NotFoundException("Registration failed. Unknown group of competition."));
 
-        GradingGroup gradingGroup = getPreferenceOrDefaultGradingGroup(competitionId, groupPreference);
-        if (gradingGroup == null) {
-            throw new NotFoundException("Registration failed. Could not assign to grading group.");
-        }
-
-        RegisterTo registerTo = registerToOrElseFetch(competition, sessionUser, gradingGroup);
+        RegisterTo registerTo = registerToGradingGroup(gradingGroup, sessionUser);
 
         return new ResponseParticipantRegistrationDto(
             competitionId,
@@ -88,6 +99,7 @@ public class CompetitionRegistrationServiceImpl implements CompetitionRegistrati
             registerTo.getGradingGroup().getId()
         );
     }
+
 
     @Override
     public ResponseMultiParticipantRegistrationDto registerParticipants(Long competitionId, List<ParticipantRegistrationDto> registrationDtos) {
@@ -104,6 +116,7 @@ public class CompetitionRegistrationServiceImpl implements CompetitionRegistrati
             .orElseThrow(() -> new NotFoundException("Unknown competition " + competitionId));
 
         checkCompetitionRegistrationAccess(competition, false);
+
         bulkRegistrationValidator.validate(competition, registrationDtos);
 
         GradingGroup gradingGroup;
@@ -112,7 +125,7 @@ public class CompetitionRegistrationServiceImpl implements CompetitionRegistrati
         for (ParticipantRegistrationDto registration : registrationDtos) {
             gradingGroup = getPreferenceOrDefaultGradingGroup(competitionId, registration.getGroupPreference());
             applicationUser = applicationUserRepository.findById(registration.getUserId()).get();
-            RegisterTo registerTo = registerToOrElseFetch(competition, applicationUser, gradingGroup);
+            RegisterTo registerTo = registerToGradingGroup(gradingGroup, applicationUser);
             regResponse.add(new ParticipantRegistrationDto(
                 registerTo.getParticipant().getId(),
                 registerTo.getGradingGroup().getId())
@@ -170,6 +183,21 @@ public class CompetitionRegistrationServiceImpl implements CompetitionRegistrati
         return registerToRepository
             .findByGradingGroupCompetitionIdAndParticipantId(competitionId, sessionUtils.getSessionUser().getId())
             .isPresent();
+    }
+
+    private RegisterTo registerToGradingGroup(GradingGroup group, ApplicationUser user) {
+        List<RegisterConstraint> registerConstraints = group.getRegisterConstraints();
+        if (!registerConstraints.isEmpty()) {
+            try {
+                List<ConstraintOperator<?>> constraints = registerConstraintParser.parse(registerConstraints);
+                registerConstraintValidator.validate(constraints, user);
+            } catch (ConstraintParserException e) {
+                throw new RuntimeException("should never happen because constraints from db should be validated");
+            }
+        }
+        return registerToRepository
+            .findByGradingGroupIdAndParticipantId(group.getId(), user.getId())
+            .orElseGet(() -> registerToRepository.save(new RegisterTo(user, group, false)));
     }
 
     /**

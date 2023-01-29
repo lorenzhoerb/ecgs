@@ -3,6 +3,8 @@ package at.ac.tuwien.sepm.groupphase.backend.integrationtest;
 import at.ac.tuwien.sepm.groupphase.backend.basetest.TestDataProvider;
 import at.ac.tuwien.sepm.groupphase.backend.config.properties.SecurityProperties;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradeDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradeResultDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.LiveResultDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.MessageErrorDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
@@ -31,6 +33,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -77,6 +80,7 @@ public class GradingWebSocketEndpointTest extends TestDataProvider {
 
 
     private ApplicationUser judge;
+    private ApplicationUser judge2;
     private Competition competition;
 
     @BeforeEach
@@ -90,12 +94,14 @@ public class GradingWebSocketEndpointTest extends TestDataProvider {
 
         this.webSocketStompClient = new WebSocketStompClient(new StandardWebSocketClient());
 
-        this.judge = createValidJudgeUser(applicationUserRepository, securityUserRepository);
+        this.judge = createValidJudgeUser(applicationUserRepository, securityUserRepository, "judge1@email.net");
+        this.judge2 = createValidJudgeUser(applicationUserRepository, securityUserRepository, "judge2@email.net");
+
         this.competition = createCompetitionEntity(applicationUserRepository,
             registerToRepository,
             gradingGroupRepository,
             competitionRepository,
-            true, false, judge,
+            true, false, Set.of(this.judge, this.judge2),
             gradingSystemRepository);
 
         StandardWebSocketClient client = new StandardWebSocketClient();
@@ -109,32 +115,10 @@ public class GradingWebSocketEndpointTest extends TestDataProvider {
 
         webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
-        StompSession session = webSocketStompClient
-            .connect(
-                WS_CONNECTION_PATH,
-                new WebSocketHttpHeaders(new HttpHeaders()), stompHeaders,
-                new StompSessionHandlerAdapter() {
-
-                }).get(1, TimeUnit.SECONDS);
-
+        StompSession session = this.setupConnection(webSocketStompClient, this.judge);
         assertTrue(session.isConnected());
 
-        StompHeaders subscriptionHeaders = getStompHeadersForDest("/topic/grades/"
-            + this.competition.getId() + "/"
-            + this.competition.getGradingGroups().stream().findFirst().get().getId()
-            + "/Station 1");
-        session.subscribe(subscriptionHeaders, new StompFrameHandler() {
-
-            @Override
-            public Type getPayloadType(StompHeaders headers) {
-                return GradeDto.class;
-            }
-
-            @Override
-            public void handleFrame(StompHeaders headers, Object payload) {
-                blockingQueue.add((GradeDto) payload);
-            }
-        });
+        this.connectToGradesDto(session, blockingQueue, this.judge);
 
         GradeDto gradeDto = getValidEnterGradeDto();
 
@@ -166,111 +150,38 @@ public class GradingWebSocketEndpointTest extends TestDataProvider {
 
         watchingWebSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
-        StompHeaders watchingStompHeaders = getStompConnectionHeader();
-
-        StompSession watchingSession = watchingWebSocketStompClient
-            .connect(
-                WS_CONNECTION_PATH,
-                new WebSocketHttpHeaders(new HttpHeaders()), watchingStompHeaders,
-                new StompSessionHandlerAdapter() {
-
-                }).get(1, TimeUnit.SECONDS);
-
+        StompSession watchingSession = this.setupConnection(watchingWebSocketStompClient, this.judge);
         assertTrue(watchingSession.isConnected());
 
-        StompHeaders watchingSubscriptionHeaders = getStompHeadersForDest("/topic/grades/"
-            + this.competition.getId() + "/"
-            + this.competition.getGradingGroups().stream().findFirst().get().getId()
-            + "/Station 1");
-        watchingSession.subscribe(watchingSubscriptionHeaders, new StompFrameHandler() {
+        this.connectToGradesDto(watchingSession, watchingBlockingQueue, this.judge);
 
-            @Override
-            public Type getPayloadType(StompHeaders headers) {
-                return GradeDto.class;
-            }
-
-            @Override
-            public void handleFrame(StompHeaders headers, Object payload) {
-                watchingBlockingQueue.add((GradeDto) payload);
-            }
-        });
-
-        StompHeaders watchingErrorSubscriptionHeaders = getStompHeadersForDest("/user/queue/error");
-        watchingSession.subscribe(watchingErrorSubscriptionHeaders, new StompFrameHandler() {
-
-            @Override
-            public Type getPayloadType(StompHeaders headers) {
-                return MessageErrorDto.class;
-            }
-
-            @Override
-            public void handleFrame(StompHeaders headers, Object payload) {
-                watchingErrorBlockingQueue.add((MessageErrorDto) payload);
-            }
-        });
+        this.connectToMessageErrorQueue(watchingSession, watchingErrorBlockingQueue, this.judge);
 
 
         //Entering User Setup
 
 
-
         BlockingQueue<GradeDto> blockingQueue = new ArrayBlockingQueue<>(1);
         BlockingQueue<MessageErrorDto> errorBlockingQueue = new ArrayBlockingQueue<>(1);
 
-        StompHeaders stompHeaders = getStompConnectionHeader();
-
         webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
-        StompSession session = webSocketStompClient
-            .connect(
-                WS_CONNECTION_PATH,
-                new WebSocketHttpHeaders(new HttpHeaders()), stompHeaders,
-                new StompSessionHandlerAdapter() {
+        StompSession session = this.setupConnection(this.webSocketStompClient, this.judge2);
+        assertTrue(watchingSession.isConnected());
 
-                }).get(1, TimeUnit.SECONDS);
+        this.connectToGradesDto(session, blockingQueue, this.judge2);
 
-        assertTrue(session.isConnected());
-
-        StompHeaders subscriptionHeaders = getStompHeadersForDest("/topic/grades/"
-            + this.competition.getId() + "/"
-            + this.competition.getGradingGroups().stream().findFirst().get().getId()
-            + "/Station 1");
-        session.subscribe(subscriptionHeaders, new StompFrameHandler() {
-
-            @Override
-            public Type getPayloadType(StompHeaders headers) {
-                return GradeDto.class;
-            }
-
-            @Override
-            public void handleFrame(StompHeaders headers, Object payload) {
-                blockingQueue.add((GradeDto) payload);
-            }
-        });
-
-        StompHeaders errorSubscriptionHeaders = getStompHeadersForDest("/user/queue/error");
-        session.subscribe(errorSubscriptionHeaders, new StompFrameHandler() {
-
-            @Override
-            public Type getPayloadType(StompHeaders headers) {
-                return MessageErrorDto.class;
-            }
-
-            @Override
-            public void handleFrame(StompHeaders headers, Object payload) {
-                errorBlockingQueue.add((MessageErrorDto) payload);
-            }
-        });
+        this.connectToMessageErrorQueue(session, errorBlockingQueue, this.judge2);
 
         //Enter valid grade
 
-        GradeDto gradeDto = getValidEnterGradeDto();
+        GradeDto gradeDto = getValidEnterGradeDto().withJudgeId(this.judge2.getId());
 
-        StompHeaders msgHeader = getStompHeadersForDest(
+        StompHeaders msgHeader = getStompHeadersForDestForUser(
             "/app/grade/"
                 + this.competition.getId() + "/"
                 + this.competition.getGradingGroups().stream().findFirst().get().getId()
-                + "/Station 1"
+                + "/Station 1", this.judge2
         );
         session.send(msgHeader, gradeDto);
 
@@ -291,6 +202,236 @@ public class GradingWebSocketEndpointTest extends TestDataProvider {
         this.gradeRepository.findAll().forEach(inDb::add);
 
         assertEquals(1, inDb.size());
+    }
+
+    @Test
+    public void givenLoggedInUserWatchingTopic_whenOtherUserEnterValidGradeAndGradeIsFinished_expectReceivingGradeWithResult() throws Exception {
+        //Watching User setup
+        WebSocketStompClient watchingWebSocketStompClient = new WebSocketStompClient(new StandardWebSocketClient());
+        BlockingQueue<GradeResultDto> watchingBlockingQueue = new ArrayBlockingQueue<>(1);
+        BlockingQueue<MessageErrorDto> watchingErrorBlockingQueue = new ArrayBlockingQueue<>(1);
+
+        watchingWebSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
+
+        StompSession watchingSession = this.setupConnection(watchingWebSocketStompClient, this.judge);
+        assertTrue(watchingSession.isConnected());
+
+        this.connectToGradeResultDto(watchingSession, watchingBlockingQueue, this.judge);
+
+        this.connectToMessageErrorQueue(watchingSession, watchingErrorBlockingQueue, this.judge);
+
+        GradeDto gradeDto = getValidEnterGradeDto();
+
+        StompHeaders msgHeader = getStompHeadersForDestForUser(
+            "/app/grade/"
+                + this.competition.getId() + "/"
+                + this.competition.getGradingGroups().stream().findFirst().get().getId()
+                + "/Station 1", this.judge
+        );
+        watchingSession.send(msgHeader, gradeDto);
+
+        assertNull(watchingErrorBlockingQueue.poll(2, TimeUnit.SECONDS));
+
+        await()
+            .atMost(1, TimeUnit.SECONDS)
+            .until(() -> {
+                GradeResultDto resultDto = watchingBlockingQueue.poll();
+                assertEquals(gradeDto.uuid(), resultDto.uuid());
+                assertFalse(resultDto.isValid());
+                assertTrue(resultDto.result().isNaN());
+                return true;
+            });
+
+
+        //Entering User Setup
+
+
+        BlockingQueue<GradeResultDto> blockingQueue = new ArrayBlockingQueue<>(1);
+        BlockingQueue<MessageErrorDto> errorBlockingQueue = new ArrayBlockingQueue<>(1);
+
+        webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
+
+        StompSession session = this.setupConnection(this.webSocketStompClient, this.judge2);
+        assertTrue(watchingSession.isConnected());
+
+        this.connectToGradeResultDto(session, blockingQueue, this.judge2);
+
+        this.connectToMessageErrorQueue(session, errorBlockingQueue, this.judge2);
+
+        //Enter valid grade
+
+        GradeDto gradeDto2 = getValidEnterGradeDto().withJudgeId(this.judge2.getId());
+
+        StompHeaders msgHeader2 = getStompHeadersForDestForUser(
+            "/app/grade/"
+                + this.competition.getId() + "/"
+                + this.competition.getGradingGroups().stream().findFirst().get().getId()
+                + "/Station 1", this.judge2
+        );
+        session.send(msgHeader2, gradeDto2);
+
+        //assertions
+
+        MessageErrorDto errorDto = errorBlockingQueue.poll(2, TimeUnit.SECONDS);
+
+        assertNull(errorDto);
+        assertNull(watchingErrorBlockingQueue.poll(2, TimeUnit.SECONDS));
+
+        await()
+            .atMost(6, TimeUnit.SECONDS)
+            .until(() -> {
+                GradeResultDto resultDto = blockingQueue.poll(5, TimeUnit.SECONDS);
+                assertEquals(gradeDto2.uuid(), resultDto.uuid());
+                assertTrue(resultDto.isValid());
+                assertEquals(10.0, resultDto.result());
+                return true;
+            });
+
+        assertNull(watchingErrorBlockingQueue.poll(2, TimeUnit.SECONDS));
+
+        await()
+            .atMost(6, TimeUnit.SECONDS)
+            .until(() -> {
+                GradeResultDto resultDto = watchingBlockingQueue.poll(5, TimeUnit.SECONDS);
+                assertEquals(gradeDto2.uuid(), resultDto.uuid());
+                assertTrue(resultDto.isValid());
+                assertEquals(10.0, resultDto.result());
+                return true;
+            });
+
+        List<at.ac.tuwien.sepm.groupphase.backend.entity.grade.Grade> inDb = new ArrayList<>();
+        this.gradeRepository.findAll().forEach(inDb::add);
+
+        assertEquals(2, inDb.size());
+    }
+
+    @Test
+    public void givenLoggedInUserWatchingLiveResults_whenJudgesEnterValidGrade_expectReceivingLiveResult() throws Exception {
+        //Watching User setup
+
+        ApplicationUser user = createValidParticipantUser(this.applicationUserRepository, this.securityUserRepository);
+
+        WebSocketStompClient liveWebSocketStompClient = new WebSocketStompClient(new StandardWebSocketClient());
+
+        BlockingQueue<LiveResultDto> liveBlockingQueue = new ArrayBlockingQueue<>(1);
+        BlockingQueue<MessageErrorDto> liveErrorBlockingQueue = new ArrayBlockingQueue<>(1);
+
+
+        StompSession liveSession = this.setupConnection(liveWebSocketStompClient, user);
+        assertTrue(liveSession.isConnected());
+
+        this.connectToLiveResultsDto(liveSession, liveBlockingQueue, user);
+        this.connectToMessageErrorQueue(liveSession, liveErrorBlockingQueue, user);
+
+
+        //First Judge
+
+        WebSocketStompClient watchingWebSocketStompClient = new WebSocketStompClient(new StandardWebSocketClient());
+        BlockingQueue<GradeResultDto> watchingBlockingQueue = new ArrayBlockingQueue<>(1);
+        BlockingQueue<MessageErrorDto> watchingErrorBlockingQueue = new ArrayBlockingQueue<>(1);
+
+        watchingWebSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
+
+        StompSession watchingSession = this.setupConnection(watchingWebSocketStompClient, this.judge);
+        assertTrue(watchingSession.isConnected());
+
+        this.connectToGradeResultDto(watchingSession, watchingBlockingQueue, this.judge);
+
+        this.connectToMessageErrorQueue(watchingSession, watchingErrorBlockingQueue, this.judge);
+
+        GradeDto gradeDto = getValidEnterGradeDto();
+
+        StompHeaders msgHeader = getStompHeadersForDestForUser(
+            "/app/grade/"
+                + this.competition.getId() + "/"
+                + this.competition.getGradingGroups().stream().findFirst().get().getId()
+                + "/Station 1", this.judge
+        );
+        watchingSession.send(msgHeader, gradeDto);
+
+        assertNull(watchingErrorBlockingQueue.poll(2, TimeUnit.SECONDS));
+        assertNull(liveBlockingQueue.poll(2, TimeUnit.SECONDS));
+
+        await()
+            .atMost(1, TimeUnit.SECONDS)
+            .until(() -> {
+                GradeResultDto resultDto = watchingBlockingQueue.poll();
+                assertEquals(gradeDto.uuid(), resultDto.uuid());
+                assertFalse(resultDto.isValid());
+                assertTrue(resultDto.result().isNaN());
+                return true;
+            });
+
+
+        //Entering User Setup
+
+
+        BlockingQueue<GradeResultDto> blockingQueue = new ArrayBlockingQueue<>(1);
+        BlockingQueue<MessageErrorDto> errorBlockingQueue = new ArrayBlockingQueue<>(1);
+
+        webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
+
+        StompSession session = this.setupConnection(this.webSocketStompClient, this.judge2);
+        assertTrue(watchingSession.isConnected());
+
+        this.connectToGradeResultDto(session, blockingQueue, this.judge2);
+
+        this.connectToMessageErrorQueue(session, errorBlockingQueue, this.judge2);
+
+        //Enter valid grade
+
+        GradeDto gradeDto2 = getValidEnterGradeDto().withJudgeId(this.judge2.getId());
+
+        StompHeaders msgHeader2 = getStompHeadersForDestForUser(
+            "/app/grade/"
+                + this.competition.getId() + "/"
+                + this.competition.getGradingGroups().stream().findFirst().get().getId()
+                + "/Station 1", this.judge2
+        );
+        session.send(msgHeader2, gradeDto2);
+
+        //assertions
+
+        MessageErrorDto errorDto = errorBlockingQueue.poll(2, TimeUnit.SECONDS);
+
+        assertNull(errorDto);
+        assertNull(watchingErrorBlockingQueue.poll(2, TimeUnit.SECONDS));
+        assertNull(liveErrorBlockingQueue.poll(2, TimeUnit.SECONDS));
+
+        await()
+            .atMost(6, TimeUnit.SECONDS)
+            .until(() -> {
+                GradeResultDto resultDto = blockingQueue.poll(5, TimeUnit.SECONDS);
+                assertEquals(gradeDto2.uuid(), resultDto.uuid());
+                assertTrue(resultDto.isValid());
+                assertEquals(10.0, resultDto.result());
+                return true;
+            });
+
+        await()
+            .atMost(6, TimeUnit.SECONDS)
+            .until(() -> {
+                GradeResultDto resultDto = watchingBlockingQueue.poll(5, TimeUnit.SECONDS);
+                assertEquals(gradeDto2.uuid(), resultDto.uuid());
+                assertTrue(resultDto.isValid());
+                assertEquals(10.0, resultDto.result());
+                return true;
+            });
+
+        await()
+            .atMost(6, TimeUnit.SECONDS)
+            .until(() -> {
+                LiveResultDto resultDto = liveBlockingQueue.poll(5, TimeUnit.SECONDS);
+                assertNotNull(resultDto);
+                assertEquals(2, resultDto.grades().size());
+                assertEquals(10.0, resultDto.grades().get(0).result());
+                return true;
+            });
+
+        List<at.ac.tuwien.sepm.groupphase.backend.entity.grade.Grade> inDb = new ArrayList<>();
+        this.gradeRepository.findAll().forEach(inDb::add);
+
+        assertEquals(2, inDb.size());
     }
 
     @Test
@@ -841,22 +982,7 @@ public class GradingWebSocketEndpointTest extends TestDataProvider {
 
         assertTrue(session.isConnected());
 
-        StompHeaders subscriptionHeaders = getStompHeadersForDest("/topic/grades/"
-            + this.competition.getId() + "/"
-            + this.competition.getGradingGroups().stream().findFirst().get().getId()
-            + "/Station 1");
-        session.subscribe(subscriptionHeaders, new StompFrameHandler() {
 
-            @Override
-            public Type getPayloadType(StompHeaders headers) {
-                return GradeDto.class;
-            }
-
-            @Override
-            public void handleFrame(StompHeaders headers, Object payload) {
-                blockingQueue.add((GradeDto) payload);
-            }
-        });
 
         StompHeaders errorSubscriptionHeaders = getStompHeadersForDest("/user/queue/error");
         session.subscribe(errorSubscriptionHeaders, new StompFrameHandler() {
@@ -1082,6 +1208,95 @@ public class GradingWebSocketEndpointTest extends TestDataProvider {
                 });
             });
 
+    }
+
+
+    private StompSession setupConnection(WebSocketStompClient webSocketStompClient, ApplicationUser user) throws Exception {
+        StompHeaders stompHeaders = getStompConnectionHeaderForUser(user);
+
+        webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
+
+        StompSession session = webSocketStompClient
+            .connect(
+                WS_CONNECTION_PATH,
+                new WebSocketHttpHeaders(new HttpHeaders()), stompHeaders,
+                new StompSessionHandlerAdapter() {
+
+                }).get(1, TimeUnit.SECONDS);
+
+
+        return session;
+    }
+
+    private void connectToGradesDto(StompSession session, BlockingQueue<GradeDto> blockingQueue, ApplicationUser user) {
+        StompHeaders subscriptionHeaders = getStompHeadersForDestForUser("/topic/grades/"
+            + this.competition.getId() + "/"
+            + this.competition.getGradingGroups().stream().findFirst().get().getId()
+            + "/Station 1", user);
+        session.subscribe(subscriptionHeaders, new StompFrameHandler() {
+
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return GradeDto.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                blockingQueue.add((GradeDto) payload);
+            }
+        });
+    }
+
+    private void connectToGradeResultDto(StompSession session, BlockingQueue<GradeResultDto> blockingQueue, ApplicationUser user) {
+        StompHeaders subscriptionHeaders = getStompHeadersForDestForUser("/topic/grades/"
+            + this.competition.getId() + "/"
+            + this.competition.getGradingGroups().stream().findFirst().get().getId()
+            + "/Station 1", user);
+        session.subscribe(subscriptionHeaders, new StompFrameHandler() {
+
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return GradeResultDto.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                blockingQueue.add((GradeResultDto) payload);
+            }
+        });
+    }
+
+    private void connectToLiveResultsDto(StompSession session, BlockingQueue<LiveResultDto> blockingQueue, ApplicationUser user) {
+        StompHeaders subscriptionHeaders = getStompHeadersForDestForUser("/topic/live-results/"
+            + this.competition.getId(), user);
+        session.subscribe(subscriptionHeaders, new StompFrameHandler() {
+
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return LiveResultDto.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                blockingQueue.add((LiveResultDto) payload);
+            }
+        });
+    }
+
+    private void connectToMessageErrorQueue(StompSession session, BlockingQueue<MessageErrorDto> blockingQueue, ApplicationUser user) {
+        StompHeaders subscriptionHeaders = getStompHeadersForDestForUser("/user/queue/error", user);
+        session.subscribe(subscriptionHeaders, new StompFrameHandler() {
+
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return MessageErrorDto.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                blockingQueue.add((MessageErrorDto) payload);
+            }
+        });
     }
 
 

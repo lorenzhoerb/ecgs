@@ -11,5 +11,11 @@ import java.util.Optional;
 public interface RegisterToRepository extends CrudRepository<RegisterTo, Long> {
     Optional<RegisterTo> findByGradingGroupCompetitionIdAndParticipantId(Long competitionId, Long participantId);
 
+    List<RegisterTo> findAllByGradingGroupCompetitionIdAndParticipantId(Long competitionId, Long participantId);
+
+    Optional<List<RegisterTo>> findAllByParticipantId(Long participantId);
+
     List<RegisterTo> findByGradingGroupCompetitionId(Long competitionId);
+
+    Optional<RegisterTo> findByGradingGroupIdAndParticipantId(Long gradingGroupId, Long participantId);
 }

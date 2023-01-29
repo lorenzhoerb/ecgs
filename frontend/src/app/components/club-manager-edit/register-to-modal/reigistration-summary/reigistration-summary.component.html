@@ -1,13 +1,33 @@
 <div>
   <div class="competition Details">
     <h5 class="card-title">{{competition.name}}</h5>
-    <small>{{localize.competition}}: {{competition.beginOfCompetition | date}} - {{competition.endOfCompetition | date}} •
+    <small>{{localize.competition}}: {{competition.beginOfCompetition | date}} - {{competition.endOfCompetition | date}}
+      •
       {{localize.registrationEnds}}: {{competition.endOfRegistration | date}}</small>
     <p class="card-text mt-2">{{competition.description}}</p>
+    <div *ngIf="showGroupInformation">
+      <h5>{{localize.groups}}</h5>
+      <app-group-registration-details [gradingGroups]="gradingGroups"></app-group-registration-details>
+    </div>
   </div>
   <hr/>
   <div>
-    <h5 class="card-title">{{localize.register}} {{participants.length}} {{localize.members}}</h5>
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <h5 class="card-title"
+          style="display: inline">{{localize.register}} {{participants.length}} {{localize.members}}</h5>
+      <div style="flex: 1"></div>
+      <div>
+        <div class="form-group">
+          <label>{{localize.assignAll}}</label>
+          <select class="form-select" aria-label="Grading Group"
+                  (change)="assignAll($event.target.value)">
+            <option selected [value]="null"></option>
+            <option *ngFor="let gg of gradingGroups" [value]="gg.id">{{gg.title}}</option>
+          </select>
+        </div>
+        <button class="btn btn-link" (click)="toggleGroupInformation()">{{localize.showGroupInformation}}</button>
+      </div>
+    </div>
     <table class="table table-striped">
       <thead>
       <tr>
@@ -15,7 +35,8 @@
         <th scope="col">{{localize.firstname}}</th>
         <th scope="col">{{localize.lastname}}</th>
         <th scope="col">{{localize.dateOfBirth}}</th>
-        <th scope="col">{{localize.groupPreference}}</th>
+        <th scope="col">{{localize.gender}}</th>
+        <th scope="col">{{localize.gradingGroup}}</th>
       </tr>
       </thead>
       <tbody>
@@ -26,10 +47,11 @@
         </td>
         <td>{{ user.lastName }}</td>
         <td>{{ user.dateOfBirth | date }}</td>
+        <td>{{ user.gender | gender}}</td>
         <td>
           <select class="form-select" aria-label="Grading Group"
                   [(ngModel)]="participants[(page - 1) * pageSize + i].groupId" (change)="onSelectGroup()">
-            <option [value]=""></option>
+            <option selected disabled [value]="null">{{localize.selectAGroup}}</option>
             <option *ngFor="let gg of gradingGroups" [value]="gg.id">{{gg.title}}</option>
           </select>
         </td>

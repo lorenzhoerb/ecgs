@@ -1,4 +1,5 @@
 import {SimpleFlagDto} from './simpleFlagDto';
+import {SimpleStationResult} from './simple-station-result';
 
 export enum Gender {
   male = 'MALE',
@@ -21,6 +22,19 @@ export class UserDetail {
   dateOfBirth: Date;
   picturePath: string;
   flags: SimpleFlagDto[];
+}
+
+export class UserDetailGrade {
+  id: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  gender: Gender;
+  dateOfBirth: Date;
+  picturePath: string;
+  flags: SimpleFlagDto[];
+  grades: SimpleStationResult[];
+  finalResult: number;
 }
 
 export class UserRegisterDetail {

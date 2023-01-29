@@ -13,6 +13,7 @@ import { ImportFlag } from '../dtos/import-flag';
 import {SimpleFlagDto} from '../dtos/simpleFlagDto';
 import {UserDetailSetFlagDto} from '../dtos/userDetailSetFlagDto';
 import {ClubManagerTeamImportResults} from '../dtos/club-manager-team-import-results';
+import {Pageable} from '../dtos/pageable';
 
 @Injectable({
   providedIn: 'root'
@@ -45,7 +46,7 @@ export class UserService {
   updateUserInfo(): void {
     this.httpClient.get<UserInfoDto>(this.userBaseUri).subscribe(value => {
       if (value.picturePath != null)  {
-        value.picturePath = 'http://localhost:8080/' + value.picturePath + '?' + new Date().getTime();
+        value.picturePath = this.globals.backendOrigin + '/' + value.picturePath + '?' + new Date().getTime();
       }
       this.userInfoDto$.next(value);
     });
@@ -111,16 +112,28 @@ export class UserService {
     return this.httpClient.patch<void>(this.userBaseUri + '/members/flags', members);
   }
 
-  getMembers(): Observable<Array<UserDetail>> {
+  getMembers(filter?: any, page?: number, size?: number): Observable<Pageable<UserDetail>> {
+    filter.page = page;
+    filter.size = size;
+
+    if(filter.flagId != null && filter.flagId !== '') {
+      filter.flagId = parseInt(filter.flagId,10);
+    }
+    console.log(filter);
+
     return this.httpClient
-      .get<Array<UserDetail>>(this.userBaseUri + '/members')
+      .get<Pageable<UserDetail>>(this.userBaseUri + '/members', {params: filter})
       .pipe(
-        map((data: Array<UserDetail>) => {
-          for (const d of data) {
+        map((data: Pageable<UserDetail>) => {
+          for (const d of data.content) {
             d.dateOfBirth = new Date(d.dateOfBirth);
           }
           return data;
         })
       );
+  }
+
+  getMyResults(): Observable<any[]> {
+    return this.httpClient.get<any[]>(this.userBaseUri + '/my-results');
   }
 }

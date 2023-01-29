@@ -22,12 +22,18 @@ import { ImportFlagsComponent } from './components/import-flags/import-flags.com
 import {ManageParticipantsComponent} from './components/competition/manage-participants/manage-participants.component';
 import {ChangeUserPassPictureComponent} from './components/change-user-pass-picture/change-user-pass-picture.component';
 import {ClubManagerEditComponent} from './components/club-manager-edit/club-manager-edit.component';
+import {GradingGroupsComponent} from './components/competition/grading-groups/grading-groups.component';
+import {
+  GradingGroupDetailComponent
+} from './components/competition/grading-groups/grading-group-detail/grading-group-detail.component';
+import { MyResultsComponent } from './components/my-results/my-results.component';
 
 const routbuilding: Routes = [
   {path: '', component: CompetitionListViewComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'login', component: LoginComponent},
   {path: 'forgot', component: ForgotPasswordComponent},
+  {path: 'my-results', canActivate: [AuthGuard], component: MyResultsComponent},
   {path: 'reset', component: ResetPasswordComponent},
   {path: 'competition', children:[
       {path: 'list', component: CompetitionListViewComponent},
@@ -35,6 +41,12 @@ const routbuilding: Routes = [
       {path: ':id', children: [
           {path: '', component: CompetitionComponent},
           {path: 'participants', canActivate: [TournamentManagerGuard], component: ManageParticipantsComponent},
+          {
+            path: 'groups', children: [
+              {path: '', canActivate: [TournamentManagerGuard], component: GradingGroupsComponent},
+              {path: ':groupId', canActivate: [TournamentManagerGuard], component: GradingGroupDetailComponent}
+            ]
+          },
           {path: 'grading', component: CompetitionGradingComponent}
         ]},
       {path: 'edit/:id', canActivate: [TournamentManagerGuard], component: CreateCompetitionComponent},

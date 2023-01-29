@@ -5,39 +5,53 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionListDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupWithRegisterToDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ReportDownloadInclusionRuleOptionsDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingGroupDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CompetitionViewDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.PageableDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantFilterDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailFilterDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDetailSetFlagDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.CompetitionMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.GradingGroupMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.GradingSystemMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.FlagsMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.entity.GradingGroup;
 import at.ac.tuwien.sepm.groupphase.backend.entity.GradingSystem;
+import at.ac.tuwien.sepm.groupphase.backend.entity.ManagedBy;
 import at.ac.tuwien.sepm.groupphase.backend.entity.RegisterTo;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Flags;
+import at.ac.tuwien.sepm.groupphase.backend.entity.ManagedBy;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradeRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingSystemRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.JudgeRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.ManagedByRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.FlagsRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionService;
 import at.ac.tuwien.sepm.groupphase.backend.service.GradingSystemService;
+import at.ac.tuwien.sepm.groupphase.backend.service.helprecords.FlagUtils;
 import at.ac.tuwien.sepm.groupphase.backend.specification.ApplicationUserSpecs;
 import at.ac.tuwien.sepm.groupphase.backend.specification.CompetitionSpecification;
 import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
 import at.ac.tuwien.sepm.groupphase.backend.validation.CompetitionValidator;
 import at.ac.tuwien.sepm.groupphase.backend.validation.GradeValidator;
 import at.ac.tuwien.sepm.groupphase.backend.validation.GradingSystemValidator;
+import at.ac.tuwien.sepm.groupphase.backend.validation.SimpleFlagValidator;
+import at.ac.tuwien.sepm.groupphase.backend.validation.UserSetFlagValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -49,12 +63,16 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -72,14 +90,21 @@ public class CompetitionServiceImpl implements CompetitionService {
     private final GradingSystemRepository gradingSystemRepository;
     private final GradingSystemMapper gradingSystemMapper;
     private final GradingSystemValidator gradingSystemValidator;
+    private final ManagedByRepository managedByRepository;
     private final GradeValidator gradeValidator;
     private final UserMapper userMapper;
+    private final FlagsMapper flagsMapper;
     private final CompetitionValidator competitionValidator;
     private final GradingSystemService gradingSystemService;
+    private final SimpleFlagValidator simpleFlagValidator;
+    private final UserSetFlagValidator userSetFlagValidator;
+    private final FlagUtils flagUtils;
 
     private final ApplicationUserRepository applicationUserRepository;
+    private final FlagsRepository flagsRepository;
     private final SessionUtils sessionUtils;
     private final RegisterToRepository registerToRepository;
+
 
     public CompetitionServiceImpl(CompetitionRepository competitionRepository, GradeRepository gradeRepository, CompetitionMapper competitionMapper,
                                   CompetitionValidator competitionValidator, UserMapper userMapper,
@@ -92,7 +117,9 @@ public class CompetitionServiceImpl implements CompetitionService {
                                   GradingGroupMapper gradingGroupMapper,
                                   ApplicationUserRepository applicationUserRepository,
                                   JudgeRepository judgeRepository,
-                                  RegisterToRepository registerToRepository) {
+                                  ManagedByRepository managedByRepository, RegisterToRepository registerToRepository,
+                                  FlagsMapper flagsMapper, SimpleFlagValidator simpleFlagValidator,
+                                  UserSetFlagValidator userSetFlagValidator, FlagsRepository flagsRepository) {
         this.competitionRepository = competitionRepository;
         this.gradeRepository = gradeRepository;
         this.competitionMapper = competitionMapper;
@@ -108,7 +135,13 @@ public class CompetitionServiceImpl implements CompetitionService {
         this.gradeValidator = gradeValidator;
         this.judgeRepository = judgeRepository;
         this.applicationUserRepository = applicationUserRepository;
+        this.managedByRepository = managedByRepository;
         this.registerToRepository = registerToRepository;
+        this.simpleFlagValidator = simpleFlagValidator;
+        this.userSetFlagValidator = userSetFlagValidator;
+        this.flagsMapper = flagsMapper;
+        this.flagsRepository = flagsRepository;
+        this.flagUtils = new FlagUtils(flagsMapper, flagsRepository);
     }
 
     private void verifyCreator(Long id) {
@@ -214,59 +247,15 @@ public class CompetitionServiceImpl implements CompetitionService {
             .setJudges(judgeDtos);
     }
 
-    private int compare(Object o1, Object o2) {
-        ApplicationUser p1 = (ApplicationUser) o1;
-        ApplicationUser p2 = (ApplicationUser) o2;
-        int res =  p1.getLastName().compareToIgnoreCase(p2.getLastName());
-        if (res != 0) {
-            return res;
-        }
-        return p1.getFirstName().compareToIgnoreCase(p2.getFirstName());
-    }
-
-    private List<ApplicationUser> getParticipantsInternal(Long id) {
-        LOGGER.debug("List participants internal for competition {}", id);
-
-        if (sessionUtils.getApplicationUserRole() == null) {
-            throw new ForbiddenException("No Permission to get participants");
-        }
-
-        Optional<Competition> competitionOptional = competitionRepository.findById(id);
-
-        if (competitionOptional.isEmpty()) {
-            throw new NotFoundException("Didn't find competition with id " + id);
-        }
-
-        Competition competition = competitionOptional.get();
-
-        if (competition.getDraft() && !competition.getCreator().getId().equals(sessionUtils.getSessionUser().getId())) {
-            // @Notice: competition shown as not found if in draft mode
-            // as a competition in draft should not be exposed.
-            throw new NotFoundException("Didn't find competition with id " + id);
-        }
-
-        Set<GradingGroup> gradingGroups = competition.getGradingGroups();
-        List<Set<RegisterTo>> registerToSets =
-            gradingGroups.stream().map(GradingGroup::getRegistrations).toList();
-        List<RegisterTo> registerTos =
-            registerToSets.stream().flatMap(Set::stream).filter(RegisterTo::getAccepted).toList();
-        List<ApplicationUser> participants =
-            new ArrayList<>(registerTos.stream().map(RegisterTo::getParticipant).toList());
-
-        participants.sort(this::compare);
-
-        return participants;
-    }
-
     @Transactional
     @Override
-    public Set<GradingGroupWithRegisterToDto> getCompetitionGradingGroupsWithParticipants(Long competitionId) {
+    public List<GradingGroupWithRegisterToDto> getCompetitionGradingGroupsWithParticipants(Long competitionId) {
         LOGGER.debug("Find gradingGroupsWithParticipants of competition with id {}", competitionId);
         Optional<Competition> competition = competitionRepository.findById(competitionId);
 
         if (competition.isPresent()) {
             Competition comp = competition.get();
-            Set<GradingGroup> gradingGroups = comp.getGradingGroups();
+            List<GradingGroup> gradingGroups = comp.getGradingGroups().stream().sorted().toList();
             gradingGroups.forEach(
                 gradingGroup -> gradingGroup.setRegistrations(gradingGroup.getRegistrations().stream().filter(RegisterTo::getAccepted).collect(
                     Collectors.toSet())));
@@ -277,13 +266,42 @@ public class CompetitionServiceImpl implements CompetitionService {
     }
 
     @Override
-    public List<UserDetailDto> getParticipants(Long id) {
-        LOGGER.debug("List participants for competition {}", id);
+    public Page<UserDetailDto> getParticipants(Long id, UserDetailFilterDto filter) {
+        LOGGER.debug("getParticipants({})", filter);
 
-        List<ApplicationUser> participants = getParticipantsInternal(id);
-        return userMapper.applicationUserListToUserDetailDtoList(participants);
+        if (!sessionUtils.isAuthenticated()) {
+            throw new ForbiddenException("No permission to get participant details");
+        }
+
+        competitionRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("No competition found"));
+
+        int page = 0;
+        int size = 10;
+
+        if (filter == null) {
+            filter = new UserDetailFilterDto();
+        }
+
+        if (filter.getPage() != null && filter.getPage() >= 0) {
+            page = filter.getPage();
+        }
+
+        if (filter.getSize() != null && filter.getSize() >= 0) {
+            size = filter.getSize();
+        }
+
+        Specification<ApplicationUser> specification = ApplicationUserSpecs.specs(id, filter);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ApplicationUser> partPage = applicationUserRepository.findAll(specification, pageable);
+
+        return new PageImpl<>(partPage.getContent()
+            .stream()
+            .map(userMapper::applicationUserToUserDetailDto).toList(),
+            pageable,
+            partPage.getTotalElements());
     }
-
 
     @Override
     public Page<ParticipantRegDetailDto> getParticipantsRegistrationDetails(PageableDto<ParticipantFilterDto> filter) {
@@ -416,6 +434,13 @@ public class CompetitionServiceImpl implements CompetitionService {
     private ParticipantRegDetailDto mapPartRegDetailDto(ApplicationUser u, Long compId) {
         RegisterTo registerTo = registerToRepository
             .findByGradingGroupCompetitionIdAndParticipantId(compId, u.getId()).get();
+
+        List<SimpleFlagDto> flags = null;
+
+        if (registerTo.getFlags() != null) {
+            flags = flagsMapper.flagsListToSimpleFlagDtoList(registerTo.getFlags().stream().toList());
+        }
+
         return new ParticipantRegDetailDto(
             u.getId(),
             u.getFirstName(),
@@ -423,6 +448,7 @@ public class CompetitionServiceImpl implements CompetitionService {
             u.getGender(),
             u.getDateOfBirth(),
             registerTo.getGradingGroup().getId(),
+            flags,
             registerTo.getAccepted()
         );
     }
@@ -454,5 +480,158 @@ public class CompetitionServiceImpl implements CompetitionService {
             competitionMapper.competitionListToCompetitionListDtoList(page.getContent()),
             pageable,
             page.getTotalElements());
+    }
+
+    @Override
+    public ReportDownloadInclusionRuleOptionsDto getCurrentUserReportDownloadInclusionRuleOptions(Long competitionId) {
+        if (!sessionUtils.isAuthenticated()) {
+            throw new ForbiddenException("Not authenticated");
+        }
+        if (competitionRepository.findById(competitionId).isEmpty()) {
+            throw new NotFoundException("No such competition");
+        }
+
+        var ret = new ReportDownloadInclusionRuleOptionsDto();
+        var currentUserRegistrations = registerToRepository.findAllByGradingGroupCompetitionIdAndParticipantId(
+            competitionId,
+            sessionUtils.getSessionUser().getId()
+            );
+        if (currentUserRegistrations != null && !currentUserRegistrations.isEmpty()) {
+            ret.setCanGenerateReportForSelf(true);
+        }
+        if (sessionUtils.isClubManager() || sessionUtils.isCompetitionManager()) {
+            var members = managedByRepository.findAllByManagerIs(sessionUtils.getSessionUser());
+            if (!members.isEmpty()) {
+                for (ManagedBy managedBy : members) {
+                    var registrationsOfMemberToAnyGradingGroupOfCurrentCompetition =
+                        registerToRepository.findAllByGradingGroupCompetitionIdAndParticipantId(
+                            competitionId, managedBy.getMember().getId()
+                        );
+                    if (!registrationsOfMemberToAnyGradingGroupOfCurrentCompetition.isEmpty()) {
+                        ret.setCanGenerateReportForTeam(true);
+                    }
+                }
+            }
+        }
+
+
+        return ret;
+    }
+
+    private Competition checkUserIsOwner(Long id) {
+        if (!sessionUtils.isCompetitionManager()) {
+            throw new ForbiddenException("Not authorized");
+        }
+
+        Optional<Competition> competitionOptional = competitionRepository.findById(id);
+
+        if (competitionOptional.isEmpty()) {
+            throw new ValidationListException("Competition doesn't exist",
+                List.of("Competition doesn't exist"));
+        }
+
+        Competition competition = competitionOptional.get();
+        ApplicationUser sessionUser = sessionUtils.getSessionUser();
+
+        if (!competition.getCreator().getId().equals(sessionUser.getId())) {
+            throw new ForbiddenException("You do not manage this competition");
+        }
+
+        return competition;
+    }
+
+    @Override
+    public List<SimpleFlagDto> getManagedFlags(Long id) {
+        Competition competition = checkUserIsOwner(id);
+
+        List<RegisterTo> registerTos = competition.getGradingGroups().stream()
+            .map(GradingGroup::getRegistrations).flatMap(Collection::stream).toList();
+        HashSet<Flags> hs = new HashSet<>();
+
+        for (RegisterTo r : registerTos) {
+            hs.addAll(r.getFlags());
+        }
+
+        List<Flags> sorted = new ArrayList<>(hs.stream().toList());
+        sorted.sort(Comparator.comparing(Flags::getName));
+
+        List<SimpleFlagDto> result = flagsMapper.flagsListToSimpleFlagDtoList(sorted);
+        return result == null ? new ArrayList<>() : result;
+    }
+
+    private RegisterTo checkUserIsRegistered(Competition competition, ApplicationUser m) {
+        if (m == null) {
+            throw new ValidationListException("User was null",
+                List.of("User was null"));
+        }
+
+        Optional<RegisterTo> relOpt = m.getRegistrations().stream()
+            .filter(r -> r.getGradingGroup().getCompetitions().getId().equals(competition.getId()))
+            .findFirst();
+
+        if (relOpt.isEmpty()) {
+            throw new ValidationListException("Participant not registered",
+                List.of("Participant not registered"));
+        }
+
+        return relOpt.get();
+    }
+
+    @Override
+    public void addFlagsForUsers(Long id, UserDetailSetFlagDto members) {
+        if (!sessionUtils.isCompetitionManager()) {
+            throw new ForbiddenException("Not authorized");
+        }
+
+        this.userSetFlagValidator.validate(members);
+
+        Competition competition = checkUserIsOwner(id);
+
+        List<ApplicationUser> users =
+            applicationUserRepository.findAllById(members.getUsers().stream().map(UserDetailDto::id).toList());
+        Set<Long> myFlagIds = getManagedFlags(id).stream().map(SimpleFlagDto::id).collect(Collectors.toSet());
+
+        Flags flag = flagUtils.verifyOrCreate(members.getFlag(), myFlagIds);
+
+        List<Long> ids = flag.getRegistrations().stream().map(RegisterTo::getId).toList();
+
+        for (ApplicationUser m : users) {
+            RegisterTo rel = checkUserIsRegistered(competition, m);
+
+            if (!ids.contains(rel.getId())) {
+                flag.getRegistrations().add(rel);
+            }
+        }
+
+        flagsRepository.save(flag);
+    }
+
+
+    @Override
+    public void removeFlagsForUsers(Long id, UserDetailSetFlagDto members) {
+        if (!sessionUtils.isCompetitionManager()) {
+            throw new ForbiddenException("Not authorized");
+        }
+
+        this.userSetFlagValidator.validate(members);
+
+        Competition competition = checkUserIsOwner(id);
+
+        Set<Long> myFlagIds = getManagedFlags(id).stream().map(SimpleFlagDto::id).collect(Collectors.toSet());
+        Flags flag = flagUtils.verify(members.getFlag(), myFlagIds);
+
+        List<ApplicationUser> users =
+            applicationUserRepository.findAllById(members.getUsers().stream().map(UserDetailDto::id).toList());
+        List<Long> ids = flag.getRegistrations().stream().map(RegisterTo::getId).toList();
+
+        for (ApplicationUser m : users) {
+            RegisterTo rel = checkUserIsRegistered(competition, m);
+
+            if (ids.contains(rel.getId())) {
+                flag.getRegistrations().removeIf(x -> x.getId().equals(rel.getId()));
+            }
+        }
+
+        flagsRepository.save(flag);
     }
 }

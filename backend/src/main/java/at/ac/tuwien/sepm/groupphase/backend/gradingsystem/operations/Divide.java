@@ -20,4 +20,10 @@ public class Divide extends Operation {
         left.bind(id, value);
         right.bind(id, value);
     }
+
+    @Override
+    public void validate() {
+        left.validate();
+        right.validate();
+    }
 }

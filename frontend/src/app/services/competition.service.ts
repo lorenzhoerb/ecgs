@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpEvent, HttpParams, HttpRequest} from '@angular/common/http';
 import {UserDetail} from '../dtos/user-detail';
 import {Competition} from '../dtos/competition';
 import {CompetitionDetail} from '../dtos/competition-detail';
@@ -16,6 +16,13 @@ import {GradingGroupWithRegisterToDto} from '../dtos/gradingGroupWithRegisterToD
 import {PartFilterDto} from '../dtos/part-filter-dto';
 import {ParticipantManageDto} from '../dtos/participant-manage-dto';
 import {Pageable} from '../dtos/pageable';
+import { DownloadReportRequestDto } from '../dtos/excel-download-request-dto';
+import { DownloadReportResponseDto } from '../dtos/excel-download-responce-dto';
+import { ReportDownloadOptions } from '../dtos/report-download-options';
+import { ReportIsDownloadable } from '../dtos/report-is-downloadable';
+import {UserDetailFilterDto} from '../dtos/userDetailFilterDto';
+import {SimpleFlagDto} from '../dtos/simpleFlagDto';
+import {UserDetailSetFlagDto} from '../dtos/userDetailSetFlagDto';
 
 @Injectable({
   providedIn: 'root'
@@ -100,13 +107,17 @@ export class CompetitionService {
    * Get aprticipants of competition.
    *
    * @param id id of competition to get participants for
+   * @param filter filter specifying what to filter by
    */
-  getParticipants(id: number): Observable<Array<UserDetail>> {
+  getParticipants(id: number, filter?: any, page?: number, size?: number): Observable<Pageable<UserDetail>> {
+    filter.page = page;
+    filter.size = size;
+
     return this.httpClient
-      .get<Array<UserDetail>>(this.competitionBaseUri + '/' + id + '/participants')
+      .get<Pageable<UserDetail>>(this.competitionBaseUri + '/' + id + '/participants', {params: {...filter}})
       .pipe(
-        map((data: Array<UserDetail>) => {
-          for (const d of data) {
+        map((data: Pageable<UserDetail>) => {
+          for (const d of data.content) {
             d.dateOfBirth = new Date(d.dateOfBirth);
           }
           return data;
@@ -121,6 +132,9 @@ export class CompetitionService {
    */
   getManagedParticipants(competitionId: number, filter?: PartFilterDto, page?: number, size?: number): Observable<Pageable<UserDetail>> {
     let params = {};
+    if (filter.flagId != null && (filter.flagId as any) !== '') {
+      filter.flagId = parseInt((filter.flagId as any), 10);
+    }
     if (filter) {
       params = {...params, ...filter};
     }
@@ -188,5 +202,42 @@ export class CompetitionService {
           return data;
         })
       );
+  }
+
+  calculateReportResults(competitionId: number) {
+    return this.httpClient.post(`${this.competitionBaseUri}/${competitionId}/report`, {});
+  }
+
+  downloadReport(competitionId: number, requestDto: DownloadReportRequestDto): Observable<DownloadReportResponseDto> {
+    return this.httpClient.post<DownloadReportResponseDto>(`${this.competitionBaseUri}/${competitionId}/report/download`, requestDto);
+  }
+
+  getCurrentUserReportDownloadOptions(competitionId: number): Observable<ReportDownloadOptions> {
+    return this.httpClient.get<ReportDownloadOptions>(`${this.competitionBaseUri}/${competitionId}/report/download-inclusion-rule-options`);
+  }
+
+  checkIfReportsAreDownloadReady(competitionId: number): Observable<ReportIsDownloadable> {
+    return this.httpClient.get<ReportIsDownloadable>(`${this.competitionBaseUri}/${competitionId}/report/downloadable`);
+  }
+
+  uploadPicture(id: number, file: File): Observable<HttpEvent<any>> {
+    const multipartFile: FormData = new FormData();
+    multipartFile.append('file', file, file.name);
+    const request = new HttpRequest('POST', this.competitionBaseUri + '/' + id + '/picture', multipartFile, {
+      responseType: 'text'
+    });
+    return this.httpClient.request(request);
+  }
+
+  getManagedFlags(id: number): Observable<SimpleFlagDto[]> {
+    return this.httpClient.get<SimpleFlagDto[]>(this.competitionBaseUri + '/' + id + '/my-flags');
+  }
+
+  addMemberFlags(id: number, members: UserDetailSetFlagDto): Observable<void> {
+    return this.httpClient.post<void>(this.competitionBaseUri + '/' + id + '/members/flags', members);
+  }
+
+  removeMemberFlags(id: number, members: UserDetailSetFlagDto): Observable<void> {
+    return this.httpClient.patch<void>(this.competitionBaseUri + '/' + id + '/members/flags', members);
   }
 }

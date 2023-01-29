@@ -74,7 +74,7 @@ public class ApplicationUser {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "judge")
     private Set<Judge> judges;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "participant")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "participant", fetch = FetchType.EAGER)
     private Set<RegisterTo> registrations;
 
     public ApplicationUser() {
@@ -220,16 +220,16 @@ public class ApplicationUser {
     public String toString() {
         return "ApplicationUser{"
             + "id=" + id
-            + ", type=" + type
-            + ", firstName='" + firstName + '\''
-            + ", lastName='" + lastName + '\''
-            + ", gender=" + gender
-            + ", dateOfBirth=" + dateOfBirth
-            + ", picturePath='" + picturePath + '\''
-            + ", members=" + members
-            + ", managers=" + managers
-            + ", judges=" + judges
-            + ", registrations=" + registrations
+            // + ", type=" + type
+            // + ", firstName='" + firstName + '\''
+            // + ", lastName='" + lastName + '\''
+            // + ", gender=" + gender
+            // + ", dateOfBirth=" + dateOfBirth
+            // + ", picturePath='" + picturePath + '\''
+            // + ", members=" + members
+            // + ", managers=" + managers
+            // + ", judges=" + judges
+            // + ", registrations=" + registrations
             + '}';
     }
 }

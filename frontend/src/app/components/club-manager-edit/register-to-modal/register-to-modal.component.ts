@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {SimpleCompetitionListEntryDto} from '../../../dtos/simpleCompetitionListEntryDto';
-import { UserRegisterDetail} from '../../../dtos/user-detail';
+import {UserRegisterDetail} from '../../../dtos/user-detail';
 import {ParticipantRegistrationDto} from '../../../dtos/ParticipantRegistrationDto';
 import {CompetitionService} from '../../../services/competition.service';
 import {ToastrService} from 'ngx-toastr';
@@ -24,6 +24,7 @@ export class RegisterToModalComponent implements OnInit {
   registerState = RegisterState;
   state: RegisterState = RegisterState.selectCompetition;
   selectedComp: SimpleCompetitionListEntryDto;
+  canRegister = false;
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -50,7 +51,6 @@ export class RegisterToModalComponent implements OnInit {
   }
 
   onRegister() {
-    console.log(this.mapMultiRegister(this.participants));
     this.competitionService
       .registerParticipants(this.selectedComp.id, this.mapMultiRegister(this.participants))
       .subscribe({
@@ -59,21 +59,35 @@ export class RegisterToModalComponent implements OnInit {
           this.activeModal.close();
         },
         error: err => {
-          this.toastr.success('Ups. something went wrong');
-          console.error(err);
+          this.displayRegistrationErrors(err.error.errors);
+          this.toastr.error('Registration cancelled.');
           this.activeModal.close();
         }
       });
   }
 
+  displayRegistrationErrors(bulkErrors) {
+    bulkErrors.forEach(bulkError => {
+      const participant = this.participants.filter(p => bulkError.id === p.id)[0];
+      let errMessage = `Registration failed for ${participant.firstName} ${participant.lastName}:\n`;
+      bulkError.errors.forEach(userBulkError => {
+        errMessage += '- ' + userBulkError + '\n';
+      });
+      this.toastr.error(errMessage);
+    });
+  }
+
+
   mapMultiRegister(participants: UserRegisterDetail[]): ParticipantRegistrationDto[] {
     return participants.map(p => ({
-        userId: p.id,
-        groupPreference: p.groupId
-      }));
+      userId: p.id,
+      groupPreference: p.groupId
+    }));
   }
 
   onGroupChange(participants: UserRegisterDetail[]) {
     this.participants = participants;
+    const notSelected = participants.filter(p => p.groupId == null).length;
+    this.canRegister = notSelected === 0;
   }
 }

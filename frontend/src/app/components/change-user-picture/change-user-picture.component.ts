@@ -4,6 +4,7 @@ import {ToastrService} from 'ngx-toastr';
 import {UserService} from '../../services/user.service';
 import {HttpResponse} from '@angular/common/http';
 import LocalizationService, {LocalizeService} from '../../services/localization/localization.service';
+import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-change-user-picture',
@@ -13,10 +14,12 @@ import LocalizationService, {LocalizeService} from '../../services/localization/
 export class ChangeUserPictureComponent implements OnInit {
 
   selectedFile: File;
+  imageUrl: string | SafeUrl = '../../../assets/user_image.jpg';
 
   constructor(private router: Router,
               private notification: ToastrService,
-              private userService: UserService) {
+              private userService: UserService,
+              private sanitizer: DomSanitizer) {
   }
 
   public get localize(): LocalizeService {
@@ -28,10 +31,15 @@ export class ChangeUserPictureComponent implements OnInit {
 
   selectFile(event) {
     this.selectedFile = event.target.files[0];
+    this.imageUrl = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(event.target.files[0]));
   }
 
   uploadFile() {
     if (this.selectedFile != null) {
+      if (this.selectedFile.size > 1000000) {
+        this.notification.error('Datei größer als 1 Megabyte', 'Datei zu groß');
+        return;
+      }
       const extension = this.selectedFile.name.substring(this.selectedFile.name.lastIndexOf('.'));
       if (extension === '.png' || extension === '.jpeg' || extension === '.jpg') {
         this.userService.uploadPicture(this.selectedFile).subscribe(

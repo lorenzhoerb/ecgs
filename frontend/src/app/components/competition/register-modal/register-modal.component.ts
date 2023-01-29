@@ -17,7 +17,7 @@ export class RegisterModalComponent implements OnInit {
   competition: Competition;
   competitionId: number;
   groups: Array<SimpleGradingGroup>;
-  groupPreference = -1;
+  groupPreference = null;
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -40,6 +40,13 @@ export class RegisterModalComponent implements OnInit {
     });
   }
 
+  getSelectedGroup(): SimpleGradingGroup {
+    if (this.groupPreference === null) {
+      return null;
+    }
+    return this.groups.filter(g => g.id === this.groupPreference)[0];
+  }
+
 
   formatDate(date: Date): string {
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
@@ -53,6 +60,9 @@ export class RegisterModalComponent implements OnInit {
           this.activeModal.close(true);
         },
         error: err => {
+          err.error.errors.forEach(e => {
+            this.toastrService.error(e);
+          });
           this.toastrService.error(this.localize.errRegComp);
           this.activeModal.close(false);
         }

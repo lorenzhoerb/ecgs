@@ -2,6 +2,8 @@ package at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Arrays;
+
 public class Mean extends Operation {
     public Operation[] operations;
 
@@ -24,5 +26,10 @@ public class Mean extends Operation {
         for (Operation op : operations) {
             op.bind(id, value);
         }
+    }
+
+    @Override
+    public void validate() {
+        Arrays.stream(operations).forEach(Operation::validate);
     }
 }

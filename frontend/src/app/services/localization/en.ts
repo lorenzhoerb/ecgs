@@ -22,6 +22,7 @@ export class Englisch implements ILanguage {
     sendResetLink: 'Send reset link',
 
     edit: 'Edit',
+    calculateCompetitionResults: 'Calculate final results',
 
     datesAndContacts: 'Dates & Contacts',
     description: 'Description',
@@ -42,6 +43,11 @@ export class Englisch implements ILanguage {
     public: 'Public',
     onlyClubs: 'Clubs only',
     save: 'Save',
+
+    meanStrategy: 'Mean',
+    equalStrategy: 'Equal',
+
+    judge: 'Judge',
 
     time: 'Date',
     beginAtOrAfter: 'Begins at / after',
@@ -79,7 +85,13 @@ export class Englisch implements ILanguage {
     new: 'new',
     create: 'create',
     createFlag: 'create Flag',
+    selectAGroup: 'Select a Group',
+    groupHasRegistrationReq: 'This group has registration requirements',
+    showGroupInformation: 'Show group information',
+    assignAll: 'Assign all',
+    groups: 'Groups',
 
+    registerToAGroup: 'Register to a group',
     close: 'Close',
     formula: 'Formula',
     chooseGradingGroup: 'Choose Grading Group',
@@ -103,7 +115,9 @@ export class Englisch implements ILanguage {
     lastname: 'Lastname',
     password: 'Password',
     userSettings: 'Settings',
-    filePictureRestrictions: 'Only .png, .jpeg or .jpg',
+    filePictureRestrictions: 'Only .png, .jpeg or .jpg, aswell as <= 1 Megabyte',
+    uploadCompetitionPictureDisclaimer: 'Here you can upload a picture for your competition.',
+    clearFileUpload: 'Choose file again',
     changePassword: 'Change password',
     changeUserPicture: 'Change profile picture',
     uploadUserPicture: 'Upload picture',
@@ -118,8 +132,28 @@ export class Englisch implements ILanguage {
     membersPerPage: 'members per page',
     searchACompetition: 'Search a competition',
     back: 'Back',
+    showRegistrationRequirements: 'Show registration requirements',
+    addAnotherCondition: 'Add another condition',
+    manageRegistrationConstraints: 'Manage registration constraints. Somebody can register if all constraints are fulfilled.',
+    registerConstraints: 'Register Constraints',
+    noConstraints: 'No Constraints',
+    constraints: 'Constraints',
+    everybodyCanRegisterToThisGroup: 'Everybody can register to this group.',
+    age: 'Age',
+    equals: 'equals',
+    notEquals: 'not equals',
+    greaterThan: 'greater than',
+    greaterOrEqualsThan: 'greater or equals than',
+    lessThan: 'less than',
+    lessOrEqualsThan: 'less or equals than',
+    bornBefore: 'born before',
+    bornAfter: 'born after',
+
 
     editTeam: 'Edit Team',
+    addRemoveFlags: 'Add/Remove Flags',
+
+    liveResults: 'Live Results',
 
     enter: (type: string) => `Enter ${type}...`,
     reEnter: (type: string) => `Repeat ${type}...`,

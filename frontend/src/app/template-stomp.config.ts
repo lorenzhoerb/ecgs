@@ -1,7 +1,7 @@
 import { RxStomp, RxStompConfig, } from '@stomp/rx-stomp';
 import { debugFnType, IFrame, StompHeaders, Versions } from '@stomp/stompjs';
 
-export const myRxStompConfig: RxStompConfig = {
+export const stompConfigTemplate: RxStompConfig = {
   // Which server?
   brokerURL: 'ws:/localhost:8080/ws/grading',
 

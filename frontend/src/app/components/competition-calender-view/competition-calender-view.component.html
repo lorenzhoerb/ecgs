@@ -18,7 +18,7 @@
             class="day-header"
             *ngFor="let index of [1, 2, 3, 4, 5, 6]">
             {{dayNumberToString(index)}}
-        </div>        
+        </div>
         <div
             class="day-header no-right-border"
         >
@@ -37,13 +37,12 @@
             class="day-body no-right-border"
             [style.grid-area]="getDayBodyGridArea(7)"
             >
-        </div>  
+        </div>
 
-        <div 
-            *ngFor="let competition of competitions; let i = index" 
-            class="competition" 
+        <div
+            *ngFor="let competition of competitions; let i = index"
+            class="competition"
             [style.grid-area]="getNextCompetitionGridArea(competition, i)"
-            [style.font-size]="getNextCompetitionFontSize(competition)"
             [routerLink]="'/competition/' + competition.id"
         >
             {{competition.name}}

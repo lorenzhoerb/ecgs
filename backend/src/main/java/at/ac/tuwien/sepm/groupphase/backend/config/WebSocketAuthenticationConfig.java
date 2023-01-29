@@ -107,6 +107,7 @@ public class WebSocketAuthenticationConfig implements WebSocketMessageBrokerConf
                 StompHeaderAccessor accessor =
                     MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
+
                 if (StompCommand.CONNECT.equals(accessor.getCommand())
                     || StompCommand.MESSAGE.equals(accessor.getCommand())
                     || StompCommand.SEND.equals(accessor.getCommand())

@@ -1,43 +1,160 @@
-<main>
-  <div class="scrollabove">
-    <app-content-card *ngIf="canEditParticipants" [title]="localize.managedParticipants" >
-      <div class="form-group">
-        <label class="mx-2" for="new-flags">{{localize.createFlag}}</label>
-        <div class="d-flex flex-row col-6">
-          <input [(ngModel)]="newFlagText" class="mx-2 form-control" id="new-flags" type="text">
-          <button class="mx-2" type="button" (click)="newFlag()" class="primary-btn bc-ming">{{localize.create}}</button>
+<div class="container">
+  <div class="row">
+    <div class="col-md-10 offset-md-1">
+      <app-content-card [title]="localize.manageParticipants">
+
+        <form #form="ngForm" class="d-flex flex-row w-auto mb-3">
+
+          <button type="submit" hidden="true">submit</button>
+          <div class="flex-grow-2">
+            <label for="firstName" class="col-form-label">
+              {{localize.firstname}}
+            </label>
+            <input type="text" name="firstName" id="firstName"
+                   class="form-control"
+                   [(ngModel)]="searchParameters.firstName"
+                   (ngModelChange)="this.inputChange.next($event)">
+          </div>
+          <div class="ms-2">
+            <label for="lastName" class="col-form-label">
+              {{localize.lastname}}
+            </label>
+            <input type="text" name="lastName" id="lastName"
+                   class="form-control"
+                   [(ngModel)]="searchParameters.lastName"
+                   (ngModelChange)="this.inputChange.next($event)">
+          </div>
+          <div class="ms-1">
+            <label for="sex" class="col-form-label">
+              {{localize.gender}}
+            </label>
+            <select name="sex" id="sex"
+                    class="form-select"
+                    [(ngModel)]="searchParameters.gender"
+                    (ngModelChange)="this.inputChange.next($event)">
+              <option></option>
+              <option value="FEMALE">{{localize.genderWoman}}</option>
+              <option value="MALE">{{localize.genderMan}}</option>
+              <option value="OTHER">{{localize.genderOther}}</option>
+            </select>
+          </div>
+          <div class="ms-1">
+            <label for="flag" class="col-form-label">
+              {{localize.flag}}
+            </label>
+            <select name="flag" id="flag"
+                    class="form-select"
+                    [(ngModel)]="searchParameters.flagId"
+                    (ngModelChange)="this.inputChange.next($event)">
+              <option></option>
+              <option *ngFor="let flag of currentFlags()" [value]="flag.id">{{flag.name}}</option>
+            </select>
+          </div>
+        </form>
+
+
+        <div class="row">
+          <div
+            style="border-top: 2px solid #dcdcde;
+            border-bottom: 2px solid #dcdcde;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding:10px;">
+
+            <div style="flex: 1"></div>
+
+            <div ngbDropdown container="body">
+              <button type="button" class="btn btn-outline-primary btn-md"
+                      ngbDropdownToggle>{{localize.action}}</button>
+              <div ngbDropdownMenu>
+                <button ngbDropdownItem (click)="onAddRemoveFlags(editFlags)">{{localize.addRemoveFlags}}</button>
+                <button ngbDropdownItem (click)="registerTo()">{{localize.register}}</button>
+              </div>
+            </div>
+
+          </div>
         </div>
 
-        <div class="spacer-2"></div>
-
-        <label class="mx-2" for="flags">{{localize.flag}}</label>
-        <div class="d-flex flex-row col-6">
-          <select [(ngModel)]="selectedFlag" class="form-select mx-2" name="my-flags" id="flags" aria-describedby="flags you already used">
-            <option *ngFor="let flag of currentFlags()" [value]="flag.id">{{flag.name}}</option>
-          </select>
-          <button class="mx-2 primary-btn bc-ming" type="button" (click)="addFlag()">{{localize.add}}</button>
-          <button class="mx-2 primary-btn bc-sizzling-red" type="button" (click)="deleteFlag()">{{localize.delete}}</button>
+        <div class="row">
+          <table class="table table-striped">
+            <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col"><input type="checkbox" class="form-check-input"
+                                     (change)="onMasterBulk($event.target.checked)" [(ngModel)]="masterBulked"/></th>
+              <th scope="col">{{localize.firstname}}</th>
+              <th scope="col">{{localize.lastname}}</th>
+              <th scope="col">{{localize.dateOfBirth}}</th>
+              <th scope="col">{{localize.gender}}</th>
+              <th scope="col">{{localize.flag}}</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let record of this.participants; let i = index">
+              <th scope="row">{{i + 1 + (page - 1) * pageSize}}</th>
+              <td><input
+                type="checkbox"
+                class="form-check-input"
+                (change)="onBulk($event.target.checked, record)"
+                [checked]="bulkMap.get(record.id) !== undefined"
+              ></td>
+              <td>{{record.firstName}}</td>
+              <td>{{record.lastName}}</td>
+              <td>{{record.dateOfBirth | date: 'dd.MM.YYYY'}}</td>
+              <td>{{record.gender | gender}}</td>
+              <td>{{mapFlags(record.flags)}}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="row">
+          <div style="display: flex; justify-content: center">
+            <ngb-pagination
+              [collectionSize]="totalElements"
+              [(page)]="page"
+              [pageSize]="pageSize"
+              (pageChange)="onPageChange()"
+              [maxSize]="5"
+              aria-label="Default pagination"
+            ></ngb-pagination>
+          </div>
         </div>
 
-        <div class="spacer-2"></div>
+      </app-content-card>
+    </div>
+  </div>
+</div>
 
-        <div class="d-flex flex-row col-6">
-          <button class="mx-2 primary-btn bc-sizzling-red" type="button" (click)="registerTo()">{{localize.register}}</button>
-        </div>
+<ng-template #editFlags let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="edit-flags">{{localize.addRemoveFlags}}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group mb-3">
+      <label class="mx-2" for="new-flags">{{localize.createFlag}}</label>
+      <div class="d-flex flex-row col-6">
+        <input [(ngModel)]="newFlagText" class="mx-2 form-control" id="new-flags" type="text">
+        <button class="mx-2" type="button" (click)="newFlag()" class="primary-btn bc-ming">{{localize.create}}</button>
       </div>
 
       <div class="spacer-2"></div>
 
-      <app-bulk-editor
-        [header]="[localize.firstname,localize.lastname,localize.gender,localize.dateOfBirth,localize.flag]"
-        [recordsPerPage]="25"
-        [enablePagination]="true"
-        [fetchData]="fetchParticipantsWithFlags"
-        [mapRecord]="mapParticipantWithFlags"
-        [disableDelete]="true"
-        [updateCounter]="this.updateCounter"
-        [bulkAction]="bulkAction"
-      ></app-bulk-editor>
-    </app-content-card>
+      <label class="mx-2" for="flags">{{localize.flag}}</label>
+      <div class="d-flex flex-row col-6">
+        <select [(ngModel)]="selectedFlag" class="form-select mx-2" name="my-flags" id="flags" aria-describedby="flags you already used">
+          <option *ngFor="let flag of currentFlags()" [value]="flag.id">{{flag.name}}</option>
+        </select>
+      </div>
+
+    </div>
   </div>
-</main>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="modal.dismiss('Canel')">{{localize.cancel}}</button>
+    <button class="mx-2 primary-btn bc-ming" type="button" (click)="modal.close('add')">{{localize.add}}</button>
+    <button class="mx-2 primary-btn bc-sizzling-red" type="button" (click)="modal.close('remove')">{{localize.delete}}</button>
+  </div>
+</ng-template>
+

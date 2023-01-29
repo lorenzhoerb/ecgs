@@ -14,4 +14,10 @@ public interface GradeRepository extends CrudRepository<Grade, GradePk> {
     List<Grade> findAllByGradePkParticipantIdAndGradePkCompetitionIdAndGradePkGradingGroupIdAndGradePkStationId(Long participantId, Long competitionId, Long gradingGroupId, Long stationId);
 
     List<Grade> findAllByGradePkCompetitionIdAndGradePkGradingGroupIdAndGradePkStationId(Long competitionId, Long gradingGroupId, Long stationId);
+
+    List<Grade> findAllByGradePkParticipantIdAndGradePkCompetitionIdAndGradePkGradingGroupId(Long participantId, Long competitionId, Long gradingGroupId);
+
+    List<Grade> findAllByGradePkCompetitionIdAndValidIsTrue(Long competitionId);
+
+    List<Grade> findAllByGradePkCompetitionId(Long competitionId);
 }

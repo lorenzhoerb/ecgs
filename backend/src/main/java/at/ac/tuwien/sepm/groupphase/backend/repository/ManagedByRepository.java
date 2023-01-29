@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface ManagedByRepository extends JpaRepository<ManagedBy, Long> {
     Optional<ManagedBy> findByManagerAndMember(ApplicationUser manager, ApplicationUser member);
 
-    Optional<List<ManagedBy>> findAllByManagerIs(ApplicationUser manager);
+    List<ManagedBy> findAllByManagerIs(ApplicationUser manager);
 
     List<ManagedBy> findByManagerId(Long managerId);
 

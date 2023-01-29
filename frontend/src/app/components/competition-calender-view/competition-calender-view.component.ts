@@ -189,7 +189,7 @@ export class CompetitionCalenderViewComponent implements OnInit {
     this.userService.getCompetitionsForCalender(this.selectedExtendedWeekInfo.year, this.selectedExtendedWeekInfo.weekNumber)
     .subscribe({
       next: (data) => {
-        this.competitions = this.parseCompetitions(data);
+        this.competitions = this.parseCompetitions(data).sort((a, b) => a.id - b.id);
       },
       error: (err) => {
         const errorObj = err.error;

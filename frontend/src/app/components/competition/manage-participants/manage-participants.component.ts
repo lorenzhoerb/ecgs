@@ -9,6 +9,8 @@ import {ParticipantManageDto} from '../../../dtos/participant-manage-dto';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import LocalizationService, {LocalizeService} from '../../../services/localization/localization.service';
 import {ToastrService} from 'ngx-toastr';
+import {SimpleFlagDto} from '../../../dtos/simpleFlagDto';
+import {RegisterToModalComponent} from '../../club-manager-edit/register-to-modal/register-to-modal.component';
 
 @Component({
   selector: 'app-manage-participants',
@@ -26,8 +28,12 @@ export class ManageParticipantsComponent implements OnInit {
   searchParameters: PartFilterDto = {};
   inputChange: Subject<any> = new Subject();
   bulkMap: Map<number, UserDetail> = new Map<number, UserDetail>();
-  bulkStates = Array(this.pageSize).fill(false);
   masterBulked = false;
+
+  myFlags: Map<number, SimpleFlagDto> = new Map();
+  newFlagText = '';
+  selectedFlag: string;
+  newId = -1;
 
   constructor(
     private competitionService: CompetitionService,
@@ -49,7 +55,9 @@ export class ManageParticipantsComponent implements OnInit {
       .subscribe(e => {
         this.page = 1;
         this.fetchParticipants();
-      });
+    });
+
+    this.getManagedFlags();
   }
 
   onTopBarSelect(key: string) {
@@ -96,15 +104,22 @@ export class ManageParticipantsComponent implements OnInit {
     );
   }
 
+  onEditFlags(modalContent) {
+    this.modalService.open(modalContent, {ariaLabelledBy: 'modal-basic-title'}).result.then(
+      result => {
+        if(result === 'add') {
+          this.addFlags();
+        } else if(result === 'remove') {
+          this.removeFlags();
+        }
+      }
+    );
+  }
+
   bulkAction(action) {
     this.masterBulked = false;
     action(Array.from(this.bulkMap.values()));
-    this.toggleAllBulk(false);
     this.bulkMap.clear();
-  }
-
-  toggleAllBulk(bulked: boolean) {
-    this.bulkStates = Array(this.pageSize).fill(bulked);
   }
 
   onBulk(bulked: boolean, record: UserDetail) {
@@ -116,7 +131,6 @@ export class ManageParticipantsComponent implements OnInit {
   }
 
   onMasterBulk(bulked: boolean) {
-    this.toggleAllBulk(bulked);
     this.participants.forEach(p => {
       this.onBulk(bulked, p);
     });
@@ -169,7 +183,6 @@ export class ManageParticipantsComponent implements OnInit {
 
   onPageChange() {
     this.fetchParticipants();
-    this.toggleAllBulk(false);
     this.masterBulked = false;
   }
 
@@ -184,4 +197,78 @@ export class ManageParticipantsComponent implements OnInit {
   getAcceptedText(accepted: boolean): string {
     return accepted ? this.localize.accepted : this.localize.outstanding;
   }
+
+  getManagedFlags() {
+    this.competitionService.getManagedFlags(this.competitionId).subscribe({
+      next: data => {
+        this.myFlags.clear();
+
+        for (const flag of data) {
+          this.myFlags.set(flag.id, flag);
+        }
+
+        if (data.length !== 0) {
+          this.selectedFlag = String(data[0].id);
+        }
+      },
+      error: error => {
+        this.toastr.error(error, 'Error fetching information');
+      }
+    });
+  }
+
+  newFlag() {
+    if (this.myFlags.size !== 0 &&
+      Array.from(this.myFlags.values()).filter(f => f.name === this.newFlagText).length !== 0) {
+      this.toastr.error('flag invalid', 'flag already exists');
+      return;
+    }
+    this.myFlags.set(this.newId, {id: this.newId, name: this.newFlagText});
+    this.selectedFlag = String(this.newId);
+    this.newFlagText = '';
+    --this.newId;
+  }
+
+  currentFlags(): SimpleFlagDto[] {
+    return Array.from(this.myFlags.values());
+  }
+
+  mapFlags(flags: SimpleFlagDto[]): string {
+    if(flags == null) {
+      return '';
+    }
+
+    return flags.map(f => f.name).join(', ');
+  }
+
+  addFlags() {
+    const flag = this.myFlags.get(parseInt(this.selectedFlag, 10));
+    const users = Array.from(this.bulkMap.values());
+    this.competitionService.addMemberFlags(this.competitionId, {flag, users}).subscribe({
+      next: data => {
+        this.fetchParticipants();
+        this.getManagedFlags();
+      },
+      error: error => {
+        this.toastr.error(error, 'Error setting flags');
+        console.log(error);
+      }
+    });
+  }
+
+  removeFlags() {
+    const flag = this.myFlags.get(parseInt(this.selectedFlag, 10));
+    const users = Array.from(this.bulkMap.values());
+    console.log({flag, users});
+    this.competitionService.removeMemberFlags(this.competitionId, {flag, users}).subscribe({
+      next: data => {
+        this.fetchParticipants();
+        this.getManagedFlags();
+      },
+      error: error => {
+        this.toastr.error(error, 'Error setting flags');
+      }
+    });
+  }
+
 }

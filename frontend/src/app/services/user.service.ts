@@ -46,7 +46,7 @@ export class UserService {
   updateUserInfo(): void {
     this.httpClient.get<UserInfoDto>(this.userBaseUri).subscribe(value => {
       if (value.picturePath != null)  {
-        value.picturePath = this.globals.backendOrigin + '/' + value.picturePath + '?' + new Date().getTime();
+        value.picturePath = this.globals.backendOrigin + value.picturePath + '?' + new Date().getTime();
       }
       this.userInfoDto$.next(value);
     });

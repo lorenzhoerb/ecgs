@@ -88,7 +88,7 @@ export class CompetitionComponent implements OnInit {
           next: data => {
             this.competition = data;
             if (this.competition.picturePath) {
-              this.imageUrl = this.globals.backendOrigin + '/' + this.competition.picturePath;
+              this.imageUrl = this.globals.backendOrigin + this.competition.picturePath;
             }
             this.error = null;
             this.service.getGroups(this.id).subscribe({

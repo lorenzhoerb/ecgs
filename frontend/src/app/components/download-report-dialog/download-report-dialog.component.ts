@@ -70,7 +70,7 @@ export class DownloadReportDialogComponent implements OnInit {
             this.toastr.error('Reports are not downloadable yet');
             return;
           }
-          const url = `${this.globals.backendOrigin}/reports/${data.name}`;
+          const url = `${this.globals.backendOrigin}reports/${data.name}`;
           this.httpClient.head(url).subscribe({
             next: _data => {
               const a = document.createElement('a');

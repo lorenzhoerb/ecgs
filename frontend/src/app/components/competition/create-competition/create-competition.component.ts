@@ -102,7 +102,7 @@ export class CreateCompetitionComponent implements OnInit {
               next: compPictureData => {
                   this.competitionPictureDummy = compPictureData;
                   if (this.competitionPictureDummy.picturePath) {
-                    this.imageUrl = this.globals.backendOrigin + '/' + this.competitionPictureDummy.picturePath;
+                    this.imageUrl = this.globals.backendOrigin + this.competitionPictureDummy.picturePath;
                     this.getImageFile(this.imageUrl.toString());
                     console.log(this.imageUrl);
                   }

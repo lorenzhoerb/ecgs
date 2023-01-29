@@ -862,9 +862,6 @@ public class CompetitionEndpointTest extends TestDataProvider {
         var response = mvcResult.getResponse();
 
         assertEquals(response.getStatus(), HttpStatus.FORBIDDEN.value());
-
-        // TODO: FIX OR DELETE
-        // assertTrue(response.getContentAsString().contains("No permissions to do this"));
     }
 
 
@@ -888,9 +885,6 @@ public class CompetitionEndpointTest extends TestDataProvider {
         var response = mvcResult.getResponse();
 
         assertEquals(response.getStatus(), HttpStatus.FORBIDDEN.value());
-
-        // TODO: FIX OR DELETE
-        // assertTrue(response.getContentAsString().contains("No permissions to do this"));
     }
 
     @Test

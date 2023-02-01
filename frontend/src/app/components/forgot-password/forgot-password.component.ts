@@ -34,16 +34,25 @@ export class ForgotPasswordComponent implements OnInit {
     if (this.forgotPasswordForm.valid) {
       this.authService.requestPasswordReset(this.forgotPasswordForm.controls.email.value).subscribe({
         next: () => {
-          this.notification.success('Password reset link has been sent');
+          this.notification.success(this.localize.passwordResetLinkSent);
           this.router.navigate(['/login']);
         },
         error: error => {
-          console.log('error.error object: ', error.error.error);
-          this.notification.error('Error: Email ' + error.error.error);
+          console.log('error.error object: ' , error.error);
+          if (error.error.errors) {
+            this.notification.error(
+              `<ul>${error.error.errors.map(e => '<li>' + e + '</li>').join('\n')}</ul>`,
+              'Validierungsfehler',
+              {enableHtml: true});
+          } else {
+            if (error.error.error === 'Not Found') {
+              this.notification.error('Unter der angegebenen E-Mail Adresse wurde kein Eintrag im System gefunden.');
+            }
+          }
         }
       });
     } else {
-      this.notification.error('Invalid input, please enter valid Email');
+      this.notification.error(this.localize.enterValidMailForReset);
     }
   }
 

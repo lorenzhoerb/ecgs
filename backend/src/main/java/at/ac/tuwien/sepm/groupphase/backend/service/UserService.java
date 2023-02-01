@@ -126,7 +126,7 @@ public interface UserService extends UserDetailsService {
      * Import a team as a club manager.
      *
      * @param clubManagerTeamImportDto a dto for club manager's team.
-     * @return Dto that has a number of new participants added to the team and a number of already present ones. (present == managed by you)
+     * @return Dto that has a number of new participants added to the team and a number of already present ones (managed by you).
      */
     ClubManagerTeamImportResults importTeam(ClubManagerTeamImportDto clubManagerTeamImportDto);
 
@@ -179,8 +179,20 @@ public interface UserService extends UserDetailsService {
      */
     UserInfoDto getUser();
 
+    /**
+     * Get current user by id.
+     *
+     * @param id the id of the user
+     * @return the user
+     */
     UserDetailDto getUser(Long id);
 
+    /**
+     * imports the given list of flags for the users specified by id in the ImportFlag.
+     *
+     * @param flags the flags to import
+     * @return the imported flags as now in the database
+     */
     ImportFlagsResultDto importFlags(List<ImportFlag> flags);
 
     /**

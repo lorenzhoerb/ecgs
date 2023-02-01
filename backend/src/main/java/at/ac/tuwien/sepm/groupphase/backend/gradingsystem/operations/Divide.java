@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations;
 
+import at.ac.tuwien.sepm.groupphase.backend.exception.EvaluationException;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Divide extends Operation {
@@ -13,7 +14,13 @@ public class Divide extends Operation {
     }
 
     public Double evaluate() {
-        return left.evaluate() / right.evaluate();
+        Double denom = right.evaluate();
+
+        if (-1e-7 < denom && denom < 1e-7) {
+            throw new EvaluationException("Division by Zero");
+        }
+
+        return left.evaluate() / denom;
     }
 
     public void bind(Long id, Double value) {

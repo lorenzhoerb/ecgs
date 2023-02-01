@@ -1,6 +1,8 @@
 package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepm.groupphase.backend.service.EmailService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -8,9 +10,12 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
+import java.lang.invoke.MethodHandles;
 
 @Service
 public class EmailServiceImpl implements EmailService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final JavaMailSender javaMailSender;
 
@@ -20,6 +25,8 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendEmail(String to, String message) throws MessagingException, UnsupportedEncodingException {
+        LOGGER.debug("sendEmail({},{})", to, message);
+
         MimeMessage msg = javaMailSender.createMimeMessage();
         MimeMessageHelper msgHelper = new MimeMessageHelper(msg);
         msgHelper.setFrom("ECGSservice@gmail.com", "ECGS");
@@ -33,6 +40,8 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendPasswordResetMail(String recipient, String resetLink) throws MessagingException, UnsupportedEncodingException {
+        LOGGER.debug("sendPasswordResetMail({},{})", recipient);
+
         MimeMessage msg = javaMailSender.createMimeMessage();
         MimeMessageHelper msgHelper = new MimeMessageHelper(msg);
         msgHelper.setFrom("ECGSservice@gmail.com", "ECGS");

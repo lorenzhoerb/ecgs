@@ -14,7 +14,7 @@ export class GenderPipe implements PipeTransform {
   transform(value: Gender, ...args: unknown[]): string {
     switch (value) {
       case Gender.female:
-        return this.localize.gender;
+        return this.localize.genderWoman;
       case Gender.male:
         return this.localize.genderMan;
       case Gender.other:

@@ -27,6 +27,7 @@ export class GradingGroupDetailComponent implements OnInit {
   conditionFormGroup: FormGroup;
   groupId: number;
   gradingGroup: DetailedGradingGroupDto;
+  url: string;
 
 
   constructor(
@@ -52,6 +53,7 @@ export class GradingGroupDetailComponent implements OnInit {
     this.conditionFormGroup = this.fb.group({
       conditions: this.fb.array([])
     });
+    this.url = this.router.url;
   }
 
 
@@ -88,8 +90,13 @@ export class GradingGroupDetailComponent implements OnInit {
         next: value => {
           this.toastr.success('Successfully set constraints');
         }, error: err => {
-          console.error(err);
-          this.toastr.error('Oops, something went wrong!');
+          if (err.status === 422) {
+            err.error.errors.forEach(error => {
+              this.toastr.error(error);
+            });
+          } else {
+            this.toastr.error('Oops, something went wrong!');
+          }
         }
       });
   }

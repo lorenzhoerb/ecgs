@@ -489,7 +489,8 @@ public class CompetitionServiceTest extends TestDataProvider {
             competitionRepository,
             gradingGroupRepository,
             registerToRepository,
-            gradingSystemRepository
+            gradingSystemRepository,
+            gradeRepository
         ).create();
 
         assertThrows(NotFoundException.class, () -> {
@@ -518,7 +519,8 @@ public class CompetitionServiceTest extends TestDataProvider {
             competitionRepository,
             gradingGroupRepository,
             registerToRepository,
-            gradingSystemRepository
+            gradingSystemRepository,
+            gradeRepository
         )
             .withCreator(creator)
             .withParticipantsPerGroup(25)
@@ -551,7 +553,8 @@ public class CompetitionServiceTest extends TestDataProvider {
             competitionRepository,
             gradingGroupRepository,
             registerToRepository,
-            gradingSystemRepository
+            gradingSystemRepository,
+            gradeRepository
         )
             .withCreator(creator)
             .withParticipantsPerGroup(25)
@@ -583,7 +586,8 @@ public class CompetitionServiceTest extends TestDataProvider {
             competitionRepository,
             gradingGroupRepository,
             registerToRepository,
-            gradingSystemRepository
+            gradingSystemRepository,
+            gradeRepository
         )
             .withCreator(creator)
             .withParticipantsPerGroup(25)

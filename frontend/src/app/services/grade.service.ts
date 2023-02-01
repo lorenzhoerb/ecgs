@@ -9,6 +9,7 @@ import { Globals } from '../global/globals';
 import { AuthService } from './auth.service';
 import { StompService } from './stomp.service';
 import { v4 as uuid } from 'uuid';
+import { StompErrorType } from '../dtos/StompErrorDto';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +23,8 @@ export class GradeService {
   private gradBaseUri: string = this.globals.backendUri + '/grades';
 
   private activeSubscriptions: SaveSubscription<GradeSubscription | JudgeSubscription>[] = [];
-  private errorSubscription?: Subscription;
+  private errorSubscription?: Subscription = null;
+  private customStompErrorSubs?: Subscription = null;
 
   constructor(private httpClient: HttpClient,
     private globals: Globals,
@@ -79,11 +81,25 @@ export class GradeService {
     }
     this.errorSubscription = null;
 
+    if(this.customStompErrorSubs !== null && this.customStompErrorSubs !== undefined) {
+      this.customStompErrorSubs.unsubscribe();
+    }
+    this.customStompErrorSubs = null;
+
     this.stomp.stop();
   }
 
   public initialize() {
     this.stomp.start();
+
+    this.customStompErrorSubs = this.stomp.customStompError$.subscribe(e => {
+      if (e !== null && e.type === StompErrorType.unauthorized) {
+        this.stomp.stop();
+        this.toastr.error('Sie haben hier keine Befugnis');
+        this.router.navigate(['/']);
+      }
+    });
+
 
     this.stomp.started$.pipe(
       filter(val => val),

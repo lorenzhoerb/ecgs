@@ -1,5 +1,8 @@
 package at.ac.tuwien.sepm.groupphase.backend.exception.applicationuser;
 
+/**
+ * Exception that signals, that an ApplicationUser wasn't found in the database.
+ */
 public class ApplicationUserNotFound extends RuntimeException {
     public ApplicationUserNotFound() {
     }

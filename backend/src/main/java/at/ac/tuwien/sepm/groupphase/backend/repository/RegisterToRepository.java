@@ -17,5 +17,5 @@ public interface RegisterToRepository extends CrudRepository<RegisterTo, Long> {
 
     List<RegisterTo> findByGradingGroupCompetitionId(Long competitionId);
 
-    Optional<RegisterTo> findByGradingGroupIdAndParticipantId(Long gradingGroupId, Long participantId);
+    Optional<RegisterTo> findFirstByGradingGroupIdAndParticipantId(Long gradingGroupId, Long participantId);
 }

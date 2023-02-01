@@ -39,7 +39,7 @@ export class CompetitionComponent implements OnInit {
   groups: SimpleGradingGroup[];
   isCreator = false;
   //change this to false when isJudge is implemented
-  isJudge = true;
+  isJudge = false;
   updateCounter = 0;
   imageUrl = '../../../assets/turnier.jpg';
   searchParameters: UserDetailFilterDto = {};
@@ -84,6 +84,12 @@ export class CompetitionComponent implements OnInit {
     this.route.params.subscribe(params => {
       if (params.id) {
         this.id = parseInt(params.id, 10);
+
+        this.userService.userIsJudge(this.id).subscribe({
+          next: value => this.isJudge = value,
+          error: _ => this.isJudge = false
+        });
+
         this.service.getCompetitionById(this.id).subscribe({
           next: data => {
             this.competition = data;
@@ -120,17 +126,23 @@ export class CompetitionComponent implements OnInit {
             this.fetchIsRegistered(this.id);
             this.fetchParticipants();
           },
-          error: err => this.errorHandler.defaultErrorhandle(err)
-        });
-
-        this.service.getCompetitionByIdDetail(this.id).subscribe({
-          next: () => {
-            this.isCreator = true;
+          error: err => {
+            if (err.status === 404) {
+              const prev = this.toastr.toastrConfig.maxOpened;
+              this.toastr.toastrConfig.maxOpened = 1;
+              this.toastr.error('No such competition found');
+              this.router.navigate(['/']);
+              return;
+            }
+            this.errorHandler.defaultErrorhandle(err);
           }
         });
 
-        this.service.getCompetitionByIdDetail(this.id).subscribe({
-          //check and set permission if logged in user is judge
+        this.service.isCreator(this.id).subscribe({
+          next: result => {
+            this.isCreator = result;
+          },
+          error: () => {}
         });
 
         this.fetchIfReportsAreAvailable();
@@ -148,7 +160,7 @@ export class CompetitionComponent implements OnInit {
 
   fetchIsRegistered(id) {
     this.userService.isRegisteredToCompetition(id)
-      .subscribe(value => this.isRegisteredToCompetition = true);
+      .subscribe(value => this.isRegisteredToCompetition = value);
   }
 
   formatDate(date: Date): string {
@@ -168,6 +180,11 @@ export class CompetitionComponent implements OnInit {
     const now = new Date();
     this.canRegister = now >= this.competition.beginOfRegistration && now <= this.competition.endOfRegistration;
     this.canRegister = this.canRegister && this.groups.length > 0;
+  }
+
+  competitionStarted() {
+    const now = new Date();
+    return now >= this.competition.beginOfCompetition;
   }
 
   pictureEmpty() {
@@ -210,6 +227,14 @@ export class CompetitionComponent implements OnInit {
 
   onGrading() {
     this.router.navigate(['competition/' + this.id + '/grading']);
+  }
+
+  onParticpantsClick() {
+    this.router.navigate(['competition/' + this.id + '/participants']);
+  }
+
+  onGroupsClick() {
+    this.router.navigate(['competition/' + this.id + '/groups']);
   }
 
   onDownloadReportClick() {
@@ -257,7 +282,7 @@ export class CompetitionComponent implements OnInit {
         this.page = data.pageable.pageNumber + 1;
       },
       error: err => {
-        this.router.navigate(['/']);
+        //this.router.navigate(['/']);
       }
     });
   }
@@ -276,7 +301,7 @@ export class CompetitionComponent implements OnInit {
         this.grouppage = data.pageable.pageNumber + 1;
       },
       error: err => {
-        this.router.navigate(['/']);
+        //this.router.navigate(['/']);
       }
     });
 

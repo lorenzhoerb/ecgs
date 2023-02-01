@@ -3,6 +3,7 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint.exceptionhandler;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.BulkErrorListDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ErrorListRestDto;
 
+import at.ac.tuwien.sepm.groupphase.backend.exception.EvaluationException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.FileInputException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenListException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
@@ -92,6 +93,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     /**
      * Use the @ExceptionHandler annotation to write handler for custom exceptions.
      */
+    @ExceptionHandler(value = {EvaluationException.class})
+    protected ResponseEntity<Object> handleEvaluationException(RuntimeException ex, WebRequest request) {
+        LOGGER.warn(ex.getMessage());
+        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    /**
+     * Use the @ExceptionHandler annotation to write handler for custom exceptions.
+     */
     @ExceptionHandler(value = {FileUploadBase.SizeLimitExceededException.class})
     protected ResponseEntity<Object> handleSizeLimitExceededException(RuntimeException ex, WebRequest request) {
         LOGGER.warn(ex.getMessage());
@@ -167,6 +177,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             List.of(e.getMessage())), new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
     }
 
+    /**
+     * Handles ForbiddenListException used when multiple forbidden exceptions can be thrown.
+     */
     @ExceptionHandler(value = {ForbiddenListException.class})
     public ResponseEntity<Object> handleForbiddenListException(ForbiddenListException e, WebRequest request) {
         LOGGER.warn("Terminating request processing with status 403 due to {}: {}", e.getClass().getSimpleName(), e.getMessage());

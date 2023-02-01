@@ -25,6 +25,12 @@
     border-bottom: 1px solid rgba(17,15,17,0.2);
 }
 
+mat-button-toggle-group {
+    height: 2.2rem;
+    display: flex;
+    align-items: center;
+}
+
 .menu-item mat-button-toggle:not(.mat-button-toggle-checked):hover {
     background-color: hsla(188, 39%, 36%, 0.3);
 }

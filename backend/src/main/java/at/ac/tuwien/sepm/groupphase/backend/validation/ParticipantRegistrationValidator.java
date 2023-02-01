@@ -2,7 +2,7 @@ package at.ac.tuwien.sepm.groupphase.backend.validation;
 
 
 import at.ac.tuwien.sepm.groupphase.backend.constraint.operator.ConstraintOperator;
-import at.ac.tuwien.sepm.groupphase.backend.constraint.parser.RegisterConstraintParser;
+import at.ac.tuwien.sepm.groupphase.backend.report.ranking.parser.RegisterConstraintParser;
 import at.ac.tuwien.sepm.groupphase.backend.constraint.validator.RegisterConstraintValidator;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegistrationDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;

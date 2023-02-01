@@ -137,6 +137,7 @@ public class PictureServiceImpl implements PictureService {
 
 
     private void writeImage(String pathToFile, InputStream inputStream) throws IOException {
+        LOGGER.debug("writeImage {}", pathToFile);
         Path filePath = Paths.get(pathToFile);
         Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
     }

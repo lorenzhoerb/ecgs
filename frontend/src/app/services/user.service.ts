@@ -43,6 +43,10 @@ export class UserService {
     return this.httpClient.post<ImportFlagsResultDto>(`${this.userBaseUri}/flags`, flags);
   }
 
+  public userIsJudge(competitionId: number):  Observable<boolean> {
+    return this.httpClient.get<boolean>(`${this.userBaseUri}/judges/${competitionId}`);
+  }
+
   updateUserInfo(): void {
     this.httpClient.get<UserInfoDto>(this.userBaseUri).subscribe(value => {
       if (value.picturePath != null)  {
@@ -69,9 +73,9 @@ export class UserService {
       .post<ResponseParticipantRegistrationDto>(uri, null);
   }
 
-  isRegisteredToCompetition(competitionId: number): Observable<void> {
+  isRegisteredToCompetition(competitionId: number): Observable<boolean> {
     return this.httpClient
-      .get<void>(this.userBaseUri + '/competitions/' + competitionId);
+      .get<boolean>(this.userBaseUri + '/competitions/' + competitionId);
   }
 
   searchByName(name: string, max: number): Observable<UserDetail[]> {

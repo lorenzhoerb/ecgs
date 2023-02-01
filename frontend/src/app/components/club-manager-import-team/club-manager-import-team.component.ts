@@ -5,6 +5,7 @@ import { ClubManagerTeamImportDto, ClubManagerTeamMemberImportDto } from 'src/ap
 import { SupportedLanguages } from 'src/app/services/localization/language';
 import LocalizationService, { LocalizeService } from 'src/app/services/localization/localization.service';
 import { UserService } from 'src/app/services/user.service';
+import {MatSelectModule} from '@angular/material/select';
 
 @Component({
   selector: 'app-club-manager-import-team',
@@ -13,65 +14,21 @@ import { UserService } from 'src/app/services/user.service';
 })
 export class ClubManagerImportTeamComponent implements OnInit {
   @Input()
-  currentPage = 1;
+  page = 1;
 
   @Input()
   teamName = '';
 
   violationNotificationLimit = 3;
 
-  membersPerPage = 25;
+  pageSize = 25;
   csvHeaders = {
     forCsv: ['firstName', 'lastName', 'email', 'gender', 'dateOfBirth', 'flag'],
     forTableHeader: ['First name', 'Last name', 'Email', 'Gender', 'Date of birth'],
   };
 
+  displayTeamMembers: ClubManagerTeamMemberImportDto[] = [];
   teamMembers: ClubManagerTeamMemberImportDto[] = [
-    {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
-    // {firstName:'fn',lastName:'ln',email:'kek@kek.com',gender:'MALE',dateOfBirth:'2022-10-01'},
-    // {firstName:'fnSecond',lastName:'lnSecond',email:'kek2@kek.com',gender:'MALE',dateOfBirth:'2022-10-02'},
-    // {firstName:'fnThird',lastName:'lnThird',email:'kek3@kek.com',gender:'FEMALE',dateOfBirth:'2022-10-03'},
   ];
 
   constructor(
@@ -85,7 +42,7 @@ export class ClubManagerImportTeamComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
+    this.refreshCountries();
   }
 
   public onFileSelect(event: any): void {
@@ -95,6 +52,7 @@ export class ClubManagerImportTeamComponent implements OnInit {
       .pipe().subscribe({
         next: (result: ClubManagerTeamMemberImportDto[]): void => {
           this.teamMembers = [...result, ...this.teamMembers];
+          this.refreshCountries();
           this.notificiation.info(`Imported ${result.length} members.`);
         },
         error: (error: NgxCSVParserError): void => {
@@ -103,18 +61,26 @@ export class ClubManagerImportTeamComponent implements OnInit {
       });
   }
 
+  refreshCountries() {
+    this.displayTeamMembers = this.teamMembers.slice(
+      (this.page - 1) * this.pageSize,
+      (this.page - 1) * this.pageSize + this.pageSize,
+    );
+  }
+
   public onFileClick(event: any) {
     event.target.value = null;
   }
 
   public onClearClicked() {
     this.teamMembers = [];
-    this.currentPage = 1;
+    this.page = 1;
+    this.refreshCountries();
   }
 
   public onSaveClicked(): void {
+    console.log(this.teamMembers);
     const team: ClubManagerTeamImportDto = {
-        teamName: this.teamName,
         teamMembers: this.teamMembers,
       };
       this.userService.importTeam(team).subscribe(
@@ -158,18 +124,18 @@ export class ClubManagerImportTeamComponent implements OnInit {
   }
 
   public onPageChangeClick(change: number) {
-    if (change > 0 && Math.ceil(this.teamMembers.length / this.membersPerPage) - this.currentPage <= 0) {
+    if (change > 0 && Math.ceil(this.teamMembers.length / this.pageSize) - this.page <= 0) {
       return;
     }
-    if (change < 0 && this.currentPage + change <= 0) {
+    if (change < 0 && this.page + change <= 0) {
       return;
     }
-    this.currentPage += change;
+    this.page += change;
   }
 
-  public getTeamMembersForCurrentPage(): ClubManagerTeamMemberImportDto[] {
-    const lowerBound = (this.currentPage - 1) * this.membersPerPage;
-    const upperBound = lowerBound + this.membersPerPage;
+  public getTeamMembersForpage(): ClubManagerTeamMemberImportDto[] {
+    const lowerBound = (this.page - 1) * this.pageSize;
+    const upperBound = lowerBound + this.pageSize;
 
     return this.teamMembers.slice(lowerBound, upperBound);
   }
@@ -182,22 +148,25 @@ export class ClubManagerImportTeamComponent implements OnInit {
       gender: 'OTHER',
       dateOfBirth: ''
     }, ...this.teamMembers];
+    this.refreshCountries();
   }
 
   public onRemoveMemberClick(index: number) {
     this.teamMembers.splice(index, 1);
-    if (this.teamMembers.length <= (this.currentPage-1) * this.membersPerPage) {
-      this.currentPage--;
+    if (this.teamMembers.length <= (this.page-1) * this.pageSize) {
+      this.page--;
     }
+    this.refreshCountries();
   }
 
   public getGlobalTeamMemberIndex(index: number) {
-    return index + (this.currentPage - 1) * this.membersPerPage;
+    return index + (this.page - 1) * this.pageSize;
   }
 
   public exportAsCSV() {
     const blob = new Blob([this.formatCSVForExport()], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
+    console.log(url);
     const tempAnchorTag = document.createElement('a');
     tempAnchorTag.href = url;
     tempAnchorTag.download = this.localize.getLanguage() === SupportedLanguages.English ? 'Exported-Team.csv' : 'Exportiertes-Team.csv';

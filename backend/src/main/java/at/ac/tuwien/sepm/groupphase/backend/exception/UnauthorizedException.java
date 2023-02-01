@@ -1,5 +1,8 @@
 package at.ac.tuwien.sepm.groupphase.backend.exception;
 
+/**
+ * Exception that signals that a user is not authorized that access the given resource.
+ */
 public class UnauthorizedException extends RuntimeException {
     public UnauthorizedException() {
     }

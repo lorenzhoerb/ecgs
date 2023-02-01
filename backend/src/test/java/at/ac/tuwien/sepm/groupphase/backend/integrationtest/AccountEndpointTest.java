@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepm.groupphase.backend.integrationtest;
 
+import at.ac.tuwien.sepm.groupphase.backend.basetest.TestDataProvider;
 import at.ac.tuwien.sepm.groupphase.backend.config.properties.SecurityProperties;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserCredentialUpdateDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
@@ -38,6 +39,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -47,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-public class AccountEndpointTest implements TestData {
+public class AccountEndpointTest extends TestDataProvider implements TestData {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Autowired
@@ -75,6 +77,7 @@ public class AccountEndpointTest implements TestData {
     @BeforeEach
     public void beforeEach() {
         applicationUserRepository.deleteAll();
+        setUpCompetitionUser();
     }
 
     @Test
@@ -152,39 +155,22 @@ public class AccountEndpointTest implements TestData {
     }
 
     @Test
-    public void registerUser_thenLogInAsUser_thenRequestPasswordReset_andReset_expect200() throws Exception {
-        UserRegisterDto userRegisterDto =
-            new UserRegisterDto.UserRegisterDtoBuilder().setFirstName("Hans").setLastName("Meyer").setEmail("hans.meyer@gmail.com").setPassword("password187")
-                .setGender(
-                    ApplicationUser.Gender.MALE).setType(ApplicationUser.Role.CLUB_MANAGER)
-                .setDateOfBirth(new GregorianCalendar(1998, Calendar.FEBRUARY, 11).getTime()).createUserRegisterDto();
+    public void givenValidEmail_thenRequestPasswordResetAndReset_expect200() throws Exception {
+        UserPasswordResetRequestDto userPasswordResetRequestDto = new UserPasswordResetRequestDto();
+        userPasswordResetRequestDto.setEmail(TEST_USER_COMPETITION_MANAGER_EMAIL);
 
-        String body = objectMapper.writeValueAsString(userRegisterDto);
+        String body = objectMapper.writeValueAsString(userPasswordResetRequestDto);
 
-        MvcResult mvcResult = mockMvc.perform(post(ACCOUNT_REGISTER_URI)
+        MvcResult mvcResult = mockMvc.perform(post(ACCOUNT_REQUEST_PASSWORD_RESET_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body))
             .andDo(print())
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
 
-        assertEquals(HttpStatus.CREATED.value(), response.getStatus());
-
-        UserPasswordResetRequestDto userPasswordResetRequestDto = new UserPasswordResetRequestDto();
-        userPasswordResetRequestDto.setEmail("hans.meyer@gmail.com");
-
-        body = objectMapper.writeValueAsString(userPasswordResetRequestDto);
-
-        mvcResult = mockMvc.perform(post(ACCOUNT_REQUEST_PASSWORD_RESET_URI)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body))
-            .andDo(print())
-            .andReturn();
-        response = mvcResult.getResponse();
-
         assertEquals(HttpStatus.OK.value(), response.getStatus());
 
-        String token = applicationUserRepository.findApplicationUserByUserEmail("hans.meyer@gmail.com").get().getUser().getResetPasswordToken();
+        String token = applicationUserRepository.findApplicationUserByUserEmail(TEST_USER_COMPETITION_MANAGER_EMAIL).get().getUser().getResetPasswordToken();
 
         UserPasswordResetDto userPasswordResetDto = new UserPasswordResetDto();
         userPasswordResetDto.setToken(token);
@@ -200,10 +186,12 @@ public class AccountEndpointTest implements TestData {
         response = mvcResult.getResponse();
 
         assertEquals(HttpStatus.OK.value(), response.getStatus());
+        token = applicationUserRepository.findApplicationUserByUserEmail(TEST_USER_COMPETITION_MANAGER_EMAIL).get().getUser().getResetPasswordToken();
+        assertNull(token);
     }
 
     @Test
-    public void requestPasswordReset_withInvalidEmail_expect404() throws Exception {
+    public void givenInvalidEmail_thenRequestPasswordReset_expect404() throws Exception {
         UserPasswordResetRequestDto userPasswordResetRequestDto = new UserPasswordResetRequestDto();
         userPasswordResetRequestDto.setEmail("hans.meyer@gmail.com");
 
@@ -220,7 +208,7 @@ public class AccountEndpointTest implements TestData {
     }
 
     @Test
-    public void tryResetPassword_withMissingToken_expect404() throws Exception {
+    public void givenMissingToken_thenResetPassword_expect404() throws Exception {
         UserPasswordResetDto userPasswordResetDto = new UserPasswordResetDto();
         userPasswordResetDto.setToken(null);
         userPasswordResetDto.setPassword(passwordEncoder.encode("pass123456"));

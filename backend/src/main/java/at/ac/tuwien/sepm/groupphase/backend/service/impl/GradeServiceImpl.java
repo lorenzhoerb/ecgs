@@ -76,6 +76,8 @@ public class GradeServiceImpl implements GradeService {
     @Transactional
     @Override
     public GradeResultDto updateCompetitionResults(Long competitionId, Long gradingGroupId, String stationName, GradeDto gradeDto) {
+        LOGGER.debug("updateCompetitionResults({},{},{},{})", competitionId, gradingGroupId, stationName, gradeDto);
+
         gradeValidator.validate(gradeDto);
 
         ApplicationUser user = sessionUtils.getSessionUser();
@@ -155,6 +157,8 @@ public class GradeServiceImpl implements GradeService {
 
     @Override
     public LiveResultDto getAllResultsForParticipantAtStation(Long competitionId, Long gradingGroupId, Long stationId, Long participantId, Double result) {
+        LOGGER.debug("getAllResultsForParticipantAtStation({},{},{},{})", competitionId, gradingGroupId, stationId, participantId);
+
         List<at.ac.tuwien.sepm.groupphase.backend.entity.grade.Grade> results = this.gradeRepository.findAllByGradePkParticipantIdAndGradePkCompetitionIdAndGradePkGradingGroupIdAndGradePkStationId(
             participantId, competitionId, gradingGroupId, stationId
         );
@@ -169,6 +173,8 @@ public class GradeServiceImpl implements GradeService {
 
     @Override
     public List<LiveResultDto> getAllResults(Long competitionId) {
+        LOGGER.debug("getAllResults({})", competitionId);
+
         List<at.ac.tuwien.sepm.groupphase.backend.entity.grade.Grade> grades = this.gradeRepository.findAllByGradePkCompetitionIdAndValidIsTrue(competitionId);
 
         List<List<GradeResultDto>> pairs = grades
@@ -203,6 +209,8 @@ public class GradeServiceImpl implements GradeService {
 
     @Override
     public Long verifyJudgeAndReturnId(Long competitionId, Long gradingGroupId, Long stationId) {
+        LOGGER.debug("verifyJudgeReturnId({},{},{})", competitionId, gradingGroupId, stationId);
+
         ApplicationUser user = sessionUtils.getSessionUser();
         Competition competition = this.getCompetition(competitionId);
         this.checkUserIsJudgeAtCompetition(user, competition);
@@ -213,6 +221,8 @@ public class GradeServiceImpl implements GradeService {
     @Override
     @Transactional
     public List<GradeResultDto> getAllGradesForStation(Long competitionId, Long gradingGroupId, Long stationId) {
+        LOGGER.debug("getAllGradesForStation({},{},{})", competitionId, gradingGroupId, stationId);
+
         ApplicationUser user = sessionUtils.getSessionUser();
         Competition competition = this.getCompetition(competitionId);
         if (!competition.getCreator().getId().equals(sessionUtils.getSessionUser().getId())) {
@@ -232,12 +242,27 @@ public class GradeServiceImpl implements GradeService {
         return resultDtos;
     }
 
+    @Override
+    public boolean userJudges(Long competitionId) {
+        ApplicationUser user = this.sessionUtils.getSessionUser();
+        Competition competition = this.getCompetition(competitionId);
+        try {
+            this.checkUserIsJudgeAtCompetition(user, competition);
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
+    }
+
 
     /** calculates for all grades the result if possible (with inplace changes).
      *
      * @param grades list of grades
      */
     private void calculateResults(List<GradeResultDto> grades, boolean saveStations) {
+        LOGGER.debug("calculateResults({},{})", grades, saveStations);
+
         if (grades.stream().filter(g -> g.isValid()).collect(Collectors.toList()).isEmpty()) {
             return;
         }
@@ -305,6 +330,8 @@ public class GradeServiceImpl implements GradeService {
     }
 
     private void checkGradeIsComplete(Grade grade, Station station) {
+        LOGGER.debug("checkGradeIsComplete({},{})", grade, station);
+
         if (grade.grades.length != station.getVariables().length) {
             throw new BadWebSocketRequestException("Grade and station Variable count differs");
         }
@@ -319,6 +346,8 @@ public class GradeServiceImpl implements GradeService {
     }
 
     private void checkGradingRequestIntegrity(ApplicationUser user, Long competitionId, Long gradingGroupId, GradeDto grade) {
+        LOGGER.debug("checkGradingRequestIntegrity({},{},{},{})", user, competitionId, gradingGroupId, grade);
+
         if (user == null || !Objects.equals(user.getId(), grade.judgeId())) {
             throw new UnauthorizedException("Can't enter grades for other judges");
         }
@@ -331,18 +360,24 @@ public class GradeServiceImpl implements GradeService {
     }
 
     private void checkUserIsJudgeAtCompetition(ApplicationUser user, Competition competition) {
+        LOGGER.debug("checkUserIsJudgeAtCompetition({},{})", user, competition);
+
         if (competition.getJudges().stream().filter(j -> Objects.equals(j.getId(), user.getId())).count() != 1) {
             throw new UnauthorizedException("Only Judges can access grades");
         }
     }
 
     private void checkParticipantExistsInGradingGroup(Long participantId, Competition competition) {
+        LOGGER.debug("checkParticipantExistsInGradingGroup({},{})", participantId, competition);
+
         if (this.registerToRepository.findByGradingGroupCompetitionIdAndParticipantId(competition.getId(), participantId).isEmpty()) {
             throw new UnauthorizedException("Participant not in ");
         }
     }
 
     private Competition getCompetition(Long competitionId) {
+        LOGGER.debug("getCompetition({})", competitionId);
+
         Optional<Competition> competitionOptional = competitionRepository.findById(competitionId);
         if (competitionOptional.isEmpty()) {
             throw new NotFoundException("Competition does not exist");
@@ -351,6 +386,8 @@ public class GradeServiceImpl implements GradeService {
     }
 
     private GradingGroup getGradingGroup(Competition competition, Long gradingGroupId) {
+        LOGGER.debug("getGradingGroup({}, {})", competition, gradingGroupId);
+
         Optional<GradingGroup> gradingGroupOptional =
             competition.getGradingGroups().stream().filter(g -> Objects.equals(g.getId(), gradingGroupId)).findFirst();
         if (gradingGroupOptional.isEmpty()) {
@@ -360,6 +397,8 @@ public class GradeServiceImpl implements GradeService {
     }
 
     private Station getStation(GradingSystem gradingSystem, Long stationId, String stationName) {
+        LOGGER.debug("getStation({}, {}, {})", gradingSystem, stationId, stationName);
+
         Optional<Station> stationOptional = Arrays.stream(gradingSystem.stations).filter(s -> Objects.equals(s.getId(), stationId)).findFirst();
 
         if (stationOptional.isEmpty()) {

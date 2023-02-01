@@ -14,6 +14,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Class that represents a number of grades from a specific judge.
+ */
 public class Grade {
     @JsonProperty("grades")
     public GradeVariable[] grades;

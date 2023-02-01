@@ -33,9 +33,8 @@
                 <small class="form-text text-warning" *ngIf="registerForm.controls.password.errors.required">
                   {{localize.isRequired(localize.password)}}
                 </small>
-                <small class="form-text text-warning" *ngIf="registerForm.controls.password.errors.minlength">Your
-                  password
-                  must be at least 8 characters long!
+                <small class="form-text text-warning" *ngIf="registerForm.controls.password.errors.minlength">
+                  {{localize.passwordMinLength8}}
                 </small>
               </div>
             </div>
@@ -91,7 +90,7 @@
             <div class="form-group">
               <label for="inputType">{{localize.type}}</label>
               <select name="type" formControlName="type" class="form-select form-control" id="inputType"
-                aria-describedby="roleHelp">
+                aria-describedby="roleHelp" [(ngModel)]="selectedRole">
                 <option value="PARTICIPANT" selected>{{localize.getType('Participant')}}</option>
                 <option value="CLUB_MANAGER">{{localize.getType('ClubManager')}}</option>
                 <option value="TOURNAMENT_MANAGER">{{localize.getType('CompetitionManager')}}</option>
@@ -99,6 +98,17 @@
               <div *ngIf="submitted && registerForm.controls.type.errors" class="error">
                 <small class="form-text text-warning" *ngIf="registerForm.controls.type.errors.required">
                   {{localize.isRequired(localize.type)}}
+                </small>
+              </div>
+            </div>
+
+            <div class="form-group" *ngIf="selectedRole === 'TOURNAMENT_MANAGER' || selectedRole === 'CLUB_MANAGER'">
+              <label for="inputLastname">{{localize.teamName}}</label>
+              <input type="text" name="teamName" formControlName="teamName" class="form-control" id="inputTeamName"
+                aria-describedby="teamNameHelp" [placeholder]="localize.enter(localize.teamName)">
+              <div *ngIf="submitted && !teamNameValid" class="error">
+                <small class="form-text text-warning" *ngIf="!teamNameValid">
+                  {{localize.isRequired(localize.teamName)}}
                 </small>
               </div>
             </div>

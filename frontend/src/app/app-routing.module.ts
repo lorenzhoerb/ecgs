@@ -58,7 +58,7 @@ const routbuilding: Routes = [
       {path: 'import-team', canActivate: [ClubManagerGuard], component: ClubManagerImportTeamComponent},
       {path: 'flags', canActivate: [ClubManagerGuard], component: ImportFlagsComponent},
       {path: 'change-picture-password', canActivate: [AuthGuard], component: ChangeUserPassPictureComponent},
-      {path: 'edit-team', canActivate: [ClubManagerGuard] , component: ClubManagerEditComponent},
+      {path: 'team', canActivate: [ClubManagerGuard] , component: ClubManagerEditComponent},
     ]
   },
   {path: '**', component: CompetitionListViewComponent},

@@ -12,6 +12,7 @@ export class GradingGroupsComponent implements OnInit {
 
   competitionId: number;
   gradingGroups: SimpleGradingGroup[];
+  url: string;
 
 
   constructor(
@@ -23,6 +24,7 @@ export class GradingGroupsComponent implements OnInit {
 
   ngOnInit(): void {
     this.onUrlChange();
+    this.url = this.router.url;
   }
 
   onUrlChange() {

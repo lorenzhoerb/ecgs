@@ -2,6 +2,7 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserPasswordResetDto;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +28,7 @@ public class ResetPasswordEndpoint {
 
     @PermitAll
     @PostMapping
+    @Operation(summary = "Resets the password of a user.")
     public String resetPassword(@RequestBody UserPasswordResetDto userPasswordResetDto) {
         LOGGER.info("POST {}", BASE_PATH);
         return userService.resetPassword(userPasswordResetDto);

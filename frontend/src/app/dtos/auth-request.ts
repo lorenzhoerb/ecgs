@@ -22,7 +22,8 @@ export class RegisterRequest {
     public lastName: string,
     public gender: Gender,
     public dateOfBirth: Date,
-    public type: Role
+    public type: Role,
+    public teamName?: string,
   ) {}
 }
 

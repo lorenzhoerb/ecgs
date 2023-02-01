@@ -14,6 +14,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Class that represents o grading system with a number of stations a formula of how to calculate it.
+ */
 public class GradingSystem {
     @JsonProperty("stations")
     public Station[] stations;

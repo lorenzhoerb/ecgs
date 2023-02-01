@@ -1,5 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import { TemplateAction, TemplateState } from 'src/app/datatypes/templateAction';
+import {TemplateAction, TemplateState} from 'src/app/datatypes/templateAction';
+import {Router} from '@angular/router';
+import {Location} from '@angular/common';
 
 @Component({
   selector: 'app-content-card',
@@ -15,6 +17,8 @@ export class ContentCardComponent implements OnInit {
   @Input() templateState = TemplateState.none;
   @Input() isCollapsed = false;
   @Input() isLargeExpanded = false;
+  @Input() hasBackButton = false;
+  @Input() navigateBackPath: string;
 
   @Output() titleChange = new EventEmitter<string>();
 
@@ -28,8 +32,11 @@ export class ContentCardComponent implements OnInit {
 
 
 
-
-  constructor() { }
+  constructor(
+    private router: Router,
+    private location: Location
+  ) {
+  }
 
   ngOnInit(): void {
   }
@@ -42,9 +49,18 @@ export class ContentCardComponent implements OnInit {
     this.delete.emit();
   }
 
+  onBack() {
+    if(this.navigateBackPath) {
+      this.router.navigate([this.navigateBackPath]);
+    } else {
+      this.location.back();
+    }
+  }
+
   duplicateClicked() {
     this.duplicate.emit();
   }
+
   collapse() {
     this.isCollapsed = !this.isCollapsed;
     this.collapsed.emit(this.isCollapsed);

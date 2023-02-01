@@ -19,6 +19,7 @@ import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ReportFileRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ReportRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.ReportFileService;
+import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +37,8 @@ import javax.transaction.Transactional;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -92,6 +95,7 @@ public class ReportFileServiceTest extends TestDataProvider {
         gradingGroupRepository.deleteAll();
         gradingSystemRepository.deleteAll();
         judgeRepository.deleteAll();
+        deleteFolder(testReportsFolder);
     }
 
     @AfterEach
@@ -107,6 +111,21 @@ public class ReportFileServiceTest extends TestDataProvider {
         gradingGroupRepository.deleteAll();
         gradingSystemRepository.deleteAll();
         judgeRepository.deleteAll();
+        deleteFolder(testReportsFolder);
+    }
+
+    private static void deleteFolder(String folderName) {
+        File folder = new File(folderName);
+        File[] files = folder.listFiles();
+        if (files != null) { //some JVMs return null for empty dirs
+            for (File f: files) {
+                try {
+                    Files.deleteIfExists(f.toPath());
+                } catch (IOException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }
     }
 
     @Test
@@ -247,56 +266,16 @@ public class ReportFileServiceTest extends TestDataProvider {
 
         var gg1_sheet = wb.getSheet("GG1");
         var gg1_row = gg1_sheet.getRow(1);
-        assertEquals(1, gg1_row.getCell(0).getNumericCellValue());
-        assertEquals("CLUBMANAGERthreeFN CLUBMANAGERthreeLN (2000-02-03)", gg1_row.getCell(1).getStringCellValue());
-        assertNull(gg1_row.getCell(2));
-        assertEquals(6, gg1_row.getCell(3).getNumericCellValue());
-        assertEquals(7, gg1_row.getCell(4).getNumericCellValue());
-        assertEquals(13, gg1_row.getCell(5).getNumericCellValue());
-        assertNull(gg1_row.getCell(6));
-        assertEquals(5, gg1_row.getCell(7).getNumericCellValue());
-        assertEquals(2.5, gg1_row.getCell(8).getNumericCellValue());
-        assertNull(gg1_row.getCell(9));
-        assertEquals(15.5, gg1_row.getCell(10).getNumericCellValue());
+        checkParticipantResults(gg1_row, "CLUBMANAGERthreeFN CLUBMANAGERthreeLN (2000-02-03)", 1, 6, 7, 13, 5, 2.5, 15.5);
 
         gg1_row = gg1_sheet.getRow(2);
-        assertEquals(2, gg1_row.getCell(0).getNumericCellValue());
-        assertEquals("PARTICIPANToneFN PARTICIPANToneLN (2000-03-01)", gg1_row.getCell(1).getStringCellValue());
-        assertNull(gg1_row.getCell(2));
-        assertEquals(6.5, gg1_row.getCell(3).getNumericCellValue());
-        assertEquals(3, gg1_row.getCell(4).getNumericCellValue());
-        assertEquals(9.5, gg1_row.getCell(5).getNumericCellValue());
-        assertNull(gg1_row.getCell(6));
-        assertEquals(10, gg1_row.getCell(7).getNumericCellValue());
-        assertEquals(5, gg1_row.getCell(8).getNumericCellValue());
-        assertNull(gg1_row.getCell(9));
-        assertEquals(14.5, gg1_row.getCell(10).getNumericCellValue());
+        checkParticipantResults(gg1_row, "PARTICIPANToneFN PARTICIPANToneLN (2000-03-01)", 2, 6.5, 3, 9.5, 10, 5, 14.5);
 
         gg1_row = gg1_sheet.getRow(3);
-        assertEquals(2, gg1_row.getCell(0).getNumericCellValue());
-        assertEquals("PARTICIPANTtwoFN PARTICIPANTtwoLN (2000-03-02)", gg1_row.getCell(1).getStringCellValue());
-        assertNull(gg1_row.getCell(2));
-        assertEquals(6.5, gg1_row.getCell(3).getNumericCellValue());
-        assertEquals(3, gg1_row.getCell(4).getNumericCellValue());
-        assertEquals(9.5, gg1_row.getCell(5).getNumericCellValue());
-        assertNull(gg1_row.getCell(6));
-        assertEquals(10, gg1_row.getCell(7).getNumericCellValue());
-        assertEquals(5, gg1_row.getCell(8).getNumericCellValue());
-        assertNull(gg1_row.getCell(9));
-        assertEquals(14.5, gg1_row.getCell(10).getNumericCellValue());
+        checkParticipantResults(gg1_row, "PARTICIPANTtwoFN PARTICIPANTtwoLN (2000-03-02)", 2, 6.5, 3, 9.5, 10, 5, 14.5);
 
         gg1_row = gg1_sheet.getRow(4);
-        assertEquals(4, gg1_row.getCell(0).getNumericCellValue());
-        assertEquals("PARTICIPANTthreeFN PARTICIPANTthreeLN (2000-03-03)", gg1_row.getCell(1).getStringCellValue());
-        assertNull(gg1_row.getCell(2));
-        assertEquals(3.2, gg1_row.getCell(3).getNumericCellValue());
-        assertEquals(4, gg1_row.getCell(4).getNumericCellValue());
-        assertEquals(7.2, gg1_row.getCell(5).getNumericCellValue());
-        assertNull(gg1_row.getCell(6));
-        assertEquals(11, gg1_row.getCell(7).getNumericCellValue());
-        assertEquals(5.5, gg1_row.getCell(8).getNumericCellValue());
-        assertNull(gg1_row.getCell(9));
-        assertEquals(12.7, gg1_row.getCell(10).getNumericCellValue());
+        checkParticipantResults(gg1_row, "PARTICIPANTthreeFN PARTICIPANTthreeLN (2000-03-03)", 4, 3.2, 4, 7.2, 11, 5.5, 12.7);
     }
 
 
@@ -308,43 +287,13 @@ public class ReportFileServiceTest extends TestDataProvider {
 
         var gg2_sheet = wb.getSheet("GG2");
         var gg2_row = gg2_sheet.getRow(1);
-        assertEquals(1, gg2_row.getCell(0).getNumericCellValue());
-        assertEquals("PARTICIPANTfourFN PARTICIPANTfourLN (2000-03-04)", gg2_row.getCell(1).getStringCellValue());
-        assertNull(gg2_row.getCell(2));
-        assertEquals(17.5, gg2_row.getCell(3).getNumericCellValue());
-        assertEquals(7.75, gg2_row.getCell(4).getNumericCellValue());
-        assertEquals(25.25, gg2_row.getCell(5).getNumericCellValue());
-        assertNull(gg2_row.getCell(6));
-        assertEquals(8, gg2_row.getCell(7).getNumericCellValue());
-        assertEquals(4, gg2_row.getCell(8).getNumericCellValue());
-        assertNull(gg2_row.getCell(9));
-        assertEquals(101, gg2_row.getCell(10).getNumericCellValue());
+        checkParticipantResults(gg2_row, "PARTICIPANTfourFN PARTICIPANTfourLN (2000-03-04)", 1, 17.5, 7.75, 25.25, 8, 4, 101);
 
         gg2_row = gg2_sheet.getRow(2);
-        assertEquals(2, gg2_row.getCell(0).getNumericCellValue());
-        assertEquals("PARTICIPANTthreeFN PARTICIPANTthreeLN (2000-03-03)", gg2_row.getCell(1).getStringCellValue());
-        assertNull(gg2_row.getCell(2));
-        assertEquals(3, gg2_row.getCell(3).getNumericCellValue());
-        assertEquals(2, gg2_row.getCell(4).getNumericCellValue());
-        assertEquals(5, gg2_row.getCell(5).getNumericCellValue());
-        assertNull(gg2_row.getCell(6));
-        assertEquals(13, gg2_row.getCell(7).getNumericCellValue());
-        assertEquals(6.5, gg2_row.getCell(8).getNumericCellValue());
-        assertNull(gg2_row.getCell(9));
-        assertEquals(32.5, gg2_row.getCell(10).getNumericCellValue());
+        checkParticipantResults(gg2_row, "PARTICIPANTthreeFN PARTICIPANTthreeLN (2000-03-03)", 2, 3, 2, 5, 13, 6.5, 32.5);
 
         gg2_row = gg2_sheet.getRow(3);
-        assertEquals(3, gg2_row.getCell(0).getNumericCellValue());
-        assertEquals("PARTICIPANTtwoFN PARTICIPANTtwoLN (2000-03-02)", gg2_row.getCell(1).getStringCellValue());
-        assertNull(gg2_row.getCell(2));
-        assertEquals(3.6, gg2_row.getCell(3).getNumericCellValue());
-        assertEquals(4, gg2_row.getCell(4).getNumericCellValue());
-        assertEquals(7.6, gg2_row.getCell(5).getNumericCellValue());
-        assertNull(gg2_row.getCell(6));
-        assertEquals(5, gg2_row.getCell(7).getNumericCellValue());
-        assertEquals(2.5, gg2_row.getCell(8).getNumericCellValue());
-        assertNull(gg2_row.getCell(9));
-        assertEquals(19, gg2_row.getCell(10).getNumericCellValue());
+        checkParticipantResults(gg2_row, "PARTICIPANTtwoFN PARTICIPANTtwoLN (2000-03-02)", 3, 3.6, 4, 7.6, 5, 2.5, 19);
     }
 
     @Test
@@ -355,31 +304,12 @@ public class ReportFileServiceTest extends TestDataProvider {
 
         var gg1_sheet = wb.getSheet("GG1");
         assertEquals(gg1_sheet.getLastRowNum(), 2);
+
         var gg1_row = gg1_sheet.getRow(1);
-        assertEquals(2, gg1_row.getCell(0).getNumericCellValue());
-        assertEquals("PARTICIPANToneFN PARTICIPANToneLN (2000-03-01)", gg1_row.getCell(1).getStringCellValue());
-        assertNull(gg1_row.getCell(2));
-        assertEquals(6.5, gg1_row.getCell(3).getNumericCellValue());
-        assertEquals(3, gg1_row.getCell(4).getNumericCellValue());
-        assertEquals(9.5, gg1_row.getCell(5).getNumericCellValue());
-        assertNull(gg1_row.getCell(6));
-        assertEquals(10, gg1_row.getCell(7).getNumericCellValue());
-        assertEquals(5, gg1_row.getCell(8).getNumericCellValue());
-        assertNull(gg1_row.getCell(9));
-        assertEquals(14.5, gg1_row.getCell(10).getNumericCellValue());
+        checkParticipantResults(gg1_row, "PARTICIPANToneFN PARTICIPANToneLN (2000-03-01)", 2, 6.5, 3, 9.5, 10, 5, 14.5);
 
         gg1_row = gg1_sheet.getRow(2);
-        assertEquals(2, gg1_row.getCell(0).getNumericCellValue());
-        assertEquals("PARTICIPANTtwoFN PARTICIPANTtwoLN (2000-03-02)", gg1_row.getCell(1).getStringCellValue());
-        assertNull(gg1_row.getCell(2));
-        assertEquals(6.5, gg1_row.getCell(3).getNumericCellValue());
-        assertEquals(3, gg1_row.getCell(4).getNumericCellValue());
-        assertEquals(9.5, gg1_row.getCell(5).getNumericCellValue());
-        assertNull(gg1_row.getCell(6));
-        assertEquals(10, gg1_row.getCell(7).getNumericCellValue());
-        assertEquals(5, gg1_row.getCell(8).getNumericCellValue());
-        assertNull(gg1_row.getCell(9));
-        assertEquals(14.5, gg1_row.getCell(10).getNumericCellValue());
+        checkParticipantResults(gg1_row, "PARTICIPANTtwoFN PARTICIPANTtwoLN (2000-03-02)", 2, 6.5, 3, 9.5, 10, 5, 14.5);
     }
 
     @Test
@@ -391,17 +321,7 @@ public class ReportFileServiceTest extends TestDataProvider {
         var gg2_sheet = wb.getSheet("GG2");
         assertEquals(gg2_sheet.getLastRowNum(), 1);
         var gg2_row = gg2_sheet.getRow(1);
-        assertEquals(3, gg2_row.getCell(0).getNumericCellValue());
-        assertEquals("PARTICIPANTtwoFN PARTICIPANTtwoLN (2000-03-02)", gg2_row.getCell(1).getStringCellValue());
-        assertNull(gg2_row.getCell(2));
-        assertEquals(3.6, gg2_row.getCell(3).getNumericCellValue());
-        assertEquals(4, gg2_row.getCell(4).getNumericCellValue());
-        assertEquals(7.6, gg2_row.getCell(5).getNumericCellValue());
-        assertNull(gg2_row.getCell(6));
-        assertEquals(5, gg2_row.getCell(7).getNumericCellValue());
-        assertEquals(2.5, gg2_row.getCell(8).getNumericCellValue());
-        assertNull(gg2_row.getCell(9));
-        assertEquals(19, gg2_row.getCell(10).getNumericCellValue());
+        checkParticipantResults(gg2_row, "PARTICIPANTtwoFN PARTICIPANTtwoLN (2000-03-02)", 3, 3.6, 4, 7.6, 5, 2.5, 19);
     }
 
     @Test
@@ -412,17 +332,7 @@ public class ReportFileServiceTest extends TestDataProvider {
 
         var gg1_sheet = wb.getSheet("GG1");
         var gg1_row = gg1_sheet.getRow(1);
-        assertEquals(1, gg1_row.getCell(0).getNumericCellValue());
-        assertEquals("CLUBMANAGERthreeFN CLUBMANAGERthreeLN (2000-02-03)", gg1_row.getCell(1).getStringCellValue());
-        assertNull(gg1_row.getCell(2));
-        assertEquals(6, gg1_row.getCell(3).getNumericCellValue());
-        assertEquals(7, gg1_row.getCell(4).getNumericCellValue());
-        assertEquals(13, gg1_row.getCell(5).getNumericCellValue());
-        assertNull(gg1_row.getCell(6));
-        assertEquals(5, gg1_row.getCell(7).getNumericCellValue());
-        assertEquals(2.5, gg1_row.getCell(8).getNumericCellValue());
-        assertNull(gg1_row.getCell(9));
-        assertEquals(15.5, gg1_row.getCell(10).getNumericCellValue());
+        checkParticipantResults(gg1_row, "CLUBMANAGERthreeFN CLUBMANAGERthreeLN (2000-02-03)", 1, 6, 7, 13, 5, 2.5, 15.5);
     }
 
     @Test
@@ -434,31 +344,11 @@ public class ReportFileServiceTest extends TestDataProvider {
 
         var gg1_sheet = wb.getSheet("GG1");
         var gg1_row = gg1_sheet.getRow(1);
-        assertEquals(2, gg1_row.getCell(0).getNumericCellValue());
-        assertEquals("PARTICIPANTtwoFN PARTICIPANTtwoLN (2000-03-02)", gg1_row.getCell(1).getStringCellValue());
-        assertNull(gg1_row.getCell(2));
-        assertEquals(6.5, gg1_row.getCell(3).getNumericCellValue());
-        assertEquals(3, gg1_row.getCell(4).getNumericCellValue());
-        assertEquals(9.5, gg1_row.getCell(5).getNumericCellValue());
-        assertNull(gg1_row.getCell(6));
-        assertEquals(10, gg1_row.getCell(7).getNumericCellValue());
-        assertEquals(5, gg1_row.getCell(8).getNumericCellValue());
-        assertNull(gg1_row.getCell(9));
-        assertEquals(14.5, gg1_row.getCell(10).getNumericCellValue());
+        checkParticipantResults(gg1_row, "PARTICIPANTtwoFN PARTICIPANTtwoLN (2000-03-02)", 2, 6.5, 3, 9.5, 10, 5, 14.5);
 
         var gg2_sheet = wb.getSheet("GG2");
         var gg2_row = gg2_sheet.getRow(1);
-        assertEquals(3, gg2_row.getCell(0).getNumericCellValue());
-        assertEquals("PARTICIPANTtwoFN PARTICIPANTtwoLN (2000-03-02)", gg2_row.getCell(1).getStringCellValue());
-        assertNull(gg2_row.getCell(2));
-        assertEquals(3.6, gg2_row.getCell(3).getNumericCellValue());
-        assertEquals(4, gg2_row.getCell(4).getNumericCellValue());
-        assertEquals(7.6, gg2_row.getCell(5).getNumericCellValue());
-        assertNull(gg2_row.getCell(6));
-        assertEquals(5, gg2_row.getCell(7).getNumericCellValue());
-        assertEquals(2.5, gg2_row.getCell(8).getNumericCellValue());
-        assertNull(gg2_row.getCell(9));
-        assertEquals(19, gg2_row.getCell(10).getNumericCellValue());
+        checkParticipantResults(gg2_row, "PARTICIPANTtwoFN PARTICIPANTtwoLN (2000-03-02)", 3, 3.6, 4, 7.6, 5, 2.5, 19);
     }
 
     @Test
@@ -470,31 +360,25 @@ public class ReportFileServiceTest extends TestDataProvider {
 
         var gg1_sheet = wb.getSheet("GG1");
         var gg1_row = gg1_sheet.getRow(1);
-        assertEquals(2, gg1_row.getCell(0).getNumericCellValue());
-        assertEquals("PARTICIPANTtwoFN PARTICIPANTtwoLN (2000-03-02)", gg1_row.getCell(1).getStringCellValue());
-        assertNull(gg1_row.getCell(2));
-        assertEquals(6.5, gg1_row.getCell(3).getNumericCellValue());
-        assertEquals(3, gg1_row.getCell(4).getNumericCellValue());
-        assertEquals(9.5, gg1_row.getCell(5).getNumericCellValue());
-        assertNull(gg1_row.getCell(6));
-        assertEquals(10, gg1_row.getCell(7).getNumericCellValue());
-        assertEquals(5, gg1_row.getCell(8).getNumericCellValue());
-        assertNull(gg1_row.getCell(9));
-        assertEquals(14.5, gg1_row.getCell(10).getNumericCellValue());
+        checkParticipantResults(gg1_row, "PARTICIPANTtwoFN PARTICIPANTtwoLN (2000-03-02)", 2, 6.5, 3, 9.5, 10, 5, 14.5);
 
         var gg2_sheet = wb.getSheet("GG2");
         var gg2_row = gg2_sheet.getRow(1);
-        assertEquals(3, gg2_row.getCell(0).getNumericCellValue());
-        assertEquals("PARTICIPANTtwoFN PARTICIPANTtwoLN (2000-03-02)", gg2_row.getCell(1).getStringCellValue());
-        assertNull(gg2_row.getCell(2));
-        assertEquals(3.6, gg2_row.getCell(3).getNumericCellValue());
-        assertEquals(4, gg2_row.getCell(4).getNumericCellValue());
-        assertEquals(7.6, gg2_row.getCell(5).getNumericCellValue());
-        assertNull(gg2_row.getCell(6));
-        assertEquals(5, gg2_row.getCell(7).getNumericCellValue());
-        assertEquals(2.5, gg2_row.getCell(8).getNumericCellValue());
-        assertNull(gg2_row.getCell(9));
-        assertEquals(19, gg2_row.getCell(10).getNumericCellValue());
+        checkParticipantResults(gg2_row, "PARTICIPANTtwoFN PARTICIPANTtwoLN (2000-03-02)", 3, 3.6, 4, 7.6, 5, 2.5, 19);
+    }
+
+    private void checkParticipantResults(XSSFRow row, String name, double ...results) {
+        assertEquals(results[0], row.getCell(0).getNumericCellValue());
+        assertEquals(name, row.getCell(1).getStringCellValue());
+        assertNull(row.getCell(2));
+        assertEquals(results[1], row.getCell(3).getNumericCellValue());
+        assertEquals(results[2], row.getCell(4).getNumericCellValue());
+        assertEquals(results[3], row.getCell(5).getNumericCellValue());
+        assertNull(row.getCell(6));
+        assertEquals(results[4], row.getCell(7).getNumericCellValue());
+        assertEquals(results[5], row.getCell(8).getNumericCellValue());
+        assertNull(row.getCell(9));
+        assertEquals(results[6], row.getCell(10).getNumericCellValue());
     }
 
     private XSSFWorkbook getWorkbook(Set<Long> ggids, ExcelReportGenerationRequestInclusionRule rule) throws IOException {

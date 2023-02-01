@@ -87,7 +87,7 @@
             <div style="flex: 1"></div>
 
             <div ngbDropdown container="body">
-              <button type="button" class="btn btn-outline-primary btn-md"
+              <button type="button" class="btn btn-primary btn-md"
                       ngbDropdownToggle>{{localize.action}}</button>
               <div ngbDropdownMenu>
                 <button ngbDropdownItem (click)="onSetActive(setStatusModal)">{{localize.editStatus}}</button>
@@ -133,7 +133,7 @@
                 <span class="badge" [ngClass]="record.accepted ? 'badge-success' : 'badge-error'">
                   {{getAcceptedText(record.accepted)}}
                 </span></td>
-              <td>{{mapFlags(record.flags)}}</td>
+              <td [title]="mapFlags(record.flags)">{{mapFlagsLengthChecked(record.flags)}}</td>
             </tr>
             </tbody>
           </table>

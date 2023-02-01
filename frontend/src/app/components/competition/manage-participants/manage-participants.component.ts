@@ -241,6 +241,16 @@ export class ManageParticipantsComponent implements OnInit {
     return flags.map(f => f.name).join(', ');
   }
 
+  mapFlagsLengthChecked(flags: SimpleFlagDto[]): string {
+    const result = this.mapFlags(flags);
+
+    if (result.length > 10) {
+      return result.substr(0, 10) + '...';
+    } else {
+      return result;
+    }
+  }
+
   addFlags() {
     const flag = this.myFlags.get(parseInt(this.selectedFlag, 10));
     const users = Array.from(this.bulkMap.values());

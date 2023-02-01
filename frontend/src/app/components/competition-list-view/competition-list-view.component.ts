@@ -47,6 +47,7 @@ export class CompetitionListViewComponent implements OnInit {
     this.competitionService.searchCompetitions(competitionSearch).subscribe(
       {
         next: (data: SimpleCompetitionListDto) => {
+          this.currentPage = 1;
           this.competitions = data;
         },
         error: (err) => {
@@ -67,6 +68,10 @@ export class CompetitionListViewComponent implements OnInit {
     const upperBound = lowerBound + this.competitionsPerPage;
 
     return this.competitions.slice(lowerBound, upperBound);
+  }
+
+  public getTotalPagesAvailable(): number {
+    return Math.max(Math.ceil(this.competitions.length / 5), 1);
   }
 
   competitionSearchChange(newCompetitionSearch: CompetitionSearchDto): void {

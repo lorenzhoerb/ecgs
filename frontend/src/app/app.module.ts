@@ -27,6 +27,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatRadioModule} from '@angular/material/radio';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatSelectModule} from '@angular/material/select';
 import {MatDialogModule} from '@angular/material/dialog';
 import {ViewParticipantsComponent} from './components/competition/view-participants/view-participants.component';
 import {ErrorComponent} from './components/error/error.component';
@@ -77,6 +78,7 @@ import {ChangeUserPassPictureComponent} from './components/change-user-pass-pict
 import {MatInputModule} from '@angular/material/input';
 import {ImportFlagsComponent} from './components/import-flags/import-flags.component';
 import {HeaderCreateModalComponent} from './components/header-create-modal/header-create-modal.component';
+import {HeaderFolderModalComponent} from './components/header-folder-modal/header-folder-modal.component';
 import { DownloadReportDialogComponent } from './components/download-report-dialog/download-report-dialog.component';
 import {
   ConditionFilterInputComponent
@@ -124,6 +126,7 @@ import { MyResultsComponent } from './components/my-results/my-results.component
     CompetitionHeaderComponent,
     AutocompleteComponent,
     HeaderCreateModalComponent,
+    HeaderFolderModalComponent,
     ImportFlagsComponent,
     BulkEditorComponent,
     ManageParticipantsComponent,
@@ -169,6 +172,7 @@ import { MyResultsComponent } from './components/my-results/my-results.component
     MatButtonToggleModule,
     MatRadioModule,
     MatTooltipModule,
+    MatSelectModule,
     MatDialogModule,
     ToastrModule.forRoot(),
     DragDropModule,

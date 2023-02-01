@@ -1,15 +1,10 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.Objects;
 
-@AllArgsConstructor
-@NoArgsConstructor
 public class UserLoginDto {
 
     @NotNull(message = "Email must not be null")
@@ -19,6 +14,15 @@ public class UserLoginDto {
 
     @NotNull(message = "Password must not be null")
     private String password;
+
+    public UserLoginDto(@NotNull(message = "Email must not be null") @Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,63}",
+        flags = Pattern.Flag.CASE_INSENSITIVE) String email, @NotNull(message = "Password must not be null") String password) {
+        this.email = email;
+        this.password = password;
+    }
+
+    public UserLoginDto() {
+    }
 
     public String getEmail() {
         return email;

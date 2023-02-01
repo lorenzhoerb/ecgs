@@ -240,4 +240,8 @@ export class CompetitionService {
   removeMemberFlags(id: number, members: UserDetailSetFlagDto): Observable<void> {
     return this.httpClient.patch<void>(this.competitionBaseUri + '/' + id + '/members/flags', members);
   }
+
+  isCreator(id: number): Observable<boolean> {
+    return this.httpClient.get<boolean>(this.competitionBaseUri + '/' + id + '/is-creator');
+  }
 }

@@ -1,6 +1,6 @@
 package at.ac.tuwien.sepm.groupphase.backend.unittests;
 
-import at.ac.tuwien.sepm.groupphase.backend.constraint.parser.RegisterConstraintParser;
+import at.ac.tuwien.sepm.groupphase.backend.report.ranking.parser.RegisterConstraintParser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.RegisterConstraint;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConstraintParserException;
 import org.junit.jupiter.api.Test;

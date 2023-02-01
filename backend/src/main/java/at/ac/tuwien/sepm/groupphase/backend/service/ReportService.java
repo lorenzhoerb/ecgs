@@ -11,9 +11,25 @@ import java.util.List;
 
 public interface ReportService {
 
+    /**
+     * Calculate all the results from a competition and create a report.
+     *
+     * @param competitionId the id to calculate results for
+     */
     void calculateResultsOfCompetition(Long competitionId);
 
+    /**
+     * Get the results for a single participant.
+     *
+     * @return the resulting grades in a dto
+     */
     List<ParticipantCompetitionResultDto> getParticipantResults();
 
+    /**
+     * Creates a reported filtered by the conditions specified in the requestDto.
+     *
+     * @param requestDto the filter conditions
+     * @return the report filtered by the given conditions
+     */
     Report generateFilteredReport(ExcelReportGenerationRequestDto requestDto);
 }

@@ -36,7 +36,6 @@ public interface ClubManagerTeamImportGeneratorHelper {
     List<ClubManagerTeamImportDto> testTeams = new ArrayList<>() {
         {
             add(new ClubManagerTeamImportDto(
-                "testteam_1",
                 new ArrayList<>() {
                     {
                         add(new ClubManagerTeamMemberImportDto(
@@ -67,7 +66,6 @@ public interface ClubManagerTeamImportGeneratorHelper {
                 }
             ));
             add(new ClubManagerTeamImportDto(
-                "testteam_2",
                 new ArrayList<>() {
                     {
                         add(new ClubManagerTeamMemberImportDto(
@@ -91,7 +89,6 @@ public interface ClubManagerTeamImportGeneratorHelper {
     List<ClubManagerTeamImportDto> testTeams_withInvalidMembers = new ArrayList<>() {
         {
             add(new ClubManagerTeamImportDto(
-                "testteam_3",
                 new ArrayList<>() {
                     {
                         add(new ClubManagerTeamMemberImportDto(
@@ -143,7 +140,6 @@ public interface ClubManagerTeamImportGeneratorHelper {
     List<ClubManagerTeamImportDto> testTeams_withInvalidTeamName = new ArrayList<>() {
         {
             add(new ClubManagerTeamImportDto(
-                null,
                 new ArrayList<>() {
                     {
                         add(new ClubManagerTeamMemberImportDto(

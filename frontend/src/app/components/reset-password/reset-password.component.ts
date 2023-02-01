@@ -4,6 +4,7 @@ import {AuthService} from '../../services/auth.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {UserPasswordReset} from '../../dtos/userPasswordReset';
 import {ToastrService} from 'ngx-toastr';
+import LocalizationService, {LocalizeService} from '../../services/localization/localization.service';
 
 @Component({
   selector: 'app-reset-password',
@@ -16,6 +17,7 @@ export class ResetPasswordComponent implements OnInit {
   submitted = false;
   success = false;
   token;
+  hide = true;
 
   constructor(private formBuilder: UntypedFormBuilder,
               private authService: AuthService,
@@ -31,15 +33,19 @@ export class ResetPasswordComponent implements OnInit {
 
       if (this.authService.isLoggedIn()) {
         this.router.navigate(['/']);
-        this.notification.error('You cant reset your password when logged in');
+        this.notification.error(this.localize.resetPasswordErrorLoggedIn);
         return;
       }
 
       if (this.token === null || this.token === undefined || this.token.length !== 32) {
-        this.notification.error('Redirected because of malformed token');
+        this.notification.error(this.localize.resetPasswordErrorMalformedToken);
         this.router.navigate(['/login']);
       }
     });
+  }
+
+  public get localize(): LocalizeService {
+    return LocalizationService;
   }
 
   ngOnInit(): void {
@@ -52,21 +58,23 @@ export class ResetPasswordComponent implements OnInit {
         const userPasswordReset: UserPasswordReset = new UserPasswordReset(this.token, this.resetPasswordForm.controls.passwordOne.value);
         this.authService.resetPassword(userPasswordReset).subscribe({
           next: () => {
-            this.notification.success('Password successfully reset');
+            this.notification.success(this.localize.resetPasswordSuccess);
             this.router.navigate(['/login']);
           },
           error: error => {
             console.log('Could not reset password due to:');
             if (typeof error.error === 'object') {
-              console.log('error.error.errors: ' + error.error.errors);
-              this.notification.error('' + error.error.errors);
+              if (error.error.error === 'Not Found') {
+                console.log('No user with given token found!');
+                this.notification.error(this.localize.resetPasswordError);
+              }
             } else {
               this.notification.error(error.error);
             }
           }
         });
       } else {
-        this.notification.error('Both passwords must match!');
+        this.notification.error(this.localize.passwordsMustMatch);
       }
     }
   }

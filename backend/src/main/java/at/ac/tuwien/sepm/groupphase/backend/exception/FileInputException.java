@@ -1,5 +1,8 @@
 package at.ac.tuwien.sepm.groupphase.backend.exception;
 
+/**
+ * Exception that signals that the file sent to the server was incorrect or malformed.
+ */
 public class FileInputException extends RuntimeException {
 
     public FileInputException() {

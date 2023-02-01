@@ -15,11 +15,33 @@ public interface GradingSystemService {
      */
     GradingSystemDetailDto createGradingSystem(GradingSystemDetailDto gradingSystemDetailDto);
 
+    /**
+     * Gets a grading system in draft mode by its id.
+     *
+     * @param id the id of the grading system
+     * @return the resulting grading system dto
+     */
     ViewEditGradingSystemDto getDraftGradingSystemById(Long id);
 
+    /**
+     * Fetches new grading system without defined formula for creating purposes.
+     *
+     * @return the new grading system
+     */
     List<GradingSystemProjectIdAndNameAndIsPublicAndEditable> getSimpleDraftGradingSystem();
 
+    /**
+     * Update a grading system in draft mode to the one given.
+     *
+     * @param gradingSystemDto the updated grading system
+     * @return the updated grading system as now in the database
+     */
     ViewEditGradingSystemDto updateDraftGradingSystem(ViewEditGradingSystemDto gradingSystemDto);
 
+    /**
+     * Removes a grading system in draft mode from the database.
+     *
+     * @param gradingSystemId the id of the grading system to remove
+     */
     void deleteDraftGradingSystem(Long gradingSystemId);
 }

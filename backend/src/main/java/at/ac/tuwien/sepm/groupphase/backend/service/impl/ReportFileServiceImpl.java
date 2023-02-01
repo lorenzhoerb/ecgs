@@ -29,6 +29,8 @@ import at.ac.tuwien.sepm.groupphase.backend.validation.ExcelReportGenerationRequ
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -48,6 +51,7 @@ import java.util.UUID;
 
 @Service
 public class ReportFileServiceImpl implements ReportFileService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Value("${reportsFolder}")
     private String reportsFolder;
     private final ReportFileRepository reportFileRepository;
@@ -78,6 +82,8 @@ public class ReportFileServiceImpl implements ReportFileService {
 
     @Override
     public ExcelReportDownloadResponseDto downloadExcelReport(ExcelReportGenerationRequestDto requestDto) {
+        LOGGER.debug("downloadExcelReport({})", requestDto);
+
         excelReportGenerationRequestDtoValidator.validate(requestDto);
         if (!sessionUtils.isAuthenticated()) {
             throw new UnauthorizedException("Not authenticated");
@@ -137,6 +143,8 @@ public class ReportFileServiceImpl implements ReportFileService {
     }
 
     private void cleanOutdatedReportFiles() {
+        LOGGER.debug("cleanOutdatedReportFiles()");
+
         var toDeleteEntries = reportFileRepository.findAllByDeleteAfterBefore(LocalDateTime.now());
         toDeleteEntries.forEach(
             rf -> {
@@ -153,6 +161,8 @@ public class ReportFileServiceImpl implements ReportFileService {
     }
 
     private ExcelReportDownloadResponseDto generateExcelReportAndSaveLocally(ExcelReportGenerationRequestDto requestDto) {
+        LOGGER.debug("generateExcelReportAndSaveLocally({})", requestDto);
+
         excelReportGenerationRequestDtoValidator.validate(requestDto);
         var filteredReport = reportService.generateFilteredReport(requestDto);
         var workbook = convertReportToExcel(filteredReport);
@@ -162,6 +172,8 @@ public class ReportFileServiceImpl implements ReportFileService {
     }
 
     private String figureOutExcelName(ExcelReportGenerationRequestDto requestDto) {
+        LOGGER.debug("figureOutExcelName({})", requestDto);
+
         var foundCompetitionName = competitionRepository.findById(requestDto.getCompetitionId()).get().getName();
 
         foundCompetitionName = foundCompetitionName.replaceAll("[!@#$%^&*()|+=/_]", "-");
@@ -200,10 +212,14 @@ public class ReportFileServiceImpl implements ReportFileService {
     }
 
     private boolean reportFileExists(String name) {
+        LOGGER.debug("reportFileExists({})", name);
+
         return (new File(reportsFolder + "/" + name)).exists();
     }
 
     private ExcelReportDownloadResponseDto saveExcelLocally(XSSFWorkbook workbook, String name) {
+        LOGGER.debug("saveExcelLocally({})", name);
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
             workbook.write(out);
@@ -230,6 +246,8 @@ public class ReportFileServiceImpl implements ReportFileService {
     }
 
     private XSSFWorkbook convertReportToExcel(Report report) {
+        LOGGER.debug("convertReportToExcel({})", report);
+
         XSSFWorkbook workbook = new XSSFWorkbook();
         for (GradingGroupRankingResults gradingGroupRankingResult : report.getGradingGroupRankingResults()) {
             XSSFSheet sheet = workbook.createSheet(gradingGroupRankingResult.getName());

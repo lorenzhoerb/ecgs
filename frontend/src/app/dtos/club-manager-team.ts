@@ -1,7 +1,6 @@
 import {Gender} from './auth-request';
 
 export interface ClubManagerTeamImportDto {
-    teamName: string;
     teamMembers: ClubManagerTeamMemberImportDto[];
 }
 

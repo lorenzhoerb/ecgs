@@ -1,9 +1,5 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Setter
 public class ReportDownloadInclusionRuleOptionsDto {
     boolean canGenerateReportForTeam;
     boolean canGenerateReportForSelf;
@@ -22,5 +18,13 @@ public class ReportDownloadInclusionRuleOptionsDto {
 
     public boolean getCanGenerateReportForSelf() {
         return canGenerateReportForSelf;
+    }
+
+    public void setCanGenerateReportForTeam(boolean canGenerateReportForTeam) {
+        this.canGenerateReportForTeam = canGenerateReportForTeam;
+    }
+
+    public void setCanGenerateReportForSelf(boolean canGenerateReportForSelf) {
+        this.canGenerateReportForSelf = canGenerateReportForSelf;
     }
 }

@@ -3,9 +3,8 @@ package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.structural.GradeVariable;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.structural.GradingSystem;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ReportIsDownloadableDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ReportIsDownloadableDto;
 import at.ac.tuwien.sepm.groupphase.backend.constraint.operator.ConstraintOperator;
-import at.ac.tuwien.sepm.groupphase.backend.constraint.parser.RegisterConstraintParser;
+import at.ac.tuwien.sepm.groupphase.backend.report.ranking.parser.RegisterConstraintParser;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.BasicRegisterConstraintDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.BasicDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.DetailedGradingGroupDto;
@@ -22,7 +21,6 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.GradingGroup;
 import at.ac.tuwien.sepm.groupphase.backend.entity.RegisterConstraint;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConstraintParserException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
-import at.ac.tuwien.sepm.groupphase.backend.entity.RegisterConstraint;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
@@ -31,7 +29,6 @@ import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterConstraintReposit
 import at.ac.tuwien.sepm.groupphase.backend.repository.ReportRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradeRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.ReportRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.GradingGroupService;
 import at.ac.tuwien.sepm.groupphase.backend.specification.ApplicationUserSpecs;
 import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
@@ -95,6 +92,8 @@ public class GradingGroupServiceImpl implements GradingGroupService {
 
     @Override
     public ReportIsDownloadableDto checkAllGradingGroupsHaveReports(Long competitionId) {
+        LOGGER.debug("checkAllGradingGroupsHaveReports({})", competitionId);
+
         var foundCompetitionOpt = competitionRepository.findById(competitionId);
         if (!sessionUtils.isAuthenticated()) {
             throw new ForbiddenException("Not authenticated");
@@ -145,7 +144,7 @@ public class GradingGroupServiceImpl implements GradingGroupService {
 
     @Override
     public DetailedGradingGroupDto getOneById(Long groupId) {
-        LOGGER.debug("createConstraints({})", groupId);
+        LOGGER.debug("getOneById({})", groupId);
         if (!sessionUtils.isCompetitionManager()) {
             throw new ForbiddenException("Not allowed to set constraints to a grading group");
         }
@@ -172,7 +171,7 @@ public class GradingGroupServiceImpl implements GradingGroupService {
 
     @Override
     public Set<DetailedRegisterConstraintDto> setConstraints(Long groupId, List<BasicRegisterConstraintDto> constraints) {
-        LOGGER.debug("createConstraints({},{})", groupId, constraints);
+        LOGGER.debug("setConstraints({},{})", groupId, constraints);
         if (!sessionUtils.isCompetitionManager()) {
             throw new ForbiddenException("Not allowed to set constraints to a grading group");
         }
@@ -213,12 +212,16 @@ public class GradingGroupServiceImpl implements GradingGroupService {
             .collect(Collectors.toSet());
     }
 
-    private UserDetailGradeDto mapUserGrades(ApplicationUser user, GradingGroup group, GradingSystem system) {
+    private UserDetailGradeDto mapUserGrades(ApplicationUser user, GradingGroup group) {
+        LOGGER.debug("mapUserGrades({},{})", user, group);
+
         List<Grade> result =
             gradeRepository.findAllByGradePkParticipantIdAndGradePkCompetitionIdAndGradePkGradingGroupId(
                 user.getId(), group.getCompetition().getId(), group.getId());
 
         ObjectMapper mapper = new ObjectMapper();
+
+        GradingSystem system = new GradingSystem(group.getGradingSystem().getFormula());
 
         for (Grade g : result) {
             at.ac.tuwien.sepm.groupphase.backend.gradingsystem.structural.Grade parsed;
@@ -289,11 +292,9 @@ public class GradingGroupServiceImpl implements GradingGroupService {
         Pageable pageable = PageRequest.of(page, size);
         Page<ApplicationUser> partPage = applicationUserRepository.findAll(specification, pageable);
 
-        GradingSystem system = new GradingSystem(group.getGradingSystem().getFormula());
-
         List<UserDetailGradeDto> list = new ArrayList<>(partPage.getContent()
             .stream()
-            .map((u) -> mapUserGrades(u, group, system)).toList());
+            .map((u) -> mapUserGrades(u, group)).toList());
 
         list.sort(Comparator.comparing(UserDetailGradeDto::finalResult).reversed());
 

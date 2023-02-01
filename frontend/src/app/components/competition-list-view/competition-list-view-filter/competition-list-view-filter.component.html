@@ -6,7 +6,7 @@
                 <input
                     type="text"
                     class="form-control ng-pristine ng-invalid ng-touched"
-                    [(ngModel)]="competitionSearch.name"
+                    [(ngModel)]="competitionSearch.name" (ngModelChange)="this.inputChange.next($event)"
                 />
             </div>
         </div>
@@ -17,7 +17,7 @@
                     <input
                         type="date"
                         class="form-control ng-pristine ng-invalid ng-touched"
-                        [(ngModel)]="competitionSearch.begin"
+                        [(ngModel)]="competitionSearch.begin" (ngModelChange)="this.inputChange.next($event)"
                     />
                 </div>
             </div>
@@ -25,11 +25,8 @@
         <div class="filter-element">
             <label>{{localize.registrationNotDone}}</label>
             <div style="padding-right: 5px;">
-                <input type="checkbox" class="" [(ngModel)]="registrationPossible" />
+                <input type="checkbox" class="" [(ngModel)]="registrationPossible"  (ngModelChange)="this.inputChange.next($event)"/>
             </div>
         </div>
-    </div>
-    <div class="filter-buttons">
-        <button class="filter-button-save" (click)="onSearchButtonClicked()">{{localize.search}}</button>
     </div>
 </div>

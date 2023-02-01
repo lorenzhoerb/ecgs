@@ -141,6 +141,10 @@ export class CompetitionGradingComponent implements OnInit, OnDestroy {
     this.gradeService.closeAll();
   }
 
+  getBackToComp() {
+    this.router.navigate(['/competition', this.id]);
+  }
+
   selectionChanged() {
     if(this.selectedGroup == -1) {
       this.uniqueStations =
@@ -152,7 +156,8 @@ export class CompetitionGradingComponent implements OnInit, OnDestroy {
           .filter((value, index, self) => index === self.findIndex(t => t.displayName === value.displayName));
     }
 
-
+    this.selectedStation = -1;
+    setTimeout(() => this.selectedStation = 0, 75);
   }
 
   loggoutFromStation() {

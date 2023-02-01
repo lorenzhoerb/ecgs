@@ -1,12 +1,9 @@
 package at.ac.tuwien.sepm.groupphase.backend.report;
 
-import at.ac.tuwien.sepm.groupphase.backend.report.ranking.GradedIdentifiableRankingEntity;
 import at.ac.tuwien.sepm.groupphase.backend.report.ranking.GradingGroupRankingResults;
 import at.ac.tuwien.sepm.groupphase.backend.report.ranking.ParticipantRankingResults;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
 
-import javax.mail.Part;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -14,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@Getter
 public class GradingGroupResults {
     private String name;
 
@@ -115,5 +111,13 @@ public class GradingGroupResults {
         }
 
         return newGradingGroupRankingResults;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public HashMap<Long, ParticipantResults> getParticipantsResults() {
+        return this.participantsResults;
     }
 }

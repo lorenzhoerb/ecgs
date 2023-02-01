@@ -1,10 +1,5 @@
 package at.ac.tuwien.sepm.groupphase.backend.report.ranking;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Setter
-@Getter
 public class GradedIdentifiableRankingEntity extends IdentifiableRankingEntity {
     private Double results;
 
@@ -14,5 +9,13 @@ public class GradedIdentifiableRankingEntity extends IdentifiableRankingEntity {
     }
 
     public GradedIdentifiableRankingEntity() {
+    }
+
+    public Double getResults() {
+        return this.results;
+    }
+
+    public void setResults(Double results) {
+        this.results = results;
     }
 }

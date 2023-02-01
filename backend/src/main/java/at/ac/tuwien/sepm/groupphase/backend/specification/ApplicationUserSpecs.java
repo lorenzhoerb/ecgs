@@ -25,6 +25,13 @@ public class ApplicationUserSpecs {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    /**
+     * Builds a specification based on the filter parameter.
+     * Searches only if the user is registered to the given competition.
+     *
+     * @param criteria filter parameter. Null variables are not included.
+     * @return the resulting specification.
+     */
     public static Specification<ApplicationUser> specs(ParticipantFilterDto criteria) {
         LOGGER.debug("specs({})", criteria);
         List<Specification<ApplicationUser>> listSpecs = new ArrayList<>();
@@ -61,6 +68,14 @@ public class ApplicationUserSpecs {
         return specs;
     }
 
+    /**
+     * Builds a specification based on the filter parameter.
+     * Searches only if the user is registered and accepted to the given competition.
+     *
+     * @param id       id of the competition
+     * @param criteria filter parameter. Null variables are not included.
+     * @return the resulting specification.
+     */
     public static Specification<ApplicationUser> specs(Long id, UserDetailFilterDto criteria) {
         LOGGER.debug("specs({})", criteria);
         List<Specification<ApplicationUser>> listSpecs = new ArrayList<>();
@@ -89,6 +104,14 @@ public class ApplicationUserSpecs {
         return specs;
     }
 
+    /**
+     * Builds a specification based on the filter parameter.
+     * Searches only if the user is registered to the given group.
+     *
+     * @param id       id of the group
+     * @param criteria filter parameter. Null variables are not included.
+     * @return the resulting specification.
+     */
     public static Specification<ApplicationUser> groupSpecs(Long id, UserDetailFilterDto criteria) {
         LOGGER.debug("groupSpecs({})", criteria);
         List<Specification<ApplicationUser>> listSpecs = new ArrayList<>();
@@ -117,8 +140,16 @@ public class ApplicationUserSpecs {
         return specs;
     }
 
+    /**
+     * Builds a specification based on the filter parameter.
+     * Searches only if the user is a member of the given managers team.
+     *
+     * @param managerId id of the manager of the team
+     * @param criteria  filter parameter. Null variables are not included.
+     * @return the resulting specification.
+     */
     public static Specification<ApplicationUser> specsForMembers(Long managerId, UserDetailFilterDto criteria) {
-        LOGGER.debug("specs({})", criteria);
+        LOGGER.debug("specsForMembers({})", criteria);
         List<Specification<ApplicationUser>> listSpecs = new ArrayList<>();
 
         listSpecs.add(isMember(managerId));
@@ -149,7 +180,12 @@ public class ApplicationUserSpecs {
         return specs;
     }
 
-
+    /**
+     * Includes only users assigned to the given grading group.
+     *
+     * @param gradingGroup id of the grading group
+     * @return the resulting specification.
+     */
     public static Specification<ApplicationUser> assignedToGradingGroup(Long gradingGroup) {
         LOGGER.debug("assignedToGradingGroup({})", gradingGroup);
         return (root, query, cb) -> {
@@ -159,6 +195,12 @@ public class ApplicationUserSpecs {
         };
     }
 
+    /**
+     * Includes only users registered to the given competition.
+     *
+     * @param competitionId id of the competition
+     * @return the resulting specification.
+     */
     public static Specification<ApplicationUser> isRegisteredTo(Long competitionId) {
         LOGGER.debug("isRegisteredTo({})", competitionId);
         return (root, query, cb) -> {
@@ -169,8 +211,14 @@ public class ApplicationUserSpecs {
         };
     }
 
+    /**
+     * Includes only users registered and accepted to the given competition.
+     *
+     * @param competitionId id of the competition
+     * @return the resulting specification.
+     */
     public static Specification<ApplicationUser> isRegisteredToAndAccepted(Long competitionId) {
-        LOGGER.debug("isRegisteredTo({})", competitionId);
+        LOGGER.debug("isRegisteredToAndAccepted({})", competitionId);
         return (root, query, cb) -> {
             Join<ApplicationUser, RegisterTo> registerToJoin = root.join("registrations", JoinType.LEFT);
             Join<RegisterTo, GradingGroup> gradingGroupJoin = registerToJoin.join("gradingGroup", JoinType.LEFT);
@@ -179,6 +227,12 @@ public class ApplicationUserSpecs {
         };
     }
 
+    /**
+     * Includes only users registered to the given group.
+     *
+     * @param groupId id of the group
+     * @return the resulting specification.
+     */
     public static Specification<ApplicationUser> isRegisteredToGroup(Long groupId) {
         LOGGER.debug("isRegisteredToGroup({})", groupId);
         return (root, query, cb) -> {
@@ -188,6 +242,12 @@ public class ApplicationUserSpecs {
         };
     }
 
+    /**
+     * Includes only users which are members of the team of the given manager.
+     *
+     * @param managerId id of the manager
+     * @return the resulting specification.
+     */
     public static Specification<ApplicationUser> isMember(Long managerId) {
         LOGGER.debug("isMember({})", managerId);
         return (root, query, cb) -> {
@@ -196,21 +256,46 @@ public class ApplicationUserSpecs {
         };
     }
 
+    /**
+     * Includes only users which have a similar first name.
+     *
+     * @param firstName query string
+     * @return the resulting specification.
+     */
     public static Specification<ApplicationUser> hasFirstName(String firstName) {
         LOGGER.debug("hasFirstName({})", firstName);
         return (root, query, cb) -> cb.like(cb.lower(root.get("firstName")), "%" + firstName.toLowerCase() + "%");
     }
 
+    /**
+     * Includes only users which have a similar last name.
+     *
+     * @param lastName query string
+     * @return the resulting specification.
+     */
     public static Specification<ApplicationUser> hasLastName(String lastName) {
         LOGGER.debug("hastLastName({})", lastName);
         return (root, query, cb) -> cb.like(cb.lower(root.get("lastName")), "%" + lastName.toLowerCase() + "%");
     }
 
+    /**
+     * Includes only users which have the given gender.
+     *
+     * @param gender given gender
+     * @return the resulting specification.
+     */
     public static Specification<ApplicationUser> hasGender(ApplicationUser.Gender gender) {
         LOGGER.debug("hasGender({})", gender);
         return (root, query, cb) -> cb.equal(root.get("gender"), gender);
     }
 
+    /**
+     * Includes only users which are registered to and active for the given competition.
+     *
+     * @param active        true if accepted false if not
+     * @param competitionId id of competition
+     * @return the resulting specification.
+     */
     public static Specification<ApplicationUser> isActive(boolean active, long competitionId) {
         LOGGER.debug("isActive({}, {})", active, competitionId);
         return (root, query, cb) -> {
@@ -223,6 +308,12 @@ public class ApplicationUserSpecs {
         };
     }
 
+    /**
+     * Includes only users which own the given competition.
+     *
+     * @param competitionId id of competition
+     * @return the resulting specification.
+     */
     private static Specification<ApplicationUser> competitionIdSpecs(Long competitionId) {
         LOGGER.debug("competitionIdSpecs({})", competitionId);
         return (root, query, cb) -> {
@@ -231,11 +322,25 @@ public class ApplicationUserSpecs {
         };
     }
 
+    /**
+     * sql constraint checking that the key <= date.
+     *
+     * @param key  database column
+     * @param date date to check
+     * @return specification to add to
+     */
     public static Specification<ApplicationUser> dateIsBeforeOrEquals(String key, Date date) {
         LOGGER.debug("dateIsBeforeOrEquals({}, {})", key, date);
         return (root, query, cb) -> cb.lessThanOrEqualTo(root.get(key), date);
     }
 
+    /**
+     * sql constraint checking if a member has a given flag.
+     *
+     * @param managerId id of the team manager the user is member of
+     * @param flagId    id of the flag the user should have
+     * @return specification to add to
+     */
     public static Specification<ApplicationUser> hasMemberFlag(Long managerId, Long flagId) {
         LOGGER.debug("hasMemberFlag({}, {})", managerId, flagId);
         return (root, query, cb) -> {
@@ -245,6 +350,13 @@ public class ApplicationUserSpecs {
         };
     }
 
+    /**
+     * sql constraint checking if a participant has a given flag.
+     *
+     * @param competitionId id of the competition the user is registered to
+     * @param flagId        id of the flag the user should have
+     * @return specification to add to
+     */
     public static Specification<ApplicationUser> hasRegisterFlag(Long competitionId, Long flagId) {
         LOGGER.debug("hasRegisterFlag({}, {})", competitionId, flagId);
         return (root, query, cb) -> {

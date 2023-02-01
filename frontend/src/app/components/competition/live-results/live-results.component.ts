@@ -36,6 +36,8 @@ export class LiveResultsComponent implements OnInit, OnDestroy {
   filterStation = '';
   filterStationModel = '';
 
+  notConnected = false;
+
   constructor(private service: LiveResultsService,
     private toastr: ToastrService,
     private userService: UserService,
@@ -308,12 +310,14 @@ export class LiveResultsComponent implements OnInit, OnDestroy {
             data2.forEach(result => this.newResult(result));
           },
           error: error2 => {
-            this.toastr.error(error2, 'Error fetching grading and registration data');
+            this.notConnected = true;
+            //this.toastr.error(error2, 'Error fetching grading and registration data');
           }
         });
       },
       error: error => {
-        this.toastr.error(error, 'Error fetching grading and registration data');
+        this.notConnected = true;
+        //this.toastr.error(error, 'Error fetching grading and registration data');
       }
     });
   }

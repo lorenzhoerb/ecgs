@@ -2,6 +2,8 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserPasswordResetRequestDto;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,7 @@ public class ForgotEndpoint {
     @PermitAll
     @CrossOrigin
     @PostMapping
+    @Operation(summary = "request a change of password")
     public String requestResetPassword(@RequestBody UserPasswordResetRequestDto userPasswordResetRequestDto) {
         LOGGER.info("POST {}", BASE_PATH);
         return userService.prepareAndSendPasswordResetMail(userPasswordResetRequestDto);

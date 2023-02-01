@@ -144,7 +144,26 @@ public class CompetitionServiceImpl implements CompetitionService {
         this.flagUtils = new FlagUtils(flagsMapper, flagsRepository);
     }
 
+    public Boolean isCreator(Long id) {
+        LOGGER.debug("isCreator({})", id);
+
+        Optional<Competition> persistedCompetition =
+            competitionRepository.findById(id);
+
+        if (persistedCompetition.isEmpty()) {
+            throw new ConflictException("The requested competition doesn't exist.",
+                List.of("The requested competition doesn't exist."));
+        }
+
+        ApplicationUser sessionUser = sessionUtils.getSessionUser();
+        ApplicationUser competitionOwner = persistedCompetition.get().getCreator();
+
+        return sessionUser.getId().equals(competitionOwner.getId());
+    }
+
     private void verifyCreator(Long id) {
+        LOGGER.debug("verifyCreator({})", id);
+
         Optional<Competition> persistedCompetition =
             competitionRepository.findById(id);
 
@@ -339,7 +358,7 @@ public class CompetitionServiceImpl implements CompetitionService {
     }
 
     public CompetitionViewDto findOne(Long id) {
-        LOGGER.debug("Find message with id {}", id);
+        LOGGER.debug("Find Competition with id {}", id);
         Optional<Competition> competitionOptional = competitionRepository.findById(id);
 
         if (competitionOptional.isPresent()) {
@@ -359,7 +378,7 @@ public class CompetitionServiceImpl implements CompetitionService {
     }
 
     public CompetitionDetailDto findOneDetail(Long id) {
-        LOGGER.debug("Find message with id {}", id);
+        LOGGER.debug("Find competitionDetail with id {}", id);
         Optional<Competition> competition = competitionRepository.findById(id);
 
         if (competition.isPresent()) {
@@ -418,6 +437,8 @@ public class CompetitionServiceImpl implements CompetitionService {
 
     @Override
     public List<CompetitionListDto> searchCompetitions(CompetitionSearchDto competitionSearchDto) {
+        LOGGER.debug("searchCompetitions({})", competitionSearchDto);
+
         List<Competition> searchResult =
             competitionRepository.findAllByBeginOfCompetitionAfterAndEndOfCompetitionAfterAndBeginOfRegistrationAfterAndEndOfRegistrationAfterAndNameContainingIgnoreCaseAndIsPublicIsTrue(
                 competitionSearchDto.getBeginDate(), competitionSearchDto.getEndDate(), competitionSearchDto.getBeginRegistrationDate(),
@@ -432,6 +453,8 @@ public class CompetitionServiceImpl implements CompetitionService {
     }
 
     private ParticipantRegDetailDto mapPartRegDetailDto(ApplicationUser u, Long compId) {
+        LOGGER.debug("mapPartRegDetailDto({}, {})", u, compId);
+
         RegisterTo registerTo = registerToRepository
             .findByGradingGroupCompetitionIdAndParticipantId(compId, u.getId()).get();
 
@@ -484,6 +507,7 @@ public class CompetitionServiceImpl implements CompetitionService {
 
     @Override
     public ReportDownloadInclusionRuleOptionsDto getCurrentUserReportDownloadInclusionRuleOptions(Long competitionId) {
+        LOGGER.debug("getCurrentUserReportDownloadInclusionRuleOptions({})", competitionId);
         if (!sessionUtils.isAuthenticated()) {
             throw new ForbiddenException("Not authenticated");
         }
@@ -519,6 +543,8 @@ public class CompetitionServiceImpl implements CompetitionService {
     }
 
     private Competition checkUserIsOwner(Long id) {
+        LOGGER.debug("checkUserIsOwner({})", id);
+
         if (!sessionUtils.isCompetitionManager()) {
             throw new ForbiddenException("Not authorized");
         }
@@ -542,6 +568,8 @@ public class CompetitionServiceImpl implements CompetitionService {
 
     @Override
     public List<SimpleFlagDto> getManagedFlags(Long id) {
+        LOGGER.debug("getManagedFlags({})", id);
+
         Competition competition = checkUserIsOwner(id);
 
         List<RegisterTo> registerTos = competition.getGradingGroups().stream()
@@ -560,6 +588,8 @@ public class CompetitionServiceImpl implements CompetitionService {
     }
 
     private RegisterTo checkUserIsRegistered(Competition competition, ApplicationUser m) {
+        LOGGER.debug("checkUserIsRegistered({}, {})", competition, m);
+
         if (m == null) {
             throw new ValidationListException("User was null",
                 List.of("User was null"));
@@ -579,6 +609,8 @@ public class CompetitionServiceImpl implements CompetitionService {
 
     @Override
     public void addFlagsForUsers(Long id, UserDetailSetFlagDto members) {
+        LOGGER.debug("addFlagsForUser({}, {})", id, members);
+
         if (!sessionUtils.isCompetitionManager()) {
             throw new ForbiddenException("Not authorized");
         }
@@ -609,6 +641,8 @@ public class CompetitionServiceImpl implements CompetitionService {
 
     @Override
     public void removeFlagsForUsers(Long id, UserDetailSetFlagDto members) {
+        LOGGER.debug("removeFlagsForUser({}, {})", id, members);
+
         if (!sessionUtils.isCompetitionManager()) {
             throw new ForbiddenException("Not authorized");
         }

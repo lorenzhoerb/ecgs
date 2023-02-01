@@ -41,6 +41,9 @@ public class UserRegisterDto {
     @NotNull(message = "Type must not be null")
     private ApplicationUser.Role type;
 
+    @Size(max = 128, message = "Team name is too long")
+    private String teamName;
+
     public UserRegisterDto() {
     }
 
@@ -53,6 +56,18 @@ public class UserRegisterDto {
         this.gender = gender;
         this.dateOfBirth = dateOfBirth;
         this.type = type;
+    }
+
+    public UserRegisterDto(String email, String password, String firstName, String lastName, ApplicationUser.Gender gender, Date dateOfBirth,
+                           ApplicationUser.Role type, String teamName) {
+        this.email = email;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.gender = gender;
+        this.dateOfBirth = dateOfBirth;
+        this.type = type;
+        this.teamName = teamName;
     }
 
     public String getEmail() {
@@ -109,6 +124,14 @@ public class UserRegisterDto {
 
     public void setType(ApplicationUser.Role type) {
         this.type = type;
+    }
+
+    public String getTeamName() {
+        return teamName;
+    }
+
+    public void setTeamName(String teamName) {
+        this.teamName = teamName;
     }
 
     @Override

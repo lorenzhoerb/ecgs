@@ -41,6 +41,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -53,6 +54,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import javax.transaction.Transactional;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -143,6 +147,9 @@ public class CompetitionEndpointTest extends TestDataProvider {
     @Autowired
     private ReportRepository reportRepository;
 
+    @Value("${reportsFolder}")
+    private String testReportsFolder;
+
     @BeforeEach
     public void beforeEach() {
         registerConstraintRepository.deleteAll();
@@ -156,6 +163,7 @@ public class CompetitionEndpointTest extends TestDataProvider {
         gradingGroupRepository.deleteAll();
         gradingSystemRepository.deleteAll();
         judgeRepository.deleteAll();
+        deleteFolder(testReportsFolder);
     }
 
     @AfterEach
@@ -171,6 +179,21 @@ public class CompetitionEndpointTest extends TestDataProvider {
         gradingGroupRepository.deleteAll();
         gradingSystemRepository.deleteAll();
         judgeRepository.deleteAll();
+        deleteFolder(testReportsFolder);
+    }
+
+    private static void deleteFolder(String folderName) {
+        File folder = new File(folderName);
+        File[] files = folder.listFiles();
+        if (files != null) { //some JVMs return null for empty dirs
+            for (File f: files) {
+                try {
+                    Files.deleteIfExists(f.toPath());
+                } catch (IOException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }
     }
 
     @Test
@@ -423,7 +446,8 @@ public class CompetitionEndpointTest extends TestDataProvider {
             competitionRepository,
             gradingGroupRepository,
             registerToRepository,
-            gradingSystemRepository
+            gradingSystemRepository,
+            gradeRepository
         )
             .withCreator(creator)
             .withParticipantsPerGroup(25)

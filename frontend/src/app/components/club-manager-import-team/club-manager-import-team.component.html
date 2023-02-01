@@ -1,36 +1,15 @@
-<app-content-card [title]="localize.importCSV" class="main-menu">
+<app-content-card
+  [title]="localize.importCSV"
+  class="main-menu"
+  hasBackButton="true"
+  navigateBackPath="/user/team"
+>
 
     <div class="top-bar">
         <div class="buttons" style="margin-bottom: 5%;">
-            <button class="save-button" (click)="onSaveClicked()">{{localize.save}}</button>
+            <button class="save-button any-btn" (click)="onSaveClicked()">{{localize.save}}</button>
         </div>
     </div>
-        <div style="display: flex; margin-bottom: 2%; justify-content: space-between;">
-            <div style="display: flex;">
-                <div class="team-name-label " style="line-break: auto; padding-right: 30px; text-align: left; ">
-                    {{localize.teamName}}
-                </div>
-                <input type="text" class="form-control ng-pristine ng-invalid ng-touched" (input)="onTeamNameChange($event.target.value)">
-            </div>
-            <div class="page-section" *ngIf="this.teamMembers.length > this.membersPerPage">
-                <button
-                    style="margin-right: 15px;"
-                    (click)="onPageChangeClick(-1)"
-                    class="navigation-button"
-                    >
-                    &lt;
-                </button>
-                {{localize.page}} {{this.currentPage}}
-                <button
-                    style="margin-left: 15px;"
-                    (click)="onPageChangeClick(1)"
-                    class="navigation-button"
-                    >
-                    &gt;
-                </button>
-            </div>
-        </div>
-
     <div class="team-content">
             <div style="display: flex;">
             <!-- <div style="max-width: 15%; word-wrap: break-word;">asdasdasdasd
@@ -38,145 +17,74 @@
                 asdasd
             </div> -->
                 <div style="max-width:10%; display: flex; flex-direction: column; padding-right: 1%; margin-top: 50px;">
-                    <button (click)="onAddNewMemberClick()" class="add-new-member-btn" style="font-size: 80%;">+ {{localize.member}}</button>
+                    <button (click)="onAddNewMemberClick()" class="add-new-member-btn any-btn" style="font-size: 80%;">+ {{localize.member}}</button>
                         <input
                             style="display: none"
                             type="file"
                             (change)="onFileSelect($event)"
                             (click)="onFileClick($event)"
                             #hiddenfileinput>
-                        <button (click)="hiddenfileinput.click()" class="import-as-csv-button csv-button" style="font-size: 80%; margin-top: 10%;">
-                            <img src="/assets/team-import/import.png" class="csv-button-img">
+                        <button (click)="hiddenfileinput.click()" class="import-as-csv-button any-btn" style="font-size: 80%; margin-top: 10%;">
+                            <img style=" object-fit: cover;" src="/assets/team-import/import.png" class="csv-button-img">
                             <br>
                             {{localize.importCSVButton}}</button>
-                        <button (click)="exportAsCSV()" class="export-as-csv-button" style="font-size: 80%;margin-top: 10%;">
+                        <button (click)="exportAsCSV()" class="export-as-csv-button any-btn" style="font-size: 80%;margin-top: 10%;">
                             <img src="/assets/team-import/export.png" class="csv-button-img csv-button">
                             <br>
                             {{localize.exportCSVButton}}</button>
-                    <button (click)="onClearClicked()" class="clear-members-btn" style="font-size: 80%;margin-top: 30%;">{{localize.clearAll}}</button>
+                    <button (click)="onClearClicked()" class="clear-members-btn any-btn" style="font-size: 80%;margin-top: 30%;">{{localize.clearAll}}</button>
                 </div>
-                <table class="participants">
-                    <thead class="table-head">
-                        <tr>
-                            <th>#</th>
-                            <th>{{localize.firstname}}</th>
-                            <th>{{localize.lastname}}</th>
-                            <th>Email</th>
-                            <th>{{localize.gender}}</th>
-                            <th>{{localize.dateOfBirth}}</th>
-                            <th>{{localize.flag}} ({{localize.optional}})</th>
-                        </tr>
-                    </thead>
-                    <hr />
-                    <tbody>
-                        <tr *ngFor="let teamMember of getTeamMembersForCurrentPage(); let i = index">
-                                <td>{{getGlobalTeamMemberIndex(i)+1}}</td>
-                                <td style="width: 15%;">
-                                    <input
-                                        size="1"
-                                        style="width: 85%;"
-                                        type="text"
-                                        value="{{teamMember.firstName}}"
-                                        class="form-control member-field-input "
-                                        (input)="onTeamMemberFieldChange($event.target.value, getGlobalTeamMemberIndex(i), 'firstName')"
-                                    >
-                                </td>
-                                <td style="width: 15%;">
-                                    <input
-                                        size="1"
-                                        style="width: 85%;"
-                                        type="text"
-                                        value="{{teamMember.lastName}}"
-                                        class="form-control member-field-input"
-                                        (input)="onTeamMemberFieldChange($event.target.value, getGlobalTeamMemberIndex(i), 'lastName')"
-                                    >
-                                </td>
-                                <td style="width: 30%;">
-                                    <input
-                                        size="1"
-                                        style="width: 85%;"
-                                        type="text"
-                                        value="{{teamMember.email}}"
-                                        class="form-control member-field-input"
-                                        (input)="onTeamMemberFieldChange($event.target.value, getGlobalTeamMemberIndex(i), 'email')"
-                                    >
-                                </td>
-                                <td style="width: 8%;">
-                                    <select
-                                        class="form-control member-field-input"
-                                        [value]="teamMember.gender"
-                                        (input)="onTeamMemberFieldChange($event.target.value, getGlobalTeamMemberIndex(i), 'gender')"
-                                        #select (change)="select.blur()"
-                                        >
-                                        <option value="MALE">{{localize.getGender('Male')}}</option>
-                                        <option value="FEMALE">{{localize.getGender('Female')}}</option>
-                                        <option value="OTHER">{{localize.getGender('Other')}}</option>
-                                    </select>
-                                </td>
-                                <td style="width: 15%;">
-                                    <input
-                                        size="1"
-                                        style="width: 85%;"
-                                        type="date"
-                                        value="{{teamMember.dateOfBirth}}"
-                                        class="form-control member-field-input"
-                                        (input)="onTeamMemberFieldChange($event.target.value, getGlobalTeamMemberIndex(i), 'dateOfBirth')"
-                                        #date (change)="date.blur()"
-                                    >
-                                </td>
-                                <td style="width: 15%;">
-                                    <input
-                                        size="1"
-                                        style="width: 85%;"
-                                        type="text"
-                                        value="{{teamMember.flag}}"
-                                        class="form-control member-field-input"
-                                        (input)="onTeamMemberFieldChange($event.target.value, getGlobalTeamMemberIndex(i), 'flag')"
-                                    >
-                                </td>
-                                <td>
-                                    <mat-icon (click)="onRemoveMemberClick(getGlobalTeamMemberIndex(i))" style="cursor: pointer; color: hsla(349, 73%, 44%, 1);" _ngcontent-xam-c83="" role="img" class="mat-icon notranslate material-icons mat-ligature-font mat-icon-no-color ng-star-inserted" aria-hidden="true" data-mat-icon-type="font">delete</mat-icon>
-                                </td>
 
-                                <!-- <td style="width: 20%;"></td>
-                                <td style="width: 50%;"></td>
-                                <td style="width: 20%;"></td>
-                                <td style="width: 20%;"></td>
-                                <td *ngFor="let header of csvHeaders.forCsv" [style.width]="header === 'email' ? '50%' : '20%'">
-                                    <input
-                                        size="1"
-                                        style="width: 85%;"
-                                        *ngIf="header !== 'gender'"
-                                        type="{{header !== 'dateOfBirth' ? 'text' : 'date'}}"
-                                        value="{{teamMember[header]}}"
-                                        class="member-field-input"
-                                        (input)="onTeamMemberFieldChange($event.target.value, i, header)"
-                                    >
-                                </td> -->
-                            </tr>
-                    </tbody>
-                </table>
-            </div>
-        <div style="display: flex; align-items: baseline; justify-content: space-between; padding-top: 20px;">
-            <div>
-            </div>
-            <div class="page-section" *ngIf="this.teamMembers.length > this.membersPerPage">
-                <button
-                    style="margin-right: 15px;"
-                    (click)="onPageChangeClick(-1)"
-                    class="navigation-button"
+        <div class="row" style="width: 100%; margin: 0;">
+          <table class="table table-striped" style="width: 100%;">
+            <thead>
+            <tr>
+              <th style="width: 3em;" scope="col">#</th>
+              <th style="width: 14%;" scope="col">{{localize.firstname}}</th>
+              <th style="width: 14%;" scope="col">{{localize.lastname}}</th>
+              <th style="width: 26%;" scope="col">Email</th>
+              <th style="width: 9em;" scope="col">{{localize.dateOfBirth}}</th>
+              <th style="width: 8em;" scope="col">{{localize.gender}}</th>
+              <th style="width: 12%;" scope="col">{{localize.flag}} ({{localize.optional}})</th>
+              <th style="width: 3em;" scope="col"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let record of this.displayTeamMembers; let i = index">
+              <th scope="row">{{i + 1 + (page - 1) * pageSize}}</th>
+              <td><input class="member-field-input" type="text" [(ngModel)]="record.firstName"></td>
+              <td><input class="member-field-input" type="text" [(ngModel)]="record.lastName"></td>
+              <td><input class="member-field-input" type="text" [(ngModel)]="record.email"></td>
+              <td><input class="member-field-input" type="date" [(ngModel)]="record.dateOfBirth"></td>
+              <td><select
+                    class="form-control member-field-input"
+                    [(ngModel)]="record.gender"
+                    #select
+                    (change)="select.blur()"
                     >
-                    &lt;
-                </button>
-                {{localize.page}} {{this.currentPage}}
-                <button
-                    style="margin-left: 15px;"
-                    (click)="onPageChangeClick(1)"
-                    class="navigation-button"
-                    >
-                    &gt;
-                </button>
-            </div>
+                    <option value="MALE">{{localize.getGender('Male')}}</option>
+                    <option value="FEMALE">{{localize.getGender('Female')}}</option>
+                    <option value="OTHER">{{localize.getGender('Other')}}</option>
+                </select></td>
+              <td><input class="member-field-input" type="text" [(ngModel)]="record.flag"></td>
+              <td>
+                <mat-icon (click)="onRemoveMemberClick(getGlobalTeamMemberIndex(i))" style="cursor: pointer; color: hsla(349, 73%, 44%, 1);" _ngcontent-xam-c83="" role="img" class="mat-icon notranslate material-icons mat-ligature-font mat-icon-no-color ng-star-inserted" aria-hidden="true" data-mat-icon-type="font">delete</mat-icon>
+            </td>
+            </tr>
+            </tbody>
+          </table>
         </div>
+    </div>
+    <div class="row">
+      <div style="display: flex; justify-content: center">
+          <ngb-pagination
+          [collectionSize]="teamMembers.length"
+          [(page)]="page"
+          [pageSize]="pageSize"
+          (pageChange)="refreshCountries()"
+          class="center"
+          ></ngb-pagination>
+      </div>
+    </div>
     </div>
 </app-content-card>

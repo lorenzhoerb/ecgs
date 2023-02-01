@@ -6,6 +6,7 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import { GradeDto } from '../dtos/gradeDto';
 import { LiveResultDto } from '../dtos/liveResultDto';
 import { MessageErrorDto } from '../dtos/messageErrorDto';
+import { StompErrorType } from '../dtos/StompErrorDto';
 import { Globals } from '../global/globals';
 import { AuthService } from './auth.service';
 import { StompService } from './stomp.service';
@@ -22,6 +23,7 @@ export class LiveResultsService {
 
   private errorSubscription?: Subscription;
   private resultsSubscription?: Subscription = null;
+  private customStompErrorSubs?: Subscription = null;
 
   constructor(private httpClient: HttpClient,
     private globals: Globals,
@@ -68,6 +70,11 @@ export class LiveResultsService {
     }
     this.resultsSubscription = null;
 
+    if (this.customStompErrorSubs !== null) {
+      this.customStompErrorSubs.unsubscribe();
+    }
+    this.customStompErrorSubs = null;
+
     if (this.errorSubscription !== null && this.errorSubscription !== undefined) {
       this.errorSubscription.unsubscribe();
     }
@@ -78,6 +85,14 @@ export class LiveResultsService {
 
   public initialize(competitionId: number) {
     this.closeAll();
+
+    this.customStompErrorSubs = this.stomp.customStompError$.subscribe(e => {
+      if (e !== null && e.type === StompErrorType.unauthorized) {
+        this.stomp.stop();
+        this.toastr.info('Melden Sie sich an um alle Informationen zu sehen.');
+
+      }
+    });
 
     this.stomp.start();
 

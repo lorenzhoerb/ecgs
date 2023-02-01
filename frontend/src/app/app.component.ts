@@ -9,4 +9,5 @@ export class AppComponent {
   title = 'SEPM Group Phase';
   showMenu = false;
   showCreateMenu = false;
+  showFolderMenu = false;
 }

@@ -1,12 +1,5 @@
 package at.ac.tuwien.sepm.groupphase.backend.report;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-
-@Getter
-@Setter
 public class GradableEntityInfo {
     private String name = "";
     private Double results;
@@ -25,6 +18,22 @@ public class GradableEntityInfo {
 
     public GradableEntityInfo(String name, Double results) {
         this.name = name;
+        this.results = results;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public Double getResults() {
+        return this.results;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setResults(Double results) {
         this.results = results;
     }
 }

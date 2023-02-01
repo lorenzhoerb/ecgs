@@ -34,9 +34,20 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         this.securityProperties = securityProperties;
     }
 
+    /**
+     * Filter roles to stop unauthorized access.
+     *
+     * @param request  the http request to filter
+     * @param response the http response to give
+     * @param chain    the filter to apply
+     * @throws IOException      if an IOException occurred while sending a response
+     * @throws ServletException if Spring encounters an exception
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
         throws IOException, ServletException {
+        LOGGER.debug("doFilterInternal()");
+
         try {
             UsernamePasswordAuthenticationToken authToken = getAuthToken(request);
             if (authToken != null) {
@@ -51,8 +62,18 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
+    /**
+     * Gets the auth token from a given request.
+     *
+     * @param request the request to get the token for
+     * @return the authentication token
+     * @throws JwtException             if an auth exception occurred
+     * @throws IllegalArgumentException if a non bearer token was given or no user was in the token
+     */
     private UsernamePasswordAuthenticationToken getAuthToken(HttpServletRequest request)
         throws JwtException, IllegalArgumentException {
+        LOGGER.debug("getAuthToken()");
+
         String token = request.getHeader(securityProperties.getAuthHeader());
         if (token == null || token.isEmpty()) {
             return null;

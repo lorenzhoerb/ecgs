@@ -1,6 +1,8 @@
 package at.ac.tuwien.sepm.groupphase.backend.exception;
 
-
+/**
+ * Exception that signals the strategy on a variable in a grading system was violated by the bound values.
+ */
 public class StrategyException extends RuntimeException {
 
     public StrategyException() {

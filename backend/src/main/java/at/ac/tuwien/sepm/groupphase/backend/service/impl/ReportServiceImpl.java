@@ -32,11 +32,14 @@ import at.ac.tuwien.sepm.groupphase.backend.util.SessionUtils;
 import at.ac.tuwien.sepm.groupphase.backend.validation.ExcelReportGenerationRequestDtoValidator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 
+import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +52,7 @@ import java.util.stream.StreamSupport;
 
 @Service
 public class ReportServiceImpl implements ReportService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final CompetitionRepository competitionRepository;
     private final RegisterToRepository registerToRepository;
     private final GradeService gradeService;
@@ -84,6 +88,8 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public void calculateResultsOfCompetition(Long competitionId) {
+        LOGGER.debug("calculateResultsOfCompetition({})", competitionId);
+
         var competitionOpt = competitionRepository.findById(competitionId);
         if (competitionOpt.isEmpty()) {
             throw new NotFoundException("Such competition was not found");
@@ -190,6 +196,8 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<ParticipantCompetitionResultDto> getParticipantResults() {
+        LOGGER.debug("getParticipantResults()");
+
         if (!sessionUtils.isAuthenticated()) {
             throw new ForbiddenException("Not authenticated");
         }
@@ -251,6 +259,8 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public Report generateFilteredReport(ExcelReportGenerationRequestDto requestDto) {
+        LOGGER.debug("generateFilteredReport({})", requestDto);
+
         excelReportGenerationRequestDtoValidator.validate(requestDto);
         if (!sessionUtils.isAuthenticated()) {
             throw new ForbiddenException("Not authenticated");
@@ -342,6 +352,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     private void saveReportResults(Report report) {
+        LOGGER.debug("saveReportResults({})", report);
+
         var objectMapper = new ObjectMapper();
         report.getGradingGroupRankingResults().forEach(ggrr -> {
             String jsonResults;

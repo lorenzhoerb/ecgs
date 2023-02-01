@@ -122,7 +122,7 @@ public class CompetitionEndpoint {
     @GetMapping(value = "/{id}")
     @Operation(summary = "Get information about a specific competition", security = @SecurityRequirement(name = "apiKey"))
     public CompetitionViewDto find(@PathVariable Long id) {
-        LOGGER.info("GET /api/v1/messages/{}", id);
+        LOGGER.info("GET {}/find/{}", BASE_PATH, id);
         return competitionService.findOne(id);
     }
 
@@ -130,7 +130,7 @@ public class CompetitionEndpoint {
     @GetMapping(value = "/{id}/detail")
     @Operation(summary = "Get detailed information about a specific competition", security = @SecurityRequirement(name = "apiKey"))
     public CompetitionDetailDto findDetail(@PathVariable Long id) {
-        LOGGER.info("GET /api/v1/messages/{}", id);
+        LOGGER.info("GET {}/findDetail/{}", BASE_PATH, id);
         return competitionService.findOneDetail(id);
     }
 
@@ -196,7 +196,7 @@ public class CompetitionEndpoint {
         @RequestParam(required = false, defaultValue = "15") Integer pageSize,
         @RequestParam(required = false, defaultValue = "0") Integer page
     ) {
-        LOGGER.info("GET {}/{}/participants/registrations", BASE_PATH);
+        LOGGER.info("GET {}/{}/participants/registrations", BASE_PATH, competitionId);
         return competitionService
             .getParticipantsRegistrationDetails(new PageableDto<>(
                 new ParticipantFilterDto(
@@ -277,6 +277,7 @@ public class CompetitionEndpoint {
         @PathVariable Long competitionId,
         @RequestBody ExcelReportGenerationRequestDto requestDto
     ) {
+        LOGGER.info("POST {}/{}/report/download {}", BASE_PATH, competitionId, requestDto);
         requestDto.setCompetitionId(competitionId);
         return reportFileService.downloadExcelReport(requestDto);
     }
@@ -287,6 +288,7 @@ public class CompetitionEndpoint {
     public ReportDownloadInclusionRuleOptionsDto getCurrentUserReportDownloadInclusionRuleOptions(
         @PathVariable Long competitionId
     ) {
+        LOGGER.info("GET {}/{}/report/download-inclusion-rule-options {}", BASE_PATH, competitionId);
         return competitionService.getCurrentUserReportDownloadInclusionRuleOptions(competitionId);
     }
 
@@ -296,6 +298,7 @@ public class CompetitionEndpoint {
     public ReportIsDownloadableDto checkIfReportsAreDownloadable(
         @PathVariable Long competitionId
     ) {
+        LOGGER.info("GET {}/{}/report/downloadable {}", BASE_PATH, competitionId);
         return gradingGroupService.checkAllGradingGroupsHaveReports(competitionId);
     }
 
@@ -310,30 +313,40 @@ public class CompetitionEndpoint {
 
     @Secured({"ROLE_TOURNAMENT_MANAGER"})
     @PostMapping("{id}/members/flags")
+    @Operation(summary = "add flags for given members of this competition", security = @SecurityRequirement(name = "apiKey"))
     public ResponseEntity<Void> addMemberFlags(
         @PathVariable Long id,
         @RequestBody UserDetailSetFlagDto members) {
-        LOGGER.info("GET {}/{}/members/flags", BASE_PATH, id);
+        LOGGER.info("POST {}/{}/members/flags", BASE_PATH, id);
         competitionService.addFlagsForUsers(id, members);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Secured({"ROLE_TOURNAMENT_MANAGER"})
     @PatchMapping("{id}/members/flags")
+    @Operation(summary = "remove flags for given members of this competition", security = @SecurityRequirement(name = "apiKey"))
     public ResponseEntity<Void> removeMemberFlags(
         @PathVariable Long id,
         @RequestBody UserDetailSetFlagDto members) {
-        LOGGER.info("GET {}/{}/members/flags", BASE_PATH, id);
+        LOGGER.info("PATCH {}/{}/members/flags", BASE_PATH, id);
         competitionService.removeFlagsForUsers(id, members);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Secured({"ROLE_TOURNAMENT_MANAGER"})
     @GetMapping("{id}/my-flags")
+    @Operation(summary = "get the flags for participants of this competition", security = @SecurityRequirement(name = "apiKey"))
     public List<SimpleFlagDto> getManagedFlags(
         @PathVariable Long id) {
         LOGGER.info("GET {}/{}/my-flags", BASE_PATH, id);
         return competitionService.getManagedFlags(id);
     }
 
+    @Secured({"ROLE_PARTICIPANT", "ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER"})
+    @GetMapping(value = "/{id}/is-creator")
+    @Operation(summary = "check if user is the creator of the competition", security = @SecurityRequirement(name = "apiKey"))
+    public Boolean isCreator(@PathVariable Long id) {
+        LOGGER.info("GET {}/{}/is-creator", BASE_PATH, id);
+        return competitionService.isCreator(id);
+    }
 }

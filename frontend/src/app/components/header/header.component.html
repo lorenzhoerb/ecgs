@@ -5,6 +5,10 @@
     </a>
   </div>
   <div class="flex">
+    <a (click)="showFolderMenu.emit()" *ngIf="this.authService.getUserRole() === 'TOURNAMENT_MANAGER' || this.authService.getUserRole() === 'CLUB_MANAGER'">
+      <mat-icon class="">folder</mat-icon>
+      <mat-icon>expand_more</mat-icon>
+    </a>
     <a (click)="showCreateMenu.emit()" *ngIf="this.authService.getUserRole() === 'TOURNAMENT_MANAGER' || this.authService.getUserRole() === 'CLUB_MANAGER'">
       <mat-icon class="">add_box</mat-icon>
       <mat-icon>expand_more</mat-icon>

@@ -242,12 +242,7 @@ export class CreateCompetitionComponent implements OnInit {
       return;
     }
 
-    if (this.selectedFile.size > 1000000) {
-      this.toastr.error('Datei größer als 1 Megabyte', 'Datei zu groß');
-      return;
-    }
-
-    if (this.selectedFile.size > 1000000) {
+    if (this.selectedFile && this.selectedFile.size > 1000000) {
       this.toastr.error('Datei größer als 1 Megabyte', 'Datei zu groß');
       return;
     }
@@ -320,19 +315,18 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
         next: value => {
           if (this.id !== null) {
             this.toastr.success('Turnier erfolgreich bearbeitet!');
-            console.log('test ' + this.selectedFile);
-            if (this.selectedFile !== undefined) {
+            if (this.selectedFile !== undefined && this.selectedFile !== null) {
               this.uploadFile(value.id);
             } else {
               this.router.navigate(['/competition', this.id]);
             }
           } else {
             this.toastr.success('Turnier erfolgreich erstellt!');
-            console.log('test ' + this.selectedFile);
-            if (this.selectedFile !== undefined) {
+            if (this.selectedFile !== undefined && this.selectedFile !== null) {
               this.uploadFile(value.id);
             } else {
-              this.router.navigate(['/competition', this.id]);
+              console.log(value);
+              this.router.navigate(['/competition', value.id]);
             }
           }
         },
@@ -473,6 +467,12 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
       return;
     }
 
+    if (station.selectedVariable.name.length > 16) {
+      this.toastr.error('Variablennamen dürfen maximal 16 Zeichen lang sein!', 'Achtung:');
+      station.selectedVariable.name = station.selectedVariable.name.substr(0, 16);
+      return;
+    }
+
     if(station.selectedVariable.value !== -1) {
       const existing = station.variables.find(v => v.value === station.selectedVariable.value);
 
@@ -522,6 +522,10 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
   }
 
   updateGroupName(id, newName) {
+    if (newName.length > 16) {
+      this.toastr.error('Gruppennamen dürfen maximal 16 Zeichen lang sein!', 'Achtung:');
+      newName = newName.substr(0, 16);
+    }
     if (this.gradingGroups.map(g => g.title.trim()).includes(newName.trim())) {
       this.toastr.warning('Gruppen müssen einzigartige Namen haben!', 'Achtung:');
     }
@@ -529,6 +533,10 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
   }
 
   upadteStationName(groupId, stationId, newName) {
+    if (newName.length > 16) {
+      this.toastr.error('Stationsnamen dürfen maximal 16 Zeichen lang sein!', 'Achtung:');
+      newName = newName.substr(0, 16);
+    }
     if (this.gradingGroups[groupId].stations.map(s => s.title.trim()).includes(newName.trim())) {
       this.toastr.warning('Stationsnamen müssen innerhalb einer Gruppen einzigartig sein!', 'Achtung:');
     }
@@ -714,7 +722,6 @@ ${invalidErrors.map(e => '<li>' + e + '</li>').join('\n')}`,
         this.competitionService.uploadPicture(id, this.selectedFile).subscribe(
           event => {
             if (event instanceof HttpResponse) {
-              this.toastr.success('Bild erfolgreich hochgeladen.');
               this.router.navigate(['/competition', id]);
             }
           },

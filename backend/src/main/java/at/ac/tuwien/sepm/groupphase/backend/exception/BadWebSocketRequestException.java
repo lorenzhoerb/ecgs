@@ -1,5 +1,8 @@
 package at.ac.tuwien.sepm.groupphase.backend.exception;
 
+/**
+ * Exception that signals, that a websocket request has gone wrong in any way shape or form.
+ */
 public class BadWebSocketRequestException extends RuntimeException {
     public BadWebSocketRequestException() {
     }

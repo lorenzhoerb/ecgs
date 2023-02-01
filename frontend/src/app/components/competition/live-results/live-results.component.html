@@ -1,4 +1,8 @@
-<div [ngClass]="getSizeClass()" class="my-container">
+<div  class="my-container" *ngIf="notConnected">
+    Sie müssen angemeldet sein um Live Ergebnisse verfolgen zu können.
+</div>
+
+<div [ngClass]="getSizeClass()" class="my-container" *ngIf="!notConnected">
 
     <div *ngIf="!small">
         <div class="filter-row">

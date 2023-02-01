@@ -5,6 +5,8 @@ import {Router} from '@angular/router';
 import {RegisterRequest} from '../../dtos/auth-request';
 import {ToastrService} from 'ngx-toastr';
 import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
+import {UserService} from 'src/app/services/user.service';
+import {ClubManagerTeamImportDto} from 'src/app/dtos/club-manager-team';
 
 @Component({
   selector: 'app-register',
@@ -13,13 +15,16 @@ import LocalizationService, {LocalizeService} from 'src/app/services/localizatio
 })
 export class RegisterComponent implements OnInit {
 
+  selectedRole;
+  teamNameValid = false;
   registerForm: UntypedFormGroup;
   // After first submission attempt, form validation will start
   submitted = false;
   hide = true;
 
   constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService,
-              private router: Router, private notification: ToastrService) {
+              private router: Router, private notification: ToastrService,
+              private userService: UserService) {
     this.registerForm = this.formBuilder.group({
       password: ['', [Validators.required, Validators.minLength(8)]],
       firstName: ['', [Validators.required]],
@@ -28,6 +33,7 @@ export class RegisterComponent implements OnInit {
       gender: ['', [Validators.required]],
       dateOfBirth: ['', [Validators.required]],
       type: ['', [Validators.required]],
+      teamName: ['', []]
     });
   }
 
@@ -35,19 +41,29 @@ export class RegisterComponent implements OnInit {
     return LocalizationService;
   }
 
+  ngOnInit() {
+  }
+
+
+  afterSuccessfulRegistration() {
+    this.notification.success('Successfully registered!');
+    this.router.navigate(['/login']);
+  }
+
   /**
    * Form validation will start after the method is called, additionally an AuthRequest will be sent
    */
   registerUser() {
     this.submitted = true;
-    if (this.registerForm.valid) {
+    if (this.registerForm.valid && this.isTeamNameValid()) {
       const registerRequest: RegisterRequest = new RegisterRequest(this.registerForm.controls.email.value,
         this.registerForm.controls.password.value,
         this.registerForm.controls.firstName.value,
         this.registerForm.controls.lastName.value,
         this.registerForm.controls.gender.value,
         this.registerForm.controls.dateOfBirth.value,
-        this.registerForm.controls.type.value
+        this.registerForm.controls.type.value,
+        this.registerForm.controls.teamName.value,
       );
       this.sendUserRegistration(registerRequest);
     } else {
@@ -63,6 +79,16 @@ export class RegisterComponent implements OnInit {
   sendUserRegistration(registerRequest: RegisterRequest) {
     this.authService.registerUser(registerRequest).subscribe({
       next: () => {
+        // const newTeam: ClubManagerTeamImportDto = {
+        //   teamName: this.registerForm.controls.teamName.value,
+        //   teamMembers: [{
+        //     firstName: 'placeholder',
+        //     lastName: 'placeholder',
+        //     gender: 'MALE',
+        //     dateOfBirth: '2022-03-03',
+        //     email: this.registerForm.controls.email.value
+        //   }]
+        // };
         this.notification.success('Successfully registered!');
         this.router.navigate(['/login']);
       },
@@ -70,10 +96,10 @@ export class RegisterComponent implements OnInit {
         console.log('Could not register due to:');
         console.log(error);
         if (typeof error.error === 'object') {
-          console.log('error.error.error object: ' +error.error.error);
+          console.log('error.error.error object: ' + error.error.error);
           this.notification.error(error.error.error);
         } else {
-          console.log('error.error object: ' , error.error);
+          console.log('error.error object: ', error.error);
           const parsedError = JSON.parse(error.error);
           console.log(parsedError);
           this.notification.error(
@@ -85,7 +111,9 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
+  private isTeamNameValid(): boolean {
+    return this.selectedRole === 'PARTICIPANT'
+      || (this.registerForm.controls.teamName.value.length > 0
+        && this.registerForm.controls.teamName.value.length < 256);
   }
-
 }

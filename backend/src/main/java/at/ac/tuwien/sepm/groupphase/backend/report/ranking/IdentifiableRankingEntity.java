@@ -1,10 +1,5 @@
 package at.ac.tuwien.sepm.groupphase.backend.report.ranking;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Setter
-@Getter
 public class IdentifiableRankingEntity {
     private Long id;
     private String name;
@@ -15,5 +10,21 @@ public class IdentifiableRankingEntity {
     }
 
     public IdentifiableRankingEntity() {
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

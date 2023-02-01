@@ -1,6 +1,6 @@
 import {formatDate} from '@angular/common';
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {Subject} from 'rxjs';
+import {debounceTime, Subject} from 'rxjs';
 import {CompetitionSearchDto} from 'src/app/dtos/competitionSearchDto';
 import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
 
@@ -31,25 +31,20 @@ export class CompetitionListViewFilterComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.registerDebounce();
+    this.inputChange
+      .pipe(debounceTime(200))
+      .subscribe(e => {
+        this.emitToFetchCompetitions();
+      });
+
     this.emitToFetchCompetitions();
   }
 
-  // registerDebounce(){
-  //   this.inputChange
-  //   .pipe(
-  //     debounceTime(300),
-  //   )
-  //   .subscribe({
-  //     next: data => {
-  //       this.emitToFetchCompetitions();
-  //     },
-  //     error: err => {
-  //     },
-  //   });
-  // }
-
   emitToFetchCompetitions() {
+    if(this.competitionSearch.begin === '') {
+      return;
+    }
+
     this.competitionSearchChange.emit({
       ...this.competitionSearch,
       begin: this.competitionSearch.begin + 'T00:00:00',

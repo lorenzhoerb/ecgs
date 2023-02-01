@@ -9,10 +9,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.ManyToMany;
 import javax.persistence.CascadeType;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import java.io.Serializable;
 import java.util.Set;
 
 @Entity
+@Table(uniqueConstraints =
+    { //other constraints
+        @UniqueConstraint(name = "UniqueRegistrationPerGroup", columnNames = { "participant_id", "grading_group_id" })})
 public class RegisterTo implements Serializable {
 
     @Id

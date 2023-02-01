@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepm.groupphase.backend.constraint.operator.ConstraintOperator;
-import at.ac.tuwien.sepm.groupphase.backend.constraint.parser.RegisterConstraintParser;
+import at.ac.tuwien.sepm.groupphase.backend.report.ranking.parser.RegisterConstraintParser;
 import at.ac.tuwien.sepm.groupphase.backend.constraint.validator.RegisterConstraintValidator;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantManageDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ParticipantRegistrationDto;
@@ -33,6 +33,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class CompetitionRegistrationServiceImpl implements CompetitionRegistrationService {
@@ -186,6 +187,7 @@ public class CompetitionRegistrationServiceImpl implements CompetitionRegistrati
     }
 
     private RegisterTo registerToGradingGroup(GradingGroup group, ApplicationUser user) {
+        LOGGER.debug("RegisteredTo({}, {})", group, user);
         List<RegisterConstraint> registerConstraints = group.getRegisterConstraints();
         if (!registerConstraints.isEmpty()) {
             try {
@@ -195,9 +197,11 @@ public class CompetitionRegistrationServiceImpl implements CompetitionRegistrati
                 throw new RuntimeException("should never happen because constraints from db should be validated");
             }
         }
-        return registerToRepository
-            .findByGradingGroupIdAndParticipantId(group.getId(), user.getId())
-            .orElseGet(() -> registerToRepository.save(new RegisterTo(user, group, false)));
+
+        Optional<RegisterTo> registerToOptional = registerToRepository
+            .findFirstByGradingGroupIdAndParticipantId(group.getId(), user.getId());
+
+        return registerToOptional.orElseGet(() -> registerToRepository.save(new RegisterTo(user, group, false)));
     }
 
     /**

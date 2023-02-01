@@ -5,7 +5,6 @@ import at.ac.tuwien.sepm.groupphase.backend.report.ranking.GradingGroupRankingRe
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@Getter
 public class Report {
     @JsonIgnore
     private final HashMap<Long, GradingGroupResults> gradingGroupsResults = new HashMap<>();
@@ -141,5 +139,13 @@ public class Report {
                 gradingGroupResultsEntry.getValue().generateRankings(gradingGroupResultsEntry.getKey())
             );
         }
+    }
+
+    public HashMap<Long, GradingGroupResults> getGradingGroupsResults() {
+        return this.gradingGroupsResults;
+    }
+
+    public List<GradingGroupRankingResults> getGradingGroupRankingResults() {
+        return this.gradingGroupRankingResults;
     }
 }

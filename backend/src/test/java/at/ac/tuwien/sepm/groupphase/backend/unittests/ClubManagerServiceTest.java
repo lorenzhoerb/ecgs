@@ -133,7 +133,7 @@ public class ClubManagerServiceTest extends TestDataProvider {
 
     @Test
     @WithMockUser(username = "cm_test@test.test")
-    public void importTeam_whenTeamMembersAreNotInDB_shouldCountCorrectlyNewAndOldMembers() {
+    public void givenTeamMembersThatAreNotInDB_whenImportingTeam_expectToCorrectlyCountNewAndOldMembers() {
         ClubManagerTeamImportDto relevantTestTeam = ClubManagerTeamImportGeneratorHelper.testTeams.get(0);
         long initUserCount = userRepository.count();
         ClubManagerTeamImportResults results = userService.importTeam(
@@ -156,7 +156,7 @@ public class ClubManagerServiceTest extends TestDataProvider {
 
     @Test
     @WithMockUser(username = "club.manager@email.com")
-    public void registerParticipantsToCompetition_ExpectCorrectCountOfCalendarCompetitionsForCM(){
+    public void givenValidParticipantsAndAClubManager_whenRegisteringParticipantsToCompetition_expectToCorrectCountCalendarCompetitions(){
         Competition c = getValidCompetitionEntity();
         c.setBeginOfCompetition(LocalDateTime.of(2023, 1, 3, 8, 0));
         c.setEndOfCompetition(LocalDateTime.of(2023, 1, 6, 8, 0));
@@ -189,7 +189,7 @@ public class ClubManagerServiceTest extends TestDataProvider {
 
     @Test
     @WithMockUser(username = "cm_test@test.test")
-    public void importTeam_whenTeamMembersArePartiallyInDB_shouldCountCorrectlyNewAndOldMembers() {
+    public void givenTeamThatIsAlreadyPartiallyPresentInDB_whenImportingTeam_expectToReturnCorrectNumberOfNewAndOldMembers() throws Exception {
         userService.importTeam(
             ClubManagerTeamImportGeneratorHelper.testTeams.get(0)
         );

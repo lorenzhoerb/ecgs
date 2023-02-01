@@ -5,6 +5,7 @@ import at.ac.tuwien.sepm.groupphase.backend.datagenerator.builder.UserBuilder;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.GradeRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingSystemRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
@@ -32,9 +33,11 @@ public class CompetitionDataGenerator {
     private final GradingSystemRepository gradingSystemRepository;
     private final CustomUserDetailService customUserDetailService;
     private final UserBuilder userBuilder;
+    private final GradeRepository gradeRepository;
 
     public CompetitionDataGenerator(CompetitionRepository competitionRepository, GradingGroupRepository gradingGroupRepository, ApplicationUserRepository applicationUserRepository, RegisterToRepository registerToRepository,
-                                    GradingSystemRepository gradingSystemRepository, CustomUserDetailService customUserDetailService, UserBuilder userBuilder) {
+                                    GradingSystemRepository gradingSystemRepository, CustomUserDetailService customUserDetailService, UserBuilder userBuilder,
+                                    GradeRepository gradeRepository) {
         this.competitionRepository = competitionRepository;
         this.gradingGroupRepository = gradingGroupRepository;
         this.applicationUserRepository = applicationUserRepository;
@@ -42,6 +45,7 @@ public class CompetitionDataGenerator {
         this.gradingSystemRepository = gradingSystemRepository;
         this.customUserDetailService = customUserDetailService;
         this.userBuilder = userBuilder;
+        this.gradeRepository = gradeRepository;
     }
 
     @PostConstruct
@@ -61,7 +65,9 @@ public class CompetitionDataGenerator {
             applicationUserRepository,
             competitionRepository,
             gradingGroupRepository,
-            registerToRepository, gradingSystemRepository)
+            registerToRepository,
+            gradingSystemRepository,
+            gradeRepository)
             .withName("Österreichische Turn10-Meisterschaft")
             .withCreator(user)
             .withDescription("550 Hobby-Turnerinnen und Turner von 9 bis 82 Jahren, aus 75 Vereinen und allen neun "
@@ -83,7 +89,9 @@ public class CompetitionDataGenerator {
             applicationUserRepository,
             competitionRepository,
             gradingGroupRepository,
-            registerToRepository, gradingSystemRepository)
+            registerToRepository,
+            gradingSystemRepository,
+            gradeRepository)
             .withParticipantsPerGroup(5)
             .withCreator(user)
             .withName("Weltmeisterschaft Leistungsturnen")
@@ -95,7 +103,9 @@ public class CompetitionDataGenerator {
             applicationUserRepository,
             competitionRepository,
             gradingGroupRepository,
-            registerToRepository, gradingSystemRepository)
+            registerToRepository,
+            gradingSystemRepository,
+            gradeRepository)
             .withParticipantsPerGroup(10)
             .withName("Österreicher Mannschaftsmeisterschaft 2023")
             .withDescription("In der diesjähringen Mannschaftmeisterschaft treten 33 Teams an.")
@@ -109,7 +119,9 @@ public class CompetitionDataGenerator {
             applicationUserRepository,
             competitionRepository,
             gradingGroupRepository,
-            registerToRepository, gradingSystemRepository)
+            registerToRepository,
+            gradingSystemRepository,
+            gradeRepository)
             .withParticipantsPerGroup(10)
             .withName("Luxembourg Open 2023")
             .withDescription("- Men's Artistic Gymnastics (Junior / Senior)\n"
@@ -124,7 +136,9 @@ public class CompetitionDataGenerator {
             applicationUserRepository,
             competitionRepository,
             gradingGroupRepository,
-            registerToRepository, gradingSystemRepository)
+            registerToRepository,
+            gradingSystemRepository,
+            gradeRepository)
             .withParticipantsPerGroup(10)
             .withName("International Tournament Sofia Cup 2023")
             .withDescription("International sofia World Cup. Add more detailed description")
@@ -139,7 +153,9 @@ public class CompetitionDataGenerator {
             applicationUserRepository,
             competitionRepository,
             gradingGroupRepository,
-            registerToRepository, gradingSystemRepository)
+            registerToRepository,
+            gradingSystemRepository,
+            gradeRepository)
             .withParticipantsPerGroup(10)
             .withName("Austrian Golf Cup 2022")
             .withDescription("Sign up for the austrian golf cup.")
@@ -153,7 +169,9 @@ public class CompetitionDataGenerator {
             applicationUserRepository,
             competitionRepository,
             gradingGroupRepository,
-            registerToRepository, gradingSystemRepository)
+            registerToRepository,
+            gradingSystemRepository,
+            gradeRepository)
             .withParticipantsPerGroup(0)
             .withName("The Real World Cup 2022")
             .withDescription("The real world cup is as real as never before. Sign up and compete against the realest persons.")

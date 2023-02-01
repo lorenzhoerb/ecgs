@@ -11,6 +11,7 @@
                             [canGrade]="isJudge"
                             (competitionResultsCalculation)="onReportResultsCalculation()" [canCalculateCompetitionResults]="isCreator"
                             (downloadReportDialogOpen)="onDownloadReportClick()" [reportsAreDownloadable]="reportsAreDownloadable"
+                            (participantsOpen)="onParticpantsClick()" (groupsOpen)="onGroupsClick()"
 
     ></app-competition-header>
 
@@ -37,7 +38,7 @@
       <div class="spacer-2"></div>
     </app-golden-ratio-container>
 
-    <app-content-card [ngClass]="isLargeResults()" [title]="localize.liveResults" [actions]="['expandable']" (largeExpandChanged)="largeResults($event)">
+    <app-content-card *ngIf="!reportsAreDownloadable && competitionStarted()" [ngClass]="isLargeResults()" [title]="localize.liveResults" [actions]="['expandable']" (largeExpandChanged)="largeResults($event)">
       <app-live-results [small]="!lResults" [competitionId]="id"></app-live-results>
     </app-content-card>
 
@@ -50,7 +51,7 @@
 
     <div class="spacer-2"></div>
 
-    <app-content-card [title]="localize.participants" >
+    <app-content-card *ngIf="!reportsAreDownloadable" [title]="localize.participants" >
       <form #form="ngForm" class="d-flex flex-row w-auto mb-3">
         <button type="submit" hidden="true">submit</button>
         <div class="flex-grow-2">

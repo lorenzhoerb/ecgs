@@ -13,7 +13,7 @@
                     >
                     &lt;
                     </button>
-                    {{localize.page}} {{this.currentPage}} 
+                    {{localize.page}} {{this.currentPage}} / {{getTotalPagesAvailable()}} 
                     <button 
                     style="margin-left: 15px;"
                     (click)="onPageChangeClick(1)"
@@ -40,7 +40,7 @@
                     >
                     &lt;
                     </button>
-                    {{localize.page}} {{this.currentPage}} 
+                    {{localize.page}} {{this.currentPage}} / {{getTotalPagesAvailable()}} 
                     <button 
                     style="margin-left: 15px;"
                     (click)="onPageChangeClick(1)"

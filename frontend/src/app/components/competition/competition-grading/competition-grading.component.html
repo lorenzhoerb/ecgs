@@ -1,5 +1,7 @@
 <div class="select-stations" *ngIf="gradingGroups !== undefined">
-  <h2 [ngClass]="dynamicStyleClass(true)" class="heading with-line">Wähle eine Station aus:</h2>
+  <h2 [ngClass]="dynamicStyleClass(true)" class="heading with-line"><mat-icon style="cursor:pointer" (click)="getBackToComp()">
+    arrow_back_ios
+  </mat-icon>Wähle eine Station aus:</h2>
 
   <div [ngClass]="dynamicStyleClass(true)" *ngIf="gradingGroups !== undefined" class="select-stations-header">
     <span>Zeige nur Stationen für Gruppe: </span>

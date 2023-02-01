@@ -26,6 +26,9 @@ export class LocalizationKeys {
   sendResetLink: string;
   gradingGroup: string;
 
+  passwordResetLinkSent: string;
+  enterValidMailForReset: string;
+
   edit: string;
   selectAGroup: string;
   groupHasRegistrationReq: string;
@@ -87,8 +90,14 @@ export class LocalizationKeys {
   genderMan: string;
   genderWoman: string;
   genderOther: string;
+  import: string;
+  team: string;
 
   createTournament: string;
+  myResults: string;
+  myGradingSystems: string;
+
+  calendar: string;
 
   importFlags: string;
   flag: string;
@@ -121,11 +130,19 @@ export class LocalizationKeys {
   firstname: string;
   lastname: string;
   password: string;
+  repeatPassword: string;
+  passwordMinLength8: string;
   userSettings: string;
   filePictureRestrictions: string;
   uploadCompetitionPictureDisclaimer: string;
   clearFileUpload: string;
   changePassword: string;
+  resetPassword: string;
+  resetPasswordSuccess: string;
+  resetPasswordError: string;
+  resetPasswordErrorLoggedIn: string;
+  resetPasswordErrorMalformedToken: string;
+  passwordsMustMatch: string;
   changeUserPicture: string;
   uploadUserPicture: string;
   dateOfBirth: string;

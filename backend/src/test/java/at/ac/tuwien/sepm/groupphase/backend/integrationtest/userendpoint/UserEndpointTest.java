@@ -104,7 +104,7 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
     }
 
     @Test
-    public void importFlags_whenAllParticipantsArePresent_shouldAddOnlyOneFlag() throws Exception {
+    public void givenValidFlags_whenImportingFlags_expectToAddOnlyOneEntityToFlagsTableAndExpectAllParticipantsToBeAssignedThatFlag() throws Exception {
         var testFlagsString = objectMapper.writeValueAsString(flagsImport_setupTestFlags());
         MvcResult mvcResult = this.mockMvc.perform(post(BASE_FLAGS_URI)
                 .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken("cm_1@test.test", CALENDAR_TEST_ROLES))
@@ -128,7 +128,7 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
     }
 
     @Test
-    public void importFlags_whenAllParticipantsArePresentImportFlagsTwice_shouldAddOnlyOneFlagOnFirstCall() throws Exception {
+    public void givenSimilarFlagsInMultipleImports_whenImportingFlags_expectToDoNothingOnSecondImport() throws Exception {
         var testFlagsString = objectMapper.writeValueAsString(flagsImport_setupTestFlags());
         MvcResult mvcResult = this.mockMvc.perform(post(BASE_FLAGS_URI)
                 .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken("cm_1@test.test", CALENDAR_TEST_ROLES))
@@ -169,8 +169,7 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
     }
 
     @Test
-    public void importFlags_whenAllParticipantsArePresent_importTwoSetsOfFlagsDifferingInOneValueSubsequently_shouldAddOnlyOneFlagOnFirstCall()
-        throws Exception {
+    public void givenSameFlagNamesButDifferentEmails_whenImportingFlags_expectToCreateOnlyOneFlagEntity() throws Exception {
         var testFlags = flagsImport_setupTestFlags();
         var testFlagsString = objectMapper.writeValueAsString(testFlags);
         MvcResult mvcResult = this.mockMvc.perform(post(BASE_FLAGS_URI)
@@ -220,7 +219,7 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
     }
 
     @Test
-    public void importFlags_whenSomeParticipantsAreNotPresent_shouldThrowValidationExceptionAndNothingMore() throws Exception {
+    public void givenFlagWithEmailThatIsNotManagedByYou_whenImportingFlags_expectToThrowForbiddenException() throws Exception {
         var testFlags = flagsImport_setupTestFlags();
         testFlags.add(
             new ImportFlag(
@@ -253,8 +252,7 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
     }
 
     @Test
-    public void importFlags_whenSomeParticipantsArePresentAndRequestHasDuplicates_shouldDiscardDuplicatesInResponse()
-        throws Exception {
+    public void givenFlagsWithDuplicates_whenImportingFlags_expectToIgnoreDuplicates() throws Exception {
         var testFlags = flagsImport_setupTestFlags();
         testFlags.add(
             new ImportFlag(
@@ -286,7 +284,7 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
     }
 
     @Test
-    public void importFlags_whenSomeParticipantsHaveInvalidEmail_shouldThrowValidationExceptionAndNothingMore() throws Exception {
+    public void givenFlagWithInvalidEmail_whenImportingFlags_expectToThrowValidationException() throws Exception {
         var testFlags = flagsImport_setupTestFlags();
         testFlags.add(
             new ImportFlag(
@@ -320,7 +318,7 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
     }
 
     @Test
-    public void importFlags_whenSomeParticipantsHaveBlankFlag_shouldThrowValidationExceptionAndNothingMore() throws Exception {
+    public void givenFlagWithInvalidName_whenImportingFlags_expectToThrowValidationException() throws Exception {
         var testFlags = flagsImport_setupTestFlags();
         testFlags.add(
             new ImportFlag(
@@ -353,7 +351,7 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
     }
 
     @Test
-    public void importFlags_whenSomeParticipantsHaveTooLongFlag_shouldThrowValidationExceptionAndNothingMore() throws Exception {
+    public void givenFlagWithTooLongName_whenImportingFlags_expectToThrowValidationException() throws Exception {
         var testFlags = flagsImport_setupTestFlags();
         testFlags.add(
             new ImportFlag(
@@ -387,7 +385,7 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
 
     @Test
     @Transactional(Transactional.TxType.NEVER)
-    public void getCompetitionsForCalendar_expectsAllManagedCompetitionsRetrieved() throws Exception {
+    public void givenTwoManagedCompetitions_whenGettingCompetitionsForCalendar_expectsAllManagedCompetitionsToBeRetrieved() throws Exception {
         MvcResult mvcResult = this.mockMvc.perform(get(String.format("%s?year=%d&weekNumber=%d", BASE_CALENDAR_URI, 2022, 38))
                 .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken("test@test.test", CALENDAR_TEST_ROLES))
             )
@@ -412,7 +410,7 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
     }
 
     @Test
-    public void getCompetitionsForCalendar_withInvalidYear_expectsValidationExceptionThrown() throws Exception {
+    public void givenInvalidYear_whenGettingCompetitionsForCalendar_expectToThrowValidationException() throws Exception {
         this.mockMvc.perform(get(String.format("%s?year=%d&weekNumber=%d", BASE_CALENDAR_URI, 1800, CURRENT_WEEK_NUMBER))
                 .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken("test@test.test", CALENDAR_TEST_ROLES))
             )
@@ -424,7 +422,7 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
     }
 
     @Test
-    public void getCompetitionsForCalendar_withInvalidMonth_expectsValidationExceptionThrown() throws Exception {
+    public void givenInvalidMonth_whenGettingCompetitionsForCalendar_expectToThrowValidationException() throws Exception {
         this.mockMvc.perform(get(String.format("%s?year=%d&weekNumber=%d", BASE_CALENDAR_URI, CURRENT_YEAR, 55))
                 .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken("test@test.test", CALENDAR_TEST_ROLES))
             )
@@ -436,7 +434,7 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
     }
 
     @Test
-    public void importTeam_withValidFields_shouldSucceedAndContainCorrectNumberOfNewMembers() throws Exception {
+    public void givenTeamWithValidFields_whenImportingTeam_expectToReturnCorrectNumberOfNewAndOldMembers() throws Exception {
         String body = objectMapper.writeValueAsString(ClubManagerTeamImportGeneratorHelper.testTeams.get(0));
 
         MvcResult mvcResult = this.mockMvc.perform(post(BASE_IMPORT_TEAM_URI)
@@ -462,69 +460,32 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
     }
 
     @Test
-    public void importTeam_withInvalidTeamMembers_shouldReturnValidationFailedAnswer() throws Exception {
-        String body = objectMapper.writeValueAsString(ClubManagerTeamImportGeneratorHelper.testTeams_withInvalidMembers.get(0));
-
-        MvcResult mvcResult = this.mockMvc.perform(post(BASE_IMPORT_TEAM_URI)
-                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(
-                    ClubManagerTeamImportGeneratorHelper.testClubManagersSecUsers.get(0).getEmail(),
-                    TEAM_IMPORT_TEST_ROLES))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body)
-            )
-            .andDo(print())
-            .andReturn();
-        MockHttpServletResponse response = mvcResult.getResponse();
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
-        ErrorListRestDto errorListRestDto = objectMapper.readValue(response.getContentAsString(),
-            ErrorListRestDto.class);
-
-        assertThat(errorListRestDto.message()).contains("Validation failed");
-        assertThat(errorListRestDto.errors().get(0)).contains("First name").contains("User #1 has some issues.");
-    }
-
-    @Test
-    public void importTeam_withInvalidTeamName_shouldReturnValidationFailedAnswer() throws Exception {
-        String body = objectMapper.writeValueAsString(ClubManagerTeamImportGeneratorHelper.testTeams_withInvalidTeamName.get(0));
-
-        MvcResult mvcResult = this.mockMvc.perform(post(BASE_IMPORT_TEAM_URI)
-                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(
-                    ClubManagerTeamImportGeneratorHelper.testClubManagersSecUsers.get(0).getEmail(),
-                    TEAM_IMPORT_TEST_ROLES))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body)
-            )
-            .andDo(print())
-            .andReturn();
-        MockHttpServletResponse response = mvcResult.getResponse();
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
-        ErrorListRestDto errorListRestDto = objectMapper.readValue(response.getContentAsString(),
-            ErrorListRestDto.class);
-
-        assertThat(errorListRestDto.message()).contains("Validation failed");
-        assertThat(errorListRestDto.errors().get(0)).contains("Team name");
-    }
-
-    @Test
-    public void importTeam_withFewInvalidMembers_shouldReturnValidationFailedAnswerForFewMembers() throws Exception {
+    public void givenTeamWithInvalidFields_whenImportingTeam_expectToThrowValidationExceptionsWithDetailedInformationOnEachFailedParticipant() throws Exception {
         String body = objectMapper.writeValueAsString(new ClubManagerTeamImportDto(
-            "teamnamee",
             new ArrayList<>() {
                 {
                     add(new ClubManagerTeamMemberImportDto(
-                            "first", null, ApplicationUser.Gender.MALE, new Date(946681200L), "ceck@ceck.com"
+                            "first", null, ApplicationUser.Gender.MALE, new Date(946681200L), "test@test.com"
                         )
                     );
                     add(new ClubManagerTeamMemberImportDto(
-                            "first", "asdasd", ApplicationUser.Gender.MALE, new Date(946681200L), "ceck@ceck.com"
+                            "first", "asdasd", ApplicationUser.Gender.MALE, new Date(946681200L), "test@test.com"
                         )
                     );
                     add(new ClubManagerTeamMemberImportDto(
-                            null, null, ApplicationUser.Gender.MALE, new Date(946681200L), "ceck.com"
+                            null, null, ApplicationUser.Gender.MALE, new Date(946681200L), "test.com"
                         )
                     );
                     add(new ClubManagerTeamMemberImportDto(
-                            "first", "second", ApplicationUser.Gender.MALE, new Date(-1567533357000L), "ceck@ceck.com"
+                            "first", "second", ApplicationUser.Gender.MALE, new Date(-1567533357000L), "test@test.com"
+                        )
+                    );
+                    add(new ClubManagerTeamMemberImportDto(
+                            "first", "last", null, new Date(946681200L), "test.com"
+                        )
+                    );
+                    add(new ClubManagerTeamMemberImportDto(
+                            "first", "second", ApplicationUser.Gender.MALE, new Date(-1567533357000L), "te..."
                         )
                     );
                 }
@@ -546,20 +507,29 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
             ErrorListRestDto.class);
 
         assertThat(errorListRestDto.message()).contains("Validation failed");
-        assertThat(errorListRestDto.errors().get(0)).contains("User #1 has some issues").contains("Last name must not be blank");
+        assertThat(errorListRestDto.errors().get(0))
+            .contains("User #1 has some issues.")
+            .contains("- Last name must not be blank");
         assertThat(errorListRestDto.errors().get(1))
-            .contains("User #3 has some issues")
-            .contains("Last name must not be blank")
-            .contains("First name must not be blank");
+            .contains("User #3 has some issues.")
+            .contains("- Email must be well-formed")
+            .contains("- First name must not be blank")
+            .contains("- Last name must not be blank");
         assertThat(errorListRestDto.errors().get(2))
-            .contains("User #4 has some issues")
-            .contains("Date of birth must be after the begin of 1920");
+            .contains("User #4 has some issues.")
+            .contains("- Date of birth must be after the begin of 1920");
+        assertThat(errorListRestDto.errors().get(3))
+            .contains("User #5 has some issues.")
+            .contains("- Email must be well-formed")
+            .contains("- Gender field is blank");
+        assertThat(errorListRestDto.errors().get(4))
+            .contains("User #6 has some issues.")
+            .contains("- Email must be well-formed");
     }
 
     @Test
-    public void importTeam_withValidMembersTwoOfWhichHaveFlags_shouldImportAllParticipantsAndAddThoseFlags() throws Exception {
+    public void givenValidTeamWithNotAllMembersHavingFlags_whenImportingTeam_expectToImportAllParticipantsAndAddThoseFlags() throws Exception {
         String body = objectMapper.writeValueAsString(new ClubManagerTeamImportDto(
-            "teamnamee",
             new ArrayList<>() {
                 {
                     add(new ClubManagerTeamMemberImportDto(
@@ -610,7 +580,7 @@ public class UserEndpointTest extends TestDataProvider implements TestData {
     }
 
     @Test
-    public void uploadUserPicture_whenCorrectFileTypeAndContent_ShouldSucceed() throws Exception {
+    public void givenCorrectFileTypeAndContent_whenUploadUserPicture_expectToSucceed() throws Exception {
         setUpCompetitionUser();
         Resource originalSource = resourceLoader.getResource("classpath:/user-pictures/dot.png");
         byte[] originalBytes = originalSource.getInputStream().readAllBytes();

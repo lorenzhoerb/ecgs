@@ -1,0 +1,12 @@
+<div class="hide-area" *ngIf="showMenu" (click)="hide()">
+  <div class="menu">
+    <a class="menu-item" [routerLink]="['/my-results']"
+      *ngIf="this.authService.getUserRole() === 'TOURNAMENT_MANAGER' || this.authService.getUserRole() === 'CLUB_MANAGER'">
+      <mat-icon style="margin-right: 8px;">preview</mat-icon> {{localize.myResults}}
+    </a>
+    <a class="menu-item" [routerLink]="['grading-systems']"
+      *ngIf="this.authService.getUserRole() === 'TOURNAMENT_MANAGER'">
+      <mat-icon style="margin-right: 8px;">edit_note</mat-icon> {{localize.myGradingSystems}}
+    </a>
+  </div>
+</div>

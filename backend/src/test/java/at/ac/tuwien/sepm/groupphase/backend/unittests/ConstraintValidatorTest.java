@@ -4,7 +4,6 @@ import at.ac.tuwien.sepm.groupphase.backend.constraint.operator.ConstraintOperat
 import at.ac.tuwien.sepm.groupphase.backend.constraint.operator.enumoperator.EnumEqualsConstraint;
 import at.ac.tuwien.sepm.groupphase.backend.constraint.operator.integer.IntegerGreaterThanConstraint;
 import at.ac.tuwien.sepm.groupphase.backend.constraint.operator.integer.IntegerLessOrEqualsThanConstraint;
-import at.ac.tuwien.sepm.groupphase.backend.constraint.operator.integer.IntegerConstraintOperator;
 import at.ac.tuwien.sepm.groupphase.backend.constraint.operator.localdate.LocalDateEqualsConstraint;
 import at.ac.tuwien.sepm.groupphase.backend.constraint.operator.localdate.LocalDateIsAfterConstraint;
 import at.ac.tuwien.sepm.groupphase.backend.constraint.operator.localdate.LocalDateIsBeforeConstraint;
@@ -53,7 +52,7 @@ public class ConstraintValidatorTest {
     }
 
     @Test
-    public void testRegisterValidator_withValidValues() {
+    public void testRegisterValidator_withValidValues_expectNoError() {
         var g1 = new LocalDateEqualsConstraint(LocalDate.now(), "dateOfBirth", "date of birth must be equals");
         var g3 = new EnumEqualsConstraint<>(ApplicationUser.Gender.MALE, "gender", "Gender must be type: " + ApplicationUser.Gender.MALE);
         List<ConstraintOperator<?>> constraints = List.of(g1, g3);
@@ -65,7 +64,7 @@ public class ConstraintValidatorTest {
     }
 
     @Test
-    public void testRegisterValidator_withInvalidGender() {
+    public void testRegisterValidator_withInvalidGender_expectValidationError() {
         var g3 = new EnumEqualsConstraint<>(ApplicationUser.Gender.MALE, "gender", "Gender must be type: " + ApplicationUser.Gender.MALE);
         List<ConstraintOperator<?>> constraints = List.of(g3);
 
@@ -80,7 +79,7 @@ public class ConstraintValidatorTest {
     }
 
     @Test
-    public void testRegisterValidator_withValidGender() {
+    public void testRegisterValidator_withValidGender_expectNoError() {
         var g3 = new EnumEqualsConstraint<>(ApplicationUser.Gender.MALE, "gender", "Gender must be type: " + ApplicationUser.Gender.MALE);
         List<ConstraintOperator<?>> constraints = List.of(g3);
 
@@ -93,7 +92,7 @@ public class ConstraintValidatorTest {
     }
 
     @Test
-    public void testRegisterValidator_greaterThenConstraint_withValidAge() {
+    public void testRegisterValidator_greaterThenConstraint_withValidAge_expectNoError() {
         var g3 = new IntegerGreaterThanConstraint(5, "age", "age");
         List<ConstraintOperator<?>> constraints = List.of(g3);
 
@@ -106,7 +105,7 @@ public class ConstraintValidatorTest {
     }
 
     @Test
-    public void testRegisterValidator_greaterThenConstraint_withInvalidValidAge() {
+    public void testRegisterValidator_greaterThenConstraint_withInvalidValidAge_expectValidationError() {
         var g3 = new IntegerGreaterThanConstraint(50, "age", "You must be older");
         List<ConstraintOperator<?>> constraints = List.of(g3);
 
@@ -122,7 +121,7 @@ public class ConstraintValidatorTest {
     }
 
     @Test
-    public void testRegisterValidator_BornBefore_withInvalidDateOfBirth() {
+    public void testRegisterValidator_BornBefore_withInvalidDateOfBirth_expectValidationError() {
         var g3 = new LocalDateIsBeforeConstraint(LocalDate.of(1999,1,1), "dateOfBirth", "");
         List<ConstraintOperator<?>> constraints = List.of(g3);
 
@@ -137,7 +136,7 @@ public class ConstraintValidatorTest {
     }
 
     @Test
-    public void testRegisterValidator_BornBefore_withValidDateOfBirth() {
+    public void testRegisterValidator_BornBefore_withValidDateOfBirth_expectNoError() {
         var g3 = new LocalDateIsBeforeConstraint(LocalDate.of(1999,1,2), "dateOfBirth", "");
         List<ConstraintOperator<?>> constraints = List.of(g3);
 
@@ -149,7 +148,7 @@ public class ConstraintValidatorTest {
     }
 
     @Test
-    public void testRegisterValidator_BornAfter_withInvalidDateOfBirth() {
+    public void testRegisterValidator_BornAfter_withInvalidDateOfBirth_expectValidationError() {
         var g3 = new LocalDateIsAfterConstraint(LocalDate.of(1999,1,1), "dateOfBirth", "");
         List<ConstraintOperator<?>> constraints = List.of(g3);
 
@@ -164,7 +163,7 @@ public class ConstraintValidatorTest {
     }
 
     @Test
-    public void testRegisterValidator_BornAfter_withValidDateOfBirth() {
+    public void testRegisterValidator_BornAfter_withValidDateOfBirth_expectNoError() {
         var g3 = new LocalDateIsAfterConstraint(LocalDate.of(1999,1,2), "dateOfBirth", "");
         List<ConstraintOperator<?>> constraints = List.of(g3);
 

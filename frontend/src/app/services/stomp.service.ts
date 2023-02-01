@@ -16,6 +16,7 @@ export class StompService extends RxStomp {
   errorIterationCount = 0;
   stopped$: BehaviorSubject<boolean>;
   started$: BehaviorSubject<boolean>;
+  customStompError$: Subject<StompErrorDto>;
   config?: RxStompConfig;
 
   public constructor(private authService: AuthService,
@@ -25,6 +26,7 @@ export class StompService extends RxStomp {
 
     this.stopped$ = new BehaviorSubject(true);
     this.started$ = new BehaviorSubject(false);
+    this.customStompError$ = new BehaviorSubject(null);
 
     const brokerURL = this.findWSBackendUrl();
 
@@ -105,12 +107,13 @@ export class StompService extends RxStomp {
   handleStompErrors(error: IFrame): string {
     console.log(error);
     const e: StompErrorDto = JSON.parse(error.body);
-    console.log(e);
+    this.customStompError$.next(e);
+    /*console.log(e);
     if (e !== null && e.type === StompErrorType.unauthorized) {
       this.stop();
       this.toastr.error('Sie haben hier keine Befugnis');
       this.router.navigate(['/']);
-    }
+    } */
     return; //return super._correlateErrors(error);
   }
 

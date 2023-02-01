@@ -3,16 +3,15 @@ package at.ac.tuwien.sepm.groupphase.backend.gradingsystem.structural;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Operation;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Getter
-@Setter
+/**
+ * Station that represents a number of variables and a formula of how to calculate it.
+ */
 public class Station {
     @JsonProperty("id")
     Long id;
@@ -49,5 +48,37 @@ public class Station {
         }
 
         return formula.evaluate();
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public String getDisplayName() {
+        return this.displayName;
+    }
+
+    public Variable[] getVariables() {
+        return this.variables;
+    }
+
+    public Operation getFormula() {
+        return this.formula;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public void setVariables(Variable[] variables) {
+        this.variables = variables;
+    }
+
+    public void setFormula(Operation formula) {
+        this.formula = formula;
     }
 }

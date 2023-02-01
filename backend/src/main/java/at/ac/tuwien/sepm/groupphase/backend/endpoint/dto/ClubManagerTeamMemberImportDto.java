@@ -32,7 +32,7 @@ public record ClubManagerTeamMemberImportDto(
 
     @NotBlank(message = "Email must be given")
     @Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,63}",
-        flags = Pattern.Flag.CASE_INSENSITIVE)
+        flags = Pattern.Flag.CASE_INSENSITIVE, message = "Email must be well-formed")
     @Size(max = 255, message = "Email must be shorter")
     String email,
 

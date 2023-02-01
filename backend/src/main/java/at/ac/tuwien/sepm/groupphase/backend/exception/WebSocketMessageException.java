@@ -1,10 +1,10 @@
 package at.ac.tuwien.sepm.groupphase.backend.exception;
 
-import lombok.Getter;
-
 import java.util.UUID;
 
-@Getter
+/**
+ * Exception that signals a problem during a websocket message with it's uuid.
+ */
 public class WebSocketMessageException extends RuntimeException {
     private UUID uuid;
 
@@ -13,4 +13,7 @@ public class WebSocketMessageException extends RuntimeException {
         this.uuid = uuid;
     }
 
+    public UUID getUuid() {
+        return this.uuid;
+    }
 }

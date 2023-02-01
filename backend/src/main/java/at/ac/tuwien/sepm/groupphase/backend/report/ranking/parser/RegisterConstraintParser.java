@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepm.groupphase.backend.constraint.parser;
+package at.ac.tuwien.sepm.groupphase.backend.report.ranking.parser;
 
 import at.ac.tuwien.sepm.groupphase.backend.constraint.operator.ConstraintOperator;
 import at.ac.tuwien.sepm.groupphase.backend.constraint.operator.enumoperator.EnumEqualsConstraint;

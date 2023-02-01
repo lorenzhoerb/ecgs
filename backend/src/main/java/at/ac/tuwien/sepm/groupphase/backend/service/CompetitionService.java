@@ -116,5 +116,17 @@ public interface CompetitionService {
     void removeFlagsForUsers(Long id, UserDetailSetFlagDto participants);
 
 
+    /**
+     * Get the options for the current user inclusion rule.
+     *
+     * @param competitionId id of competition
+     */
     ReportDownloadInclusionRuleOptionsDto getCurrentUserReportDownloadInclusionRuleOptions(Long competitionId);
+
+    /**
+     * Check if the session user is the owner of the competition.
+     *
+     * @param id if of the competition to check
+     */
+    Boolean isCreator(Long id);
 }

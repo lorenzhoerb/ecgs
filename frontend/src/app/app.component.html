@@ -1,4 +1,5 @@
-<app-header (showMenu)="showMenu = !showMenu" (showCreateMenu)="showCreateMenu = !showCreateMenu"></app-header>
+<app-header (showMenu)="showMenu = !showMenu" (showCreateMenu)="showCreateMenu = !showCreateMenu" (showFolderMenu)="showFolderMenu = !showFolderMenu"></app-header>
+<app-folder-header-modal [(showMenu)]="showFolderMenu"></app-folder-header-modal>
 <app-create-header-modal [(showMenu)]="showCreateMenu"></app-create-header-modal>
 <app-header-modal [(showMenu)]="showMenu"></app-header-modal>
 

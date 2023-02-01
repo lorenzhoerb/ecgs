@@ -1,13 +1,11 @@
 package at.ac.tuwien.sepm.groupphase.backend.report;
 
 import at.ac.tuwien.sepm.groupphase.backend.report.ranking.ParticipantRankingResults;
-import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-@Getter
 public class ParticipantResults extends GradableEntityInfo {
     private final HashMap<Long, StationResults> stationsResults = new HashMap<>();
 
@@ -60,5 +58,9 @@ public class ParticipantResults extends GradableEntityInfo {
         }
 
         return newParticipantRankingResults;
+    }
+
+    public HashMap<Long, StationResults> getStationsResults() {
+        return this.stationsResults;
     }
 }

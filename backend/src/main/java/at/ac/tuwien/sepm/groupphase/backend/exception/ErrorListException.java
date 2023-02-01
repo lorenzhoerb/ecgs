@@ -3,6 +3,9 @@ package at.ac.tuwien.sepm.groupphase.backend.exception;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Exception that gives a generic List of errors.
+ */
 public class ErrorListException extends RuntimeException {
     private final List<String> errors;
     private final String messageSummary;

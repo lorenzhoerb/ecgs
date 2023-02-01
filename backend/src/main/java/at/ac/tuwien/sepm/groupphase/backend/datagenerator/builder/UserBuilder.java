@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.List;
 
-@Profile("generateData")
 @Component
 public class UserBuilder {
 
@@ -33,6 +32,7 @@ public class UserBuilder {
         private SecurityUser securityUser;
         private static int USER_COUNTER = 1;
         private List<ApplicationUser> clubMembers;
+        private String teamName;
 
         public UserConstruct() {
             applicationUser = getDefaultApplicationUser();
@@ -106,7 +106,8 @@ public class UserBuilder {
                     applicationUser.getLastName(),
                     applicationUser.getGender(),
                     applicationUser.getDateOfBirth(),
-                    applicationUser.getType()
+                    applicationUser.getType(),
+                    teamName
                 ));
             return appUser;
         }
@@ -120,6 +121,11 @@ public class UserBuilder {
                 "participant" + USER_COUNTER + "@email.com",
                 "12345678"
             );
+        }
+
+        public UserConstruct withTeamName(String teamName) {
+            this.teamName = teamName;
+            return this;
         }
     }
 }

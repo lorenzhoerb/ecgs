@@ -592,17 +592,6 @@ public class GradingGroupServiceTest extends TestDataProvider {
     }
 
     @Test
-    @Transactional(Transactional.TxType.NEVER)
-    @WithMockUser(value = "club_manager3@report.test")
-    public void getParticipants_forFinishedCompetition_shouldSucceed() throws Exception {
-        var compEntity = beforeEachReportTest();
-
-        for (GradingGroup group : compEntity.getGradingGroups()) {
-            Page<UserDetailGradeDto> result = gradingGroupService.getParticipants(group.getId(), null);
-        }
-    }
-
-    @Test
     public void getParticipants_givenNotLoggedInUser_shouldThrowForbidden() throws Exception {
         Competition competition = createCompetitionEntity(
             applicationUserRepository,
@@ -618,6 +607,31 @@ public class GradingGroupServiceTest extends TestDataProvider {
         });
 
         assertEquals(e.getMessage(), "No permission to get participant details");
+    }
+
+    @Test
+    @Transactional(Transactional.TxType.NEVER)
+    @WithMockUser(value = "club_manager3@report.test")
+    public void getParticipants_forFinishedCompetition_shouldSucceed() throws Exception {
+        var compEntity = beforeEachReportTest();
+
+        for (GradingGroup group : compEntity.getGradingGroups()) {
+            Page<UserDetailGradeDto> result = gradingGroupService.getParticipants(group.getId(), null);
+
+            switch (group.getTitle()) {
+                case "GG1":
+                    assertEquals(result.getContent().get(0).finalResult(), 15.5);
+                    assertEquals(result.getContent().get(1).finalResult(), 14.5);
+                    assertEquals(result.getContent().get(2).finalResult(), 14.5);
+                    assertEquals(result.getContent().get(3).finalResult(), 12.7);
+                    break;
+                case "GG2":
+                    assertEquals(result.getContent().get(0).finalResult(), 101);
+                    assertEquals(result.getContent().get(1).finalResult(), 32.5);
+                    assertEquals(result.getContent().get(2).finalResult(), 19);
+                    break;
+            }
+        }
     }
 
 }

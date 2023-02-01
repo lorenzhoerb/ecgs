@@ -2,3 +2,46 @@
     width: 100%;
     border-radius: 8px;
 }
+
+.manage-competitions {
+    background-color: var(--fancy-red);
+    color: snow;
+    display: flex;
+    gap: 8px;
+    margin-right: 16px;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: 750;
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+.manage-modal {
+    display: flex;
+    flex-direction: column;
+    /* align-items: stretch; */
+    position: absolute;
+    right: 1rem;
+    top: 4rem;
+    background-color: snow;
+    border-radius: 4px;
+    background-color: var(--fancy-red);
+    padding: 4px;
+}
+
+.modal-entry {
+    border-bottom: 1px solid white;
+}
+
+.modal-entry:last-of-type {
+    border-bottom: none;
+}
+
+.modal-entry:hover button {
+    background-color: rgba(255, 14, 57,1);
+}
+
+.modal-entry button {
+    width: 100%;
+    border-radius: 0;
+}

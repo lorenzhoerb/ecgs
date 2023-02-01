@@ -8,6 +8,12 @@ import LocalizationService, {LocalizeService} from 'src/app/services/localizatio
 })
 export class CompetitionHeaderComponent implements OnInit, AfterViewInit {
 
+  @ViewChild('header', {read: ElementRef})
+  header: ElementRef;
+
+  @ViewChild('ob', {read: ElementRef})
+  ob: ElementRef;
+
   @Input() title = '...';
 
   @Input() isRegistered = false;
@@ -34,12 +40,10 @@ export class CompetitionHeaderComponent implements OnInit, AfterViewInit {
 
   @Output() downloadReportDialogOpen = new EventEmitter<void>();
 
+  @Output() participantsOpen = new EventEmitter<void>();
+  @Output() groupsOpen = new EventEmitter<void>();
 
-  @ViewChild('header', {read: ElementRef})
-  header: ElementRef;
-  @ViewChild('ob', {read: ElementRef})
-  ob: ElementRef;
-
+  hideManageModal = true;
   intersectionObserver?: IntersectionObserver;
 
   constructor() {
@@ -50,6 +54,13 @@ export class CompetitionHeaderComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+  }
+
+  showVerwalten(): boolean {
+    return this.reportsAreDownloadable
+      || this.canCalculateCompetitionResults
+      || this.canEdit
+      || this.canGrade;
   }
 
   ngAfterViewInit(): void {
@@ -80,6 +91,14 @@ export class CompetitionHeaderComponent implements OnInit, AfterViewInit {
 
   onCalculateCompetitionResults() {
     this.competitionResultsCalculation.emit();
+  }
+
+  onParticipantClick() {
+    this.participantsOpen.emit();
+  }
+
+  onGroupClick() {
+    this.groupsOpen.emit();
   }
 
   onDownloadReportClick() {

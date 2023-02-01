@@ -1,10 +1,5 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
 public class ReportIsDownloadableDto {
     boolean downloadable;
 
@@ -12,6 +7,14 @@ public class ReportIsDownloadableDto {
     }
 
     public ReportIsDownloadableDto(Boolean downloadable) {
+        this.downloadable = downloadable;
+    }
+
+    public boolean isDownloadable() {
+        return this.downloadable;
+    }
+
+    public void setDownloadable(boolean downloadable) {
         this.downloadable = downloadable;
     }
 }

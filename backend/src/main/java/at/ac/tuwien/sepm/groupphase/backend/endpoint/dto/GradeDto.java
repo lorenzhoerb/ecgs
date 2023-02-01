@@ -1,13 +1,10 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 
-import lombok.With;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.UUID;
 
 
-@With
 public record GradeDto(
     @NotNull(message = "must have a uuid attached to the message")
     UUID uuid,
@@ -31,4 +28,31 @@ public record GradeDto(
     @NotNull(message = "grade must be given")
     String grade
 ) {
+    public GradeDto withUuid(UUID uuid) {
+        return new GradeDto(uuid, this.judgeId, this.participantId, this.competitionId, this.gradingGroupId, this.stationId, this.grade);
+    }
+
+    public GradeDto withJudgeId(Long judgeId) {
+        return new GradeDto(this.uuid, judgeId, this.participantId, this.competitionId, this.gradingGroupId, this.stationId, this.grade);
+    }
+
+    public GradeDto withParticipantId(Long participantId) {
+        return new GradeDto(this.uuid, this.judgeId, participantId, this.competitionId, this.gradingGroupId, this.stationId, this.grade);
+    }
+
+    public GradeDto withCompetitionId(Long competitionId) {
+        return new GradeDto(this.uuid, this.judgeId, this.participantId, competitionId, this.gradingGroupId, this.stationId, this.grade);
+    }
+
+    public GradeDto withGradingGroupId(Long gradingGroupId) {
+        return new GradeDto(this.uuid, this.judgeId, this.participantId, this.competitionId, gradingGroupId, this.stationId, this.grade);
+    }
+
+    public GradeDto withStationId(Long stationId) {
+        return new GradeDto(this.uuid, this.judgeId, this.participantId, this.competitionId, this.gradingGroupId, stationId, this.grade);
+    }
+
+    public GradeDto withGrade(String grade) {
+        return new GradeDto(this.uuid, this.judgeId, this.participantId, this.competitionId, this.gradingGroupId, this.stationId, grade);
+    }
 }

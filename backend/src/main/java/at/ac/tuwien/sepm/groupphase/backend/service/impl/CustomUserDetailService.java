@@ -30,6 +30,7 @@ import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenListException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.UnauthorizedException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
@@ -287,6 +288,13 @@ public class CustomUserDetailService implements UserService {
         LOGGER.debug("ApplicationUser " + applicationUser.toString());
         applicationUser.getUser().setPassword(passwordEncoder.encode(applicationUser.getUser().getPassword()));
         ApplicationUser save = userRepository.save(applicationUser);
+        if (!userRegisterDto.getType().equals(ApplicationUser.Role.PARTICIPANT)
+            && userRegisterDto.getTeamName() != null) {
+            managedByRepository.save(new ManagedBy(
+                save, save, userRegisterDto.getTeamName()
+            ));
+        }
+
         return save;
     }
 
@@ -312,6 +320,9 @@ public class CustomUserDetailService implements UserService {
     @Override
     public Set<Competition> getCompetitionsForCalendar(int year, int weekNumber) {
         LOGGER.debug("getCompetitionsForCalendar(year={}, weekNumber={})", year, weekNumber);
+        if (!sessionUtils.isAuthenticated()) {
+            throw new UnauthorizedException("Not authorized");
+        }
         List<String> errors = new ArrayList<>();
         if (year < 2000) {
             errors.add("Year must be at least 2000");
@@ -334,45 +345,33 @@ public class CustomUserDetailService implements UserService {
 
         final var endOfSelectedWeek = beginOfSelectedWeek.plusDays(7).minusSeconds(1);
 
-        Set<Competition> competitions = null;
+        Set<Competition> competitions = new HashSet<>();
 
-        switch (sessionUtils.getApplicationUserRole()) {
-            case PARTICIPANT:
-                ApplicationUser participant = findApplicationUserByEmail(sessionUtils.getSessionUser().getUser().getEmail());
-                List<RegisterTo> registerToList;
-                if (registerToRepository.findAllByParticipantId(participant.getId()).isPresent()) {
-                    competitions = new HashSet<>();
-                    registerToList = registerToRepository.findAllByParticipantId(participant.getId()).get();
-                    for (RegisterTo registerTo : registerToList) {
-                        Competition toAdd = competitionRepository.findById(registerTo.getGradingGroup().getCompetitions().getId()).get();
-                        competitions.add(toAdd);
-                    }
-                }
-                break;
-            case CLUB_MANAGER:
-                competitions = new HashSet<>();
-                List<RegisterTo> registrationList;
-                for (ManagedBy manageBy : user.getMembers()) {
-                    if (registerToRepository.findAllByParticipantId(manageBy.getMember().getId()).isPresent()) {
-                        registrationList = registerToRepository.findAllByParticipantId(manageBy.getMember().getId()).get();
-                        for (RegisterTo registerTo : registrationList) {
-                            Competition toAdd = competitionRepository.findById(registerTo.getGradingGroup().getCompetitions().getId()).get();
-                            competitions.add(toAdd);
-                        }
-                    }
-                }
-                break;
-            case TOURNAMENT_MANAGER:
-                competitions = user.getCompetitions();
-                break;
-            default:
-                break;
+        // User's registrations
+        var registerToListOpt = registerToRepository.findAllByParticipantId(sessionUtils.getSessionUser().getId());
+        if (registerToListOpt.isPresent() && !registerToListOpt.get().isEmpty()) {
+            for (RegisterTo registerTo : registerToListOpt.get()) {
+                Competition toAdd = competitionRepository.findById(registerTo.getGradingGroup().getCompetitions().getId()).get();
+                competitions.add(toAdd);
+            }
         }
 
-        var kek = userRepository.findAll();
-        var k2k = competitionRepository.findAll();
-        if (competitions == null) {
-            return Set.of();
+        if (!sessionUtils.isParticipant()) {
+            // Registration of those, whom user manages
+            for (ManagedBy manageBy : user.getMembers()) {
+                if (registerToRepository.findAllByParticipantId(manageBy.getMember().getId()).isPresent()) {
+                    List<RegisterTo> registrationList = registerToRepository.findAllByParticipantId(manageBy.getMember().getId()).get();
+                    for (RegisterTo registerTo : registrationList) {
+                        competitions.add(
+                            competitionRepository.findById(registerTo.getGradingGroup().getCompetitions().getId()).get()
+                        );
+                    }
+                }
+            }
+            // All competitions that are managed by current user
+            if (sessionUtils.isCompetitionManager()) {
+                competitions.addAll(user.getCompetitions());
+            }
         }
 
         return competitions.stream().filter(
@@ -387,6 +386,8 @@ public class CustomUserDetailService implements UserService {
     }
 
     private void importOneFlag(String flag, ManagedBy managedBy) {
+        LOGGER.debug("importOneFlag({}, {})", flag, managedBy);
+
         if (flag == null || flag.isEmpty() || managedBy == null) {
             return;
         }
@@ -408,6 +409,8 @@ public class CustomUserDetailService implements UserService {
 
     @Override
     public ClubManagerTeamImportResults importTeam(ClubManagerTeamImportDto clubManagerTeamImportDto) {
+        LOGGER.debug("importTeam({})", clubManagerTeamImportDto);
+
         if (clubManagerTeamImportDto == null) {
             throw new ValidationException("Team is empty!");
         }
@@ -420,17 +423,21 @@ public class CustomUserDetailService implements UserService {
         }
 
         teamValidator.validate(clubManagerTeamImportDto);
-        ApplicationUser teamMember;
+        var foundManagedByOpt = managedByRepository.findByManagerIdAndMemberId(sessionUtils.getSessionUser().getId(), sessionUtils.getSessionUser().getId());
+        if (foundManagedByOpt.isEmpty()) {
+            throw new ConflictException("Manager who does not have a team name!");
+        }
+        String teamName = foundManagedByOpt.get().getTeamName();
         for (ClubManagerTeamMemberImportDto clubManagerTeamMemberImportDto : clubManagerTeamImportDto.teamMembers()) {
             Optional<ApplicationUser> existingParticipantOpt = userRepository.findApplicationUserByUserEmail(clubManagerTeamMemberImportDto.email());
+            ApplicationUser teamMember;
             if (existingParticipantOpt.isPresent()) {
                 teamMember = existingParticipantOpt.get();
                 var foundManagedBy = managedByRepository.findByManagerAndMember(clubManager, teamMember);
                 if (foundManagedBy.isPresent()) {
                     results.incrementOldParticipantsCount();
-                    foundManagedBy.get().setTeamName(clubManagerTeamImportDto.teamName());
+                    foundManagedBy.get().setTeamName(teamName);
                     importOneFlag(clubManagerTeamMemberImportDto.flag(), foundManagedBy.get());
-                    foundManagedBy.get().setTeamName(clubManagerTeamImportDto.teamName());
                     continue;
                 }
             } else {
@@ -453,7 +460,7 @@ public class CustomUserDetailService implements UserService {
 
 
             var newManagedBy = managedByRepository.save(
-                new ManagedBy(clubManager, teamMember, clubManagerTeamImportDto.teamName())
+                new ManagedBy(clubManager, teamMember, teamName)
             );
             importOneFlag(clubManagerTeamMemberImportDto.flag(), newManagedBy);
 
@@ -548,6 +555,9 @@ public class CustomUserDetailService implements UserService {
     public String resetPassword(UserPasswordResetDto userPasswordResetDto) {
         LOGGER.debug("Resets a password by its reset token{}", userPasswordResetDto);
         String token = userPasswordResetDto.getToken();
+        if (token == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Missing token for password reset");
+        }
         String password = userPasswordResetDto.getPassword();
         Optional<SecurityUser> account = this.getSecurityUserByResetToken(token);
 
@@ -591,6 +601,7 @@ public class CustomUserDetailService implements UserService {
 
     @Override
     public UserInfoDto getUser() {
+        LOGGER.debug("getUser()");
         ApplicationUser user = sessionUtils.getSessionUser();
 
         return UserInfoDto.builder()
@@ -602,11 +613,14 @@ public class CustomUserDetailService implements UserService {
     }
 
     public UserDetailDto getUser(Long id) {
+        LOGGER.debug("getUser({})", id);
         return userMapper.applicationUserToUserDetailDto(userRepository.findById(id).get());
     }
 
     @Override
     public List<SimpleFlagDto> getManagedFlags() {
+        LOGGER.debug("getManagedFlags()");
+
         if (!sessionUtils.isCompetitionManager() && !sessionUtils.isClubManager()) {
             throw new ForbiddenException("Not authorized");
         }
@@ -627,6 +641,8 @@ public class CustomUserDetailService implements UserService {
     }
 
     private ManagedBy checkUserIsManaged(ApplicationUser sessionUser, ApplicationUser m) {
+        LOGGER.debug("checkUserIsManaged({},{})", sessionUser, m);
+
         if (m == null) {
             throw new ValidationListException("User was null",
                 List.of("User was null"));
@@ -645,6 +661,8 @@ public class CustomUserDetailService implements UserService {
 
     @Override
     public void addFlagsForUsers(UserDetailSetFlagDto members) {
+        LOGGER.debug("addFlagsForUsers({})", members);
+
         if (!sessionUtils.isCompetitionManager() && !sessionUtils.isClubManager()) {
             throw new ForbiddenException("Not authorized");
         }
@@ -673,6 +691,8 @@ public class CustomUserDetailService implements UserService {
 
     @Override
     public void removeFlagsForUsers(UserDetailSetFlagDto members) {
+        LOGGER.debug("removeFlagsForUsers({})", members);
+
         if (!sessionUtils.isCompetitionManager() && !sessionUtils.isClubManager()) {
             throw new ForbiddenException("Not authorized");
         }

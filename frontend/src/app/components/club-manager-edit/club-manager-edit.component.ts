@@ -62,7 +62,7 @@ export class ClubManagerEditComponent implements OnInit {
       .subscribe(e => {
         this.page = 1;
         this.getMembers();
-    });
+      });
 
     this.getMembers();
   }
@@ -107,16 +107,13 @@ export class ClubManagerEditComponent implements OnInit {
   }
 
   registerTo() {
-    this.bulkAction = (users => {
-      if (!users || users.length === 0) {
-        this.toastr.error('No members selected to register.');
-        return;
-      }
-      const modalRef = this.modalService.open(RegisterToModalComponent, {size: 'lg'});
-      modalRef.componentInstance.participants = users.map(u => ({...u, groupId: null}));
-      modalRef.closed.subscribe(registered => {
-      });
-    });
+    const users = Array.from(this.bulkMap.values());
+    if (!users || users.length === 0) {
+      this.toastr.error('No members selected to register.');
+      return;
+    }
+    const modalRef = this.modalService.open(RegisterToModalComponent, {size: 'lg'});
+    modalRef.componentInstance.participants = users.map(u => ({...u, groupId: null}));
   }
 
   removeFlags() {
@@ -188,11 +185,21 @@ export class ClubManagerEditComponent implements OnInit {
   }
 
   mapFlags(flags: SimpleFlagDto[]): string {
-    if(flags == null) {
+    if (flags == null) {
       return '';
     }
 
     return flags.map(f => f.name).join(', ');
+  }
+
+  mapFlagsLengthChecked(flags: SimpleFlagDto[]): string {
+    const result = this.mapFlags(flags);
+
+    if (result.length > 10) {
+      return result.substr(0, 10) + '...';
+    } else {
+      return result;
+    }
   }
 
   deepCopy(x: any): any {
@@ -202,9 +209,9 @@ export class ClubManagerEditComponent implements OnInit {
   onAddRemoveFlags(modalContent) {
     this.modalService.open(modalContent, {ariaLabelledBy: 'modal-basic-title'}).result.then(
       result => {
-        if(result === 'add') {
+        if (result === 'add') {
           this.addFlags();
-        } else if(result === 'remove') {
+        } else if (result === 'remove') {
           this.removeFlags();
         }
       }

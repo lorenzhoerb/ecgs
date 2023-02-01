@@ -25,6 +25,11 @@ public class SessionUtils {
         this.applicationUserRepository = applicationUserRepository;
     }
 
+    /**
+     * Gets the detailed information for the current user.
+     *
+     * @return the detail object
+     */
     private Object getSessionUserDetails() {
         LOGGER.debug("getSessionUserDetails");
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -34,6 +39,11 @@ public class SessionUtils {
         return SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
+    /**
+     * Gets the Email of the user in the current session.
+     *
+     * @return email of current user
+     */
     private String getSessionUserEmail() {
         LOGGER.debug("getSessionUserEmail");
         Object user = this.getSessionUserDetails();

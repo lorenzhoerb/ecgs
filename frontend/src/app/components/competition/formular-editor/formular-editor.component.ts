@@ -1,6 +1,7 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {CdkDrag, CdkDropList, copyArrayItem, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import {cloneDeep} from 'lodash';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-formular-editor',
@@ -40,7 +41,7 @@ export class FormularEditorComponent implements OnInit, OnChanges {
 
   variables = cloneDeep(this.vars);
 
-  tempConst = 0.0;
+  tempConst = 1.0;
 
   functions: any[] = [
     { name: '+', value: 'add', typeHint: 'add', type: 'function', spaces: 2, priority: 2 },
@@ -54,7 +55,7 @@ export class FormularEditorComponent implements OnInit, OnChanges {
     []
   ];
 
-  constructor() { }
+  constructor(private toastr: ToastrService) { }
 
   ngOnChanges(changes: SimpleChanges): void {
     this.variables = cloneDeep(this.vars);
@@ -88,6 +89,10 @@ export class FormularEditorComponent implements OnInit, OnChanges {
   }
 
   addConstant() {
+    if(this.tempConst <= 0.0) {
+      this.toastr.warning('Konstanten müssen größer als 0 sein.');
+      return;
+    }
     this.constants.push({ name: `${this.tempConst}`, value: this.tempConst, typeHint: 'const', type: 'constant', spaces: 0, priority: 0},);
   }
 

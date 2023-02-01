@@ -221,7 +221,7 @@ public class CompetitionRegistrationEndpointTest extends TestDataProvider {
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
 
-        assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());
+        assertEquals("true", response.getContentAsString());
     }
 
     @Test
@@ -257,7 +257,7 @@ public class CompetitionRegistrationEndpointTest extends TestDataProvider {
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
 
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
+        assertEquals("false", response.getContentAsString());
     }
 
     @Test

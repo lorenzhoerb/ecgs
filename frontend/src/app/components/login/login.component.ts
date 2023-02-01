@@ -4,6 +4,7 @@ import {Router} from '@angular/router';
 import {AuthService} from '../../services/auth.service';
 import {AuthRequest} from '../../dtos/auth-request';
 import LocalizationService, {LocalizeService} from 'src/app/services/localization/localization.service';
+import {ToastrService} from 'ngx-toastr';
 
 
 @Component({
@@ -17,11 +18,10 @@ export class LoginComponent implements OnInit {
   // After first submission attempt, form validation will start
   submitted = false;
   // Error flag
-  error = false;
-  errorMessage = '';
   hide = true;
 
-  constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private router: Router) {
+  constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private router: Router,
+              private toastr: ToastrService) {
     this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(8)]]
@@ -57,22 +57,13 @@ export class LoginComponent implements OnInit {
       },
       error: error => {
         console.log('Could not log in due to:');
-        console.log(error);
-        this.error = true;
         if (typeof error.error === 'object') {
-          this.errorMessage = error.error.error;
+          this.toastr.error(error.error.error);
         } else {
-          this.errorMessage = error.error;
+          this.toastr.error('Ihre E-Mail oder Ihr Passwort ist nicht korrekt!');
         }
       }
     });
-  }
-
-  /**
-   * Error flag will be deactivated, which clears the error message
-   */
-  vanishError() {
-    this.error = false;
   }
 
   ngOnInit() {

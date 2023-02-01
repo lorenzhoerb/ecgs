@@ -5,6 +5,8 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Competition;
 import at.ac.tuwien.sepm.groupphase.backend.entity.GradingGroup;
 import at.ac.tuwien.sepm.groupphase.backend.entity.RegisterTo;
+import at.ac.tuwien.sepm.groupphase.backend.entity.grade.Grade;
+import at.ac.tuwien.sepm.groupphase.backend.entity.grade.GradePk;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Add;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Constant;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Divide;
@@ -13,13 +15,16 @@ import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.strategys.Mean;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.structural.GradingSystem;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.structural.Station;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.structural.Variable;
+import at.ac.tuwien.sepm.groupphase.backend.report.GradableEntityInfo;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.GradeRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingSystemRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,6 +46,7 @@ public class CompetitionBuilder {
     private final GradingGroupRepository gradingGroupRepository;
     private final RegisterToRepository registerToRepository;
     private final GradingSystemRepository gradingSystemRepository;
+    private final GradeRepository gradeRepository;
 
     private final Competition competition;
     private ApplicationUser creator;
@@ -49,12 +56,16 @@ public class CompetitionBuilder {
 
     public CompetitionBuilder(ApplicationUserRepository applicationUserRepository,
                               CompetitionRepository competitionRepository,
-                              GradingGroupRepository gradingGroupRepository, RegisterToRepository registerToRepository, GradingSystemRepository gradingSystemRepository) {
+                              GradingGroupRepository gradingGroupRepository,
+                              RegisterToRepository registerToRepository,
+                              GradingSystemRepository gradingSystemRepository,
+                              GradeRepository gradeRepository) {
         this.applicationUserRepository = applicationUserRepository;
         this.competitionRepository = competitionRepository;
         this.gradingGroupRepository = gradingGroupRepository;
         this.registerToRepository = registerToRepository;
         this.gradingSystemRepository = gradingSystemRepository;
+        this.gradeRepository = gradeRepository;
         competition = getDefaultCompetition();
         gradingGroups = getDefaultGradingGroups();
         creator = getDefaultAppUser();
@@ -86,6 +97,13 @@ public class CompetitionBuilder {
     }
 
     private void assignParticipants() {
+        Random rand = new Random();
+        List<ApplicationUser> judges = null;
+
+        if (competition.getJudges() != null) {
+            judges = competition.getJudges().stream().toList();
+        }
+
         for (int i = 0; i < gradingGroups.size(); i++) {
             for (int j = 0; j < participantCount; j++) {
                 ApplicationUser participant = UserProvider.getRandomAppUser();
@@ -101,6 +119,44 @@ public class CompetitionBuilder {
                 gradingGroups.get(i).getRegistrations().add(registerTo);
                 applicationUserRepository.save(participant);
                 registerToRepository.save(registerTo);
+
+                if (judges != null) {
+                    // grades per station
+                    for (int k = 0; k < rand.nextInt(0, 5); ++k) {
+                        ApplicationUser judge = judges.get(rand.nextInt(0, judges.size()));
+                        GradingGroup gradingGroup = gradingGroups.get(i);
+
+                        gradeRepository.save(
+                            new Grade(
+                                new GradePk(judge.getId(), participant.getId(),
+                                    competition.getId(), gradingGroup.getId(),
+                                    1L),
+                                judge,
+                                participant,
+                                competition,
+                                gradingGroup,
+                                "{\"grades\":[{\"id\":1,\"value\":" + random2Decimal() + "},"
+                                    + "{\"id\":2,\"value\":" + random2Decimal() + "}]}",
+                                true
+                            )
+                        );
+
+                        judge = judges.get(rand.nextInt(0, judges.size()));
+                        gradeRepository.save(
+                            new Grade(
+                                new GradePk(judge.getId(), participant.getId(),
+                                    competition.getId(), gradingGroup.getId(),
+                                    2L),
+                                judge,
+                                participant,
+                                competition,
+                                gradingGroup,
+                                "{\"grades\":[{\"id\":1,\"value\":" + random2Decimal() + "}]}",
+                                true
+                            )
+                        );
+                    }
+                }
             }
         }
     }
@@ -223,12 +279,12 @@ public class CompetitionBuilder {
     private String getGradingSystemFormula() {
         ObjectMapper mapper = new ObjectMapper();
         GradingSystem system = new GradingSystem();
-        system.stations = new Station[] {
-            new Station(1L, "Station 1", new Variable[] {
+        system.stations = new Station[]{
+            new Station(1L, "Station 1", new Variable[]{
                 new Variable(1L, "Var 1", 2L, new Mean()),
                 new Variable(2L, "Var 2", 1L, new Mean()),
             }, new Add(new VariableRef(1L), new VariableRef(2L))),
-            new Station(2L, "Station 2", new Variable[] {
+            new Station(2L, "Station 2", new Variable[]{
                 new Variable(1L, "Var 1", 3L, new Mean()),
             }, new Divide(new VariableRef(1L), new Constant(2.0)))
         };
@@ -239,5 +295,9 @@ public class CompetitionBuilder {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private double random2Decimal() {
+        return Math.round((new Random()).nextDouble(0, 10) * 100.0) / 100.0;
     }
 }

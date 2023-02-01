@@ -88,6 +88,8 @@ public class GradeController {
     @MessageExceptionHandler
     @SendToUser(value = "/queue/error", broadcast = false)
     public MessageErrorDto handleException(Throwable message) {
+        LOGGER.trace("handleException {}", message);
+
         if (!(message instanceof  WebSocketMessageException)) {
             //should never happen
             return new MessageErrorDto()

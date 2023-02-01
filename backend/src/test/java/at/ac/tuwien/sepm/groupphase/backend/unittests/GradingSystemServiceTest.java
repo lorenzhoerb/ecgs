@@ -1,15 +1,11 @@
 package at.ac.tuwien.sepm.groupphase.backend.unittests;
 
 import at.ac.tuwien.sepm.groupphase.backend.basetest.TestDataProvider;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ErrorListRestDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.GradingSystemDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ViewEditGradingSystemDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.GradingSystemMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
-import at.ac.tuwien.sepm.groupphase.backend.exception.ForbiddenException;
-import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
-import at.ac.tuwien.sepm.groupphase.backend.exception.StrategyException;
-import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationListException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.*;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Add;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Constant;
 import at.ac.tuwien.sepm.groupphase.backend.gradingsystem.operations.Divide;
@@ -33,22 +29,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -82,7 +70,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
     }
 
     @Test
-    public void addOpTest() throws JsonProcessingException {
+    public void givenValid_addOp_calculateCorrectResult() throws JsonProcessingException {
         String json = getSingleOp2Formula(new Add(new VariableRef(1L), new VariableRef(2L)));
         GradingSystem result = new GradingSystem(json);
         result.bindVariable(1L, 1L, 2.0);
@@ -91,7 +79,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
     }
 
     @Test
-    public void subOpTest() throws JsonProcessingException {
+    public void givenValid_subOp_calculateCorrectResult() throws JsonProcessingException {
         String json = getSingleOp2Formula(new Sub(new VariableRef(1L), new VariableRef(2L)));
         GradingSystem result = new GradingSystem(json);
         result.bindVariable(1L, 1L, 2.0);
@@ -100,14 +88,14 @@ public class GradingSystemServiceTest extends TestDataProvider {
     }
 
     @Test
-    public void constantOpTest() throws JsonProcessingException {
+    public void givenValid_constantOp_getCorrectResult() throws JsonProcessingException {
         String json = getSingleOp0Formula(new Constant(4.0));
         GradingSystem result = new GradingSystem(json);
         assertEquals(result.evaluate(), 4.0, 1e-5);
     }
 
     @Test
-    public void divideOpTest() throws JsonProcessingException {
+    public void givenValid_divideOp_calculateCorrectResult() throws JsonProcessingException {
         String json = getSingleOp2Formula(new Divide(new VariableRef(1L),
                                                      new VariableRef(2L)));
         GradingSystem result = new GradingSystem(json);
@@ -117,7 +105,19 @@ public class GradingSystemServiceTest extends TestDataProvider {
     }
 
     @Test
-    public void multiplyOpTest() throws JsonProcessingException {
+    public void givenZeroDenominator_divideOp_throwsEvaluationException() throws JsonProcessingException {
+        String json = getSingleOp2Formula(new Divide(new VariableRef(1L),
+            new VariableRef(2L)));
+        GradingSystem result = new GradingSystem(json);
+        result.bindVariable(1L, 1L, 2.0);
+        result.bindVariable(1L, 2L, 0.0);
+
+        EvaluationException e = assertThrows(EvaluationException.class, result::evaluate);
+        assertEquals(e.getMessage(), "Division by Zero");
+    }
+
+    @Test
+    public void givenValid_multiplyOp_calculateCorrectResult() throws JsonProcessingException {
         String json = getSingleOp2Formula(new Multiply(new VariableRef(1L),
             new VariableRef(2L)));
         GradingSystem result = new GradingSystem(json);
@@ -127,7 +127,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
     }
 
     @Test
-    public void meanOpTest() throws JsonProcessingException {
+    public void givenValid_meanOp_calculateCorrectResult() throws JsonProcessingException {
         String json = getSingleOp2Formula(new Mean(new Operation[] {
             new VariableRef(1L),
             new VariableRef(2L)
@@ -139,7 +139,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
     }
 
     @Test
-    public void variableRefOpTest() throws JsonProcessingException {
+    public void givenValid_variableRefOp_calculateCorrectResult() throws JsonProcessingException {
         String json = getSingleOp2Formula(new VariableRef(1L));
         GradingSystem result = new GradingSystem(json);
         result.bindVariable(1L, 1L, 2.0);
@@ -148,36 +148,55 @@ public class GradingSystemServiceTest extends TestDataProvider {
     }
 
     @Test
-    public void EqualStrategyTest() throws JsonProcessingException {
+    public void givenValid_EqualStrategy_calculateCorrectResult() throws JsonProcessingException {
+        String json = getSingleStrategyFormula(new Equal(), 2L);
+        GradingSystem result = new GradingSystem(json);
+
+        result.bindVariable(1L, 1L, 2.0);
+        result.bindVariable(1L, 1L, 2.0);
+        assertEquals(result.evaluate(), 2.0, 1e-5);
+    }
+
+    @Test
+    public void givenToViewVariables_EqualStrategy_throwsStrategyException() throws JsonProcessingException {
         String json = getSingleStrategyFormula(new Equal(), 2L);
         GradingSystem result = new GradingSystem(json);
 
         result.bindVariable(1L, 1L, 2.0);
         assertThrows(StrategyException.class, result::evaluate);
+    }
+
+    @Test
+    public void givenUnequalValues_EqualStrategy_throwsStrategyException() throws JsonProcessingException {
+        String json = getSingleStrategyFormula(new Equal(), 2L);
+        GradingSystem result = new GradingSystem(json);
 
         result.bindVariable(1L, 1L, 2.0);
-        assertEquals(result.evaluate(), 2.0, 1e-5);
-
         result.bindVariable(1L, 1L, 3.0);
         assertThrows(StrategyException.class, result::evaluate);
     }
 
     @Test
-    public void MeanStrategyTest() throws JsonProcessingException {
-        String json = getSingleStrategyFormula(
-            new at.ac.tuwien.sepm.groupphase.backend.gradingsystem.strategys.Mean(),
-            2L);
+    public void givenValid_MeanStrategy_calculateCorrectResult() throws JsonProcessingException {
+        String json = getSingleStrategyFormula(new at.ac.tuwien.sepm.groupphase.backend.gradingsystem.strategys.Mean(), 2L);
         GradingSystem result = new GradingSystem(json);
 
         result.bindVariable(1L, 1L, 2.0);
-        assertThrows(StrategyException.class, result::evaluate);
-
         result.bindVariable(1L, 1L, 4.0);
         assertEquals(result.evaluate(), 3.0, 1e-5);
     }
 
     @Test
-    public void defaultParserTest() throws JsonProcessingException {
+    public void givenToViewVariables_MeanStrategy_throwsStrategyException() throws JsonProcessingException {
+        String json = getSingleStrategyFormula(new at.ac.tuwien.sepm.groupphase.backend.gradingsystem.strategys.Mean(), 2L);
+        GradingSystem result = new GradingSystem(json);
+
+        result.bindVariable(1L, 1L, 2.0);
+        assertThrows(StrategyException.class, result::evaluate);
+    }
+
+    @Test
+    public void givenMultipleStations_GradingSystem_calculatesCorrectResult() throws JsonProcessingException {
         String json = getGradingSystemFormula();
         GradingSystem result = new GradingSystem(json);
         result.bindVariable(1L, 1L, 2.0);
@@ -206,7 +225,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
 
     @Test
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
-    public void givenInvalidNameToLong() throws JsonProcessingException {
+    public void givenInvalidNameToLong_throwValidationListException() throws JsonProcessingException {
         GradingSystemDetailDto gradingSystemDetailDto1 = new GradingSystemDetailDto(
             "A".repeat(257),
             "desc",
@@ -215,15 +234,13 @@ public class GradingSystemServiceTest extends TestDataProvider {
             getGradingSystemFormula()
         );
 
-        ValidationListException e = assertThrows(ValidationListException.class, () -> {
-            gradingSystemService.createGradingSystem(gradingSystemDetailDto1);
-        });
+        ValidationListException e = assertThrows(ValidationListException.class, () -> gradingSystemService.createGradingSystem(gradingSystemDetailDto1));
         assertEquals(e.errors().get(0), "name to long");
     }
 
     @Test
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
-    public void givenInvalidNameNull() throws JsonProcessingException {
+    public void givenInvalidNameNull_throwValidationListException() throws JsonProcessingException {
         GradingSystemDetailDto gradingSystemDetailDto1 = new GradingSystemDetailDto(
             null,
             "desc",
@@ -232,15 +249,14 @@ public class GradingSystemServiceTest extends TestDataProvider {
             getGradingSystemFormula()
         );
 
-        ValidationListException e = assertThrows(ValidationListException.class, () -> {
-            gradingSystemService.createGradingSystem(gradingSystemDetailDto1);
-        });
+        ValidationListException e = assertThrows(ValidationListException.class, () ->
+            gradingSystemService.createGradingSystem(gradingSystemDetailDto1));
         assertEquals(e.errors().get(0), "name can't be empty");
     }
 
     @Test
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
-    public void givenInvalidNameEmpty() throws JsonProcessingException {
+    public void givenInvalidNameEmpty_throwValidationListException() throws JsonProcessingException {
         GradingSystemDetailDto gradingSystemDetailDto1 = new GradingSystemDetailDto(
             "",
             "desc",
@@ -249,15 +265,14 @@ public class GradingSystemServiceTest extends TestDataProvider {
             getGradingSystemFormula()
         );
 
-        ValidationListException e = assertThrows(ValidationListException.class, () -> {
-            gradingSystemService.createGradingSystem(gradingSystemDetailDto1);
-        });
+        ValidationListException e = assertThrows(ValidationListException.class, () ->
+            gradingSystemService.createGradingSystem(gradingSystemDetailDto1));
         assertEquals(e.errors().get(0), "name can't be empty");
     }
 
     @Test
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
-    public void givenInvalidDescriptionToLong() throws JsonProcessingException {
+    public void givenInvalidDescriptionToLong_throwValidationListException() throws JsonProcessingException {
         GradingSystemDetailDto gradingSystemDetailDto2 = new GradingSystemDetailDto(
             "name",
             "A".repeat(4097),
@@ -266,15 +281,14 @@ public class GradingSystemServiceTest extends TestDataProvider {
             getGradingSystemFormula()
         );
 
-        ValidationListException e = assertThrows(ValidationListException.class, () -> {
-            gradingSystemService.createGradingSystem(gradingSystemDetailDto2);
-        });
+        ValidationListException e = assertThrows(ValidationListException.class, () ->
+            gradingSystemService.createGradingSystem(gradingSystemDetailDto2));
         assertEquals(e.errors().get(0), "description to long");
     }
 
     @Test
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
-    public void givenInvalidDescriptionNull() throws JsonProcessingException {
+    public void givenInvalidDescriptionNull_throwValidationListException() throws JsonProcessingException {
         GradingSystemDetailDto gradingSystemDetailDto2 = new GradingSystemDetailDto(
             "name",
             null,
@@ -283,15 +297,14 @@ public class GradingSystemServiceTest extends TestDataProvider {
             getGradingSystemFormula()
         );
 
-        ValidationListException e = assertThrows(ValidationListException.class, () -> {
-            gradingSystemService.createGradingSystem(gradingSystemDetailDto2);
-        });
+        ValidationListException e = assertThrows(ValidationListException.class, () ->
+            gradingSystemService.createGradingSystem(gradingSystemDetailDto2));
         assertEquals(e.errors().get(0), "description can't be empty");
     }
 
     @Test
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
-    public void givenInvalidDescriptionEmpty() throws JsonProcessingException {
+    public void givenInvalidDescriptionEmpty_throwValidationListException() throws JsonProcessingException {
         GradingSystemDetailDto gradingSystemDetailDto2 = new GradingSystemDetailDto(
             "name",
             "",
@@ -300,15 +313,14 @@ public class GradingSystemServiceTest extends TestDataProvider {
             getGradingSystemFormula()
         );
 
-        ValidationListException e = assertThrows(ValidationListException.class, () -> {
-            gradingSystemService.createGradingSystem(gradingSystemDetailDto2);
-        });
+        ValidationListException e = assertThrows(ValidationListException.class, () ->
+            gradingSystemService.createGradingSystem(gradingSystemDetailDto2));
         assertEquals(e.errors().get(0), "description can't be empty");
     }
 
     @Test
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
-    public void givenInvalidFormulaToLong() {
+    public void givenInvalidFormulaToLong_throwValidationListException() {
         GradingSystemDetailDto gradingSystemDetailDto2 = new GradingSystemDetailDto(
             "name",
             "desc",
@@ -317,15 +329,14 @@ public class GradingSystemServiceTest extends TestDataProvider {
             "A".repeat(65537)
         );
 
-        ValidationListException e = assertThrows(ValidationListException.class, () -> {
-            gradingSystemService.createGradingSystem(gradingSystemDetailDto2);
-        });
+        ValidationListException e = assertThrows(ValidationListException.class, () ->
+            gradingSystemService.createGradingSystem(gradingSystemDetailDto2));
         assertEquals(e.errors().get(0), "formula to long");
     }
 
     @Test
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
-    public void givenInvalidFormulaEmpty() {
+    public void givenInvalidFormulaEmpty_throwValidationListException() {
         GradingSystemDetailDto gradingSystemDetailDto2 = new GradingSystemDetailDto(
             "name",
             "desc",
@@ -334,15 +345,14 @@ public class GradingSystemServiceTest extends TestDataProvider {
             ""
         );
 
-        ValidationListException e = assertThrows(ValidationListException.class, () -> {
-            gradingSystemService.createGradingSystem(gradingSystemDetailDto2);
-        });
+        ValidationListException e = assertThrows(ValidationListException.class, () ->
+            gradingSystemService.createGradingSystem(gradingSystemDetailDto2));
         assertEquals(e.errors().get(0), "parsing formula");
     }
 
     @Test
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
-    public void givenInvalidFormulaNull() {
+    public void givenInvalidFormulaNull_throwValidationListException() {
         GradingSystemDetailDto gradingSystemDetailDto2 = new GradingSystemDetailDto(
             "name",
             "description",
@@ -351,15 +361,14 @@ public class GradingSystemServiceTest extends TestDataProvider {
            null
         );
 
-        ValidationListException e = assertThrows(ValidationListException.class, () -> {
-            gradingSystemService.createGradingSystem(gradingSystemDetailDto2);
-        });
+        ValidationListException e = assertThrows(ValidationListException.class, () ->
+            gradingSystemService.createGradingSystem(gradingSystemDetailDto2));
         assertEquals(e.errors().get(0), "formula must be given");
     }
 
     @Test
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
-    public void givenInvalidFormulaIdsNotUniqueOnStationVars() throws Exception {
+    public void givenInvalidFormulaIdsNotUniqueOnStationVars_throwValidationListException() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
 
         GradingSystem system = new GradingSystem();
@@ -379,15 +388,14 @@ public class GradingSystemServiceTest extends TestDataProvider {
             mapper.writeValueAsString(system)
         );
 
-        ValidationListException e = assertThrows(ValidationListException.class, () -> {
-            gradingSystemService.createGradingSystem(gradingSystemDetailDto2);
-        });
+        ValidationListException e = assertThrows(ValidationListException.class, () ->
+            gradingSystemService.createGradingSystem(gradingSystemDetailDto2));
         assertEquals(e.errors().get(0), "Station Station has a duplicate variable id");
     }
 
     @Test
     @WithMockUser(username = TEST_USER_COMPETITION_MANAGER_EMAIL)
-    public void givenInvalidFormulaIdsNotUniqueOnStations() throws Exception {
+    public void givenInvalidFormulaIdsNotUniqueOnStations_throwValidationListException() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
 
         GradingSystem system = new GradingSystem();
@@ -409,26 +417,23 @@ public class GradingSystemServiceTest extends TestDataProvider {
             mapper.writeValueAsString(system)
         );
 
-        ValidationListException e = assertThrows(ValidationListException.class, () -> {
-            gradingSystemService.createGradingSystem(gradingSystemDetailDto2);
-        });
+        ValidationListException e = assertThrows(ValidationListException.class, () ->
+            gradingSystemService.createGradingSystem(gradingSystemDetailDto2));
         assertEquals(e.errors().get(0), "GradingSystem has a duplicate station id");
     }
 
     @Test
-    public void givenNotLoggedInUser_thenForbiddenException() {
-        assertThrows(ForbiddenException.class, () -> {
-            gradingSystemService.createGradingSystem(getValidGradingSystemDetailDto());
-        });
+    public void givenNotLoggedInUser_thenThrowForbiddenException() {
+        assertThrows(ForbiddenException.class, () ->
+            gradingSystemService.createGradingSystem(getValidGradingSystemDetailDto()));
     }
 
     @Test
     @WithMockUser("gs_test_1@test.test")
-    public void getDraftGradingSystemById_withValidId_expectToFindCorrectGradingSystem() throws Exception {
+    public void getDraftGradingSystemById_withValidId_expectToFindCorrectGradingSystem() {
         var gss = setupGradingSystems();
         var gs_test = gss.get(0);
         var gs_test_mapped = gradingSystemMapper.gradingSystemToViewEditGradingSystemDto(gs_test);
-        var user = userService.findApplicationUserByEmail("gs_test_1@test.test");
 
         var found = this.gradingSystemService.getDraftGradingSystemById(gs_test.getId());
         assertThat(found).isEqualTo(gs_test_mapped);
@@ -436,11 +441,10 @@ public class GradingSystemServiceTest extends TestDataProvider {
 
     @Test
     @WithMockUser("gs_test_1@test.test")
-    public void getDraftGradingSystemById_withIncorrectId_expectToFindIncorrectGradingSystem() throws Exception {
+    public void getDraftGradingSystemById_withIncorrectId_expectToFindIncorrectGradingSystem() {
         var gss = setupGradingSystems();
         var gs_test = gss.get(0);
         var gs_test_mapped = gradingSystemMapper.gradingSystemToViewEditGradingSystemDto(gs_test);
-        var user = userService.findApplicationUserByEmail("gs_test_1@test.test");
 
         var found = this.gradingSystemService.getDraftGradingSystemById(gss.get(1).getId());
         assertThat(found).isNotEqualTo(gs_test_mapped);
@@ -448,41 +452,32 @@ public class GradingSystemServiceTest extends TestDataProvider {
 
     @Test
     @WithMockUser("gs_test_1@test.test")
-    public void getDraftGradingSystemById_withInvalidId_expectToGetNotFoundException() throws Exception {
-        var gss = setupGradingSystems();
-        var gs_test = gss.get(0);
-        var gs_test_mapped = gradingSystemMapper.gradingSystemToViewEditGradingSystemDto(gs_test);
-        var user = userService.findApplicationUserByEmail("gs_test_1@test.test");
+    public void getDraftGradingSystemById_withInvalidId_expectToGetNotFoundException() {
+        setupGradingSystems();
 
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
-            gradingSystemService.getDraftGradingSystemById(-123L);
-        });
+        NotFoundException exception = assertThrows(NotFoundException.class, () ->
+            gradingSystemService.getDraftGradingSystemById(-123L));
 
         assertThat(exception.getMessage()).contains("No such grading system found");
     }
 
     @Test
     @WithMockUser("gs_test_1@test.test")
-    public void getDraftGradingSystemById_withValidIdButOfDifferentUserWhenNonPublicAndIsDraft_expectToGetNotFoundException() throws Exception {
+    public void getDraftGradingSystemById_withValidIdButOfDifferentUserWhenNonPublicAndIsDraft_expectToGetNotFoundException() {
         var gss = setupGradingSystems();
-        var gs_test = gss.get(0);
-        var gs_test_mapped = gradingSystemMapper.gradingSystemToViewEditGradingSystemDto(gs_test);
-        var user = userService.findApplicationUserByEmail("gs_test_1@test.test");
 
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
-            gradingSystemService.getDraftGradingSystemById(gss.get(5).getId());
-        });
+        NotFoundException exception = assertThrows(NotFoundException.class, () ->
+            gradingSystemService.getDraftGradingSystemById(gss.get(5).getId()));
 
         assertThat(exception.getMessage()).contains("No such grading system found");
     }
 
     @Test
     @WithMockUser("gs_test_1@test.test")
-    public void getDraftGradingSystemById_withValidIdButOfDifferentUserWhenPublicAndIsDraft_expectToGetCorrectGradingSystem() throws Exception {
+    public void getDraftGradingSystemById_withValidIdButOfDifferentUserWhenPublicAndIsDraft_expectToGetCorrectGradingSystem() {
         var gss = setupGradingSystems();
         var gs_test = gss.get(4);
         var gs_test_mapped = gradingSystemMapper.gradingSystemToViewEditGradingSystemDto(gs_test);
-        var user = userService.findApplicationUserByEmail("gs_test_1@test.test");
 
         var found = this.gradingSystemService.getDraftGradingSystemById(gs_test.getId());
         assertThat(found).isEqualTo(gs_test_mapped);
@@ -490,7 +485,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
 
     @Test
     @WithMockUser("gs_test_1@test.test")
-    public void getSimpleDraftGradingSystemById_expectToGetCorrectGradingSystems() throws Exception {
+    public void getSimpleDraftGradingSystemById_expectToGetCorrectGradingSystems() {
         var gss = setupGradingSystems();
         var user = userService.findApplicationUserByEmail("gs_test_1@test.test");
 
@@ -515,7 +510,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
 
     @Test
     @WithMockUser("gs_test_1@test.test")
-    public void updateDraftGradingSystem_expectToGetCorrectGradingSystems() throws Exception {
+    public void updateDraftGradingSystem_expectToGetCorrectGradingSystems() {
         var gss = setupGradingSystems();
         var gs_test = gss.get(0);
         var testVEGS = new ViewEditGradingSystemDto(
@@ -532,7 +527,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
 
     @Test
     @WithMockUser("gs_test_1@test.test")
-    public void updateDraftGradingSystem_withTooLongName_expectToThrowValidationException() throws Exception {
+    public void updateDraftGradingSystem_withTooLongName_expectToThrowValidationException() {
         var gss = setupGradingSystems();
         var gs_test = gss.get(0);
         var testVEGS = new ViewEditGradingSystemDto(
@@ -542,16 +537,15 @@ public class GradingSystemServiceTest extends TestDataProvider {
             !gs_test.getPublic(),
             "{KEK:\"KEK\"}"
         );
-        ValidationListException exception = assertThrows(ValidationListException.class, () -> {
-            this.gradingSystemService.updateDraftGradingSystem(testVEGS);
-        });
+        ValidationListException exception = assertThrows(ValidationListException.class, () ->
+            this.gradingSystemService.updateDraftGradingSystem(testVEGS));
 
         assertThat(exception.errors()).contains("name to long");
     }
 
     @Test
     @WithMockUser("gs_test_1@test.test")
-    public void updateDraftGradingSystem_withEmptyName_expectToThrowValidationException() throws Exception {
+    public void updateDraftGradingSystem_withEmptyName_expectToThrowValidationException() {
         var gss = setupGradingSystems();
         var gs_test = gss.get(0);
         var testVEGS = new ViewEditGradingSystemDto(
@@ -562,16 +556,14 @@ public class GradingSystemServiceTest extends TestDataProvider {
             "{KEK:\"KEK\"}"
         );
 
-        ValidationListException exception = assertThrows(ValidationListException.class, () -> {
-            this.gradingSystemService.updateDraftGradingSystem(testVEGS);
-        });
+        ValidationListException exception = assertThrows(ValidationListException.class, () -> this.gradingSystemService.updateDraftGradingSystem(testVEGS));
 
         assertThat(exception.errors()).contains("name can't be empty");
     }
 
     @Test
     @WithMockUser("gs_test_1@test.test")
-    public void updateDraftGradingSystem_withNullName_expectToThrowValidationException() throws Exception {
+    public void updateDraftGradingSystem_withNullName_expectToThrowValidationException() {
         var gss = setupGradingSystems();
         var gs_test = gss.get(0);
         var testVEGS = new ViewEditGradingSystemDto(
@@ -582,16 +574,14 @@ public class GradingSystemServiceTest extends TestDataProvider {
             "{KEK:\"KEK\"}"
         );
 
-        ValidationListException exception = assertThrows(ValidationListException.class, () -> {
-            this.gradingSystemService.updateDraftGradingSystem(testVEGS);
-        });
+        ValidationListException exception = assertThrows(ValidationListException.class, () -> this.gradingSystemService.updateDraftGradingSystem(testVEGS));
 
         assertThat(exception.errors()).contains("name can't be empty");
     }
 
     @Test
     @WithMockUser("gs_test_1@test.test")
-    public void updateDraftGradingSystem_withTooLongDescription_expectToThrowValidationException() throws Exception {
+    public void updateDraftGradingSystem_withTooLongDescription_expectToThrowValidationException() {
         var gss = setupGradingSystems();
         var gs_test = gss.get(0);
         var testVEGS = new ViewEditGradingSystemDto(
@@ -602,16 +592,14 @@ public class GradingSystemServiceTest extends TestDataProvider {
             "{KEK:\"KEK\"}"
         );
 
-        ValidationListException exception = assertThrows(ValidationListException.class, () -> {
-            this.gradingSystemService.updateDraftGradingSystem(testVEGS);
-        });
+        ValidationListException exception = assertThrows(ValidationListException.class, () -> this.gradingSystemService.updateDraftGradingSystem(testVEGS));
 
         assertThat(exception.errors()).contains("description to long");
     }
 
     @Test
     @WithMockUser("gs_test_1@test.test")
-    public void updateDraftGradingSystem_withEmptyDescription_expectToThrowValidationException() throws Exception {
+    public void updateDraftGradingSystem_withEmptyDescription_expectToThrowValidationException() {
         var gss = setupGradingSystems();
         var gs_test = gss.get(0);
         var testVEGS = new ViewEditGradingSystemDto(
@@ -621,16 +609,14 @@ public class GradingSystemServiceTest extends TestDataProvider {
             !gs_test.getPublic(),
             "{KEK:\"KEK\"}"
         );
-        ValidationListException exception = assertThrows(ValidationListException.class, () -> {
-            this.gradingSystemService.updateDraftGradingSystem(testVEGS);
-        });
+        ValidationListException exception = assertThrows(ValidationListException.class, () -> this.gradingSystemService.updateDraftGradingSystem(testVEGS));
 
         assertThat(exception.errors()).contains("description can't be empty");
     }
 
     @Test
     @WithMockUser("gs_test_1@test.test")
-    public void updateDraftGradingSystem_withNullDescription_expectToThrowValidationException() throws Exception {
+    public void updateDraftGradingSystem_withNullDescription_expectToThrowValidationException() {
         var gss = setupGradingSystems();
         var gs_test = gss.get(0);
         var testVEGS = new ViewEditGradingSystemDto(
@@ -641,16 +627,14 @@ public class GradingSystemServiceTest extends TestDataProvider {
             "{KEK:\"KEK\"}"
         );
 
-        ValidationListException exception = assertThrows(ValidationListException.class, () -> {
-            this.gradingSystemService.updateDraftGradingSystem(testVEGS);
-        });
+        ValidationListException exception = assertThrows(ValidationListException.class, () -> this.gradingSystemService.updateDraftGradingSystem(testVEGS));
 
         assertThat(exception.errors()).contains("description can't be empty");
     }
 
     @Test
     @WithMockUser("gs_test_1@test.test")
-    public void updateDraftGradingSystem_withNullIsPublic_expectToThrowValidationException() throws Exception {
+    public void updateDraftGradingSystem_withNullIsPublic_expectToThrowValidationException() {
         var gss = setupGradingSystems();
         var gs_test = gss.get(0);
         var testVEGS = new ViewEditGradingSystemDto(
@@ -661,16 +645,14 @@ public class GradingSystemServiceTest extends TestDataProvider {
             "{KEK:\"KEK\"}"
         );
 
-        ValidationListException exception = assertThrows(ValidationListException.class, () -> {
-            this.gradingSystemService.updateDraftGradingSystem(testVEGS);
-        });
+        ValidationListException exception = assertThrows(ValidationListException.class, () -> this.gradingSystemService.updateDraftGradingSystem(testVEGS));
 
         assertThat(exception.errors()).contains("isPublic must be given");
     }
 
     @Test
     @WithMockUser("gs_test_1@test.test")
-    public void updateDraftGradingSystem_withTooLongFormula_expectToThrowValidationException() throws Exception {
+    public void updateDraftGradingSystem_withTooLongFormula_expectToThrowValidationException() {
         var gss = setupGradingSystems();
         var gs_test = gss.get(0);
         var testVEGS = new ViewEditGradingSystemDto(
@@ -681,9 +663,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
             "f".repeat(65536)
         );
 
-        ValidationListException exception = assertThrows(ValidationListException.class, () -> {
-            this.gradingSystemService.updateDraftGradingSystem(testVEGS);
-        });
+        ValidationListException exception = assertThrows(ValidationListException.class, () -> this.gradingSystemService.updateDraftGradingSystem(testVEGS));
 
 
         assertThat(exception.errors()).contains("formula to long");
@@ -691,7 +671,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
 
     @Test
     @WithMockUser("gs_test_1@test.test")
-    public void updateDraftGradingSystem_withNullFormula_expectToThrowValidationException() throws Exception {
+    public void updateDraftGradingSystem_withNullFormula_expectToThrowValidationException() {
         var gss = setupGradingSystems();
         var gs_test = gss.get(0);
         var testVEGS = new ViewEditGradingSystemDto(
@@ -702,16 +682,14 @@ public class GradingSystemServiceTest extends TestDataProvider {
             null
         );
 
-        ValidationListException exception = assertThrows(ValidationListException.class, () -> {
-            this.gradingSystemService.updateDraftGradingSystem(testVEGS);
-        });
+        ValidationListException exception = assertThrows(ValidationListException.class, () -> this.gradingSystemService.updateDraftGradingSystem(testVEGS));
 
         assertThat(exception.errors()).contains("formula must be given");
     }
 
     @Test
     @WithMockUser("gs_test_1@test.test")
-    public void updateDraftGradingSystem_withIdBelongingToOtherUserAndIsPrivateTemplate_expectToThrowNotFoundException() throws Exception {
+    public void updateDraftGradingSystem_withIdBelongingToOtherUserAndIsPrivateTemplate_expectToThrowNotFoundException() {
         var gss = setupGradingSystems();
         var gs_test = gss.get(5);
         var testVEGS = new ViewEditGradingSystemDto(
@@ -722,16 +700,14 @@ public class GradingSystemServiceTest extends TestDataProvider {
             "{}"
         );
 
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
-            this.gradingSystemService.updateDraftGradingSystem(testVEGS);
-        });
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> this.gradingSystemService.updateDraftGradingSystem(testVEGS));
 
         assertThat(exception.getMessage()).contains("No such grading system found");
     }
 
     @Test
     @WithMockUser("gs_test_1@test.test")
-    public void deleteDraftGradingSystem_withCorrectId_expectToSucceed() throws Exception {
+    public void deleteDraftGradingSystem_withCorrectId_expectToSucceed() {
         var gss = setupGradingSystems();
         var gs_test = gss.get(0);
         var toDeleteOpt = gradingSystemRepository.findById(gs_test.getId());
@@ -746,7 +722,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
 
     @Test
     @WithMockUser("gs_test_1@test.test")
-    public void deleteDraftGradingSystem_withIncorrectId_expectToThrowNotFoundException() throws Exception {
+    public void deleteDraftGradingSystem_withIncorrectId_expectToThrowNotFoundException() {
         var gss = setupGradingSystems();
         var gs_test = gss.get(5);
         var toDeleteOpt = gradingSystemRepository.findById(gs_test.getId());
@@ -754,9 +730,7 @@ public class GradingSystemServiceTest extends TestDataProvider {
             fail("Did not find grading system, that should have been initialized beforehand");
         }
         assertThat(toDeleteOpt.get().getId()).isEqualTo(gs_test.getId());
-        NotFoundException e = assertThrows(NotFoundException.class, () -> {
-            gradingSystemService.deleteDraftGradingSystem(gs_test.getId());
-        });
+        NotFoundException e = assertThrows(NotFoundException.class, () -> gradingSystemService.deleteDraftGradingSystem(gs_test.getId()));
 
         assertThat(gradingSystemRepository.findById(gs_test.getId()).isEmpty()).isFalse();
         assertThat(e.getMessage()).contains("No such grading system found");
@@ -764,11 +738,9 @@ public class GradingSystemServiceTest extends TestDataProvider {
 
     @Test
     @WithMockUser("gs_test_1@test.test")
-    public void deleteDraftGradingSystem_withInvalidId_expectToThrowNotFoundException() throws Exception {
-        var gss = setupGradingSystems();
-        NotFoundException e = assertThrows(NotFoundException.class, () -> {
-            gradingSystemService.deleteDraftGradingSystem(222222L);
-        });
+    public void deleteDraftGradingSystem_withInvalidId_expectToThrowNotFoundException() {
+        setupGradingSystems();
+        NotFoundException e = assertThrows(NotFoundException.class, () -> gradingSystemService.deleteDraftGradingSystem(222222L));
         assertThat(e.getMessage()).contains("No such grading system found");
     }
 }

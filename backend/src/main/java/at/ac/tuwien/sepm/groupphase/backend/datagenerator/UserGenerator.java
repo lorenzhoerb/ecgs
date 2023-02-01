@@ -6,12 +6,13 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ManagedBy;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ApplicationUserRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.ManagedByRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.SecurityUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.CompetitionRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.GradeRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingGroupRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.GradingSystemRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.ManagedByRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.RegisterToRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.SecurityUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.impl.CustomUserDetailService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -34,11 +35,13 @@ public class UserGenerator {
     private final ApplicationUserRepository applicationUserRepository;
     private final RegisterToRepository registerToRepository;
     private final GradingSystemRepository gradingSystemRepository;
+    private final GradeRepository gradeRepository;
 
     public UserGenerator(CustomUserDetailService customUserDetailService, CompetitionRepository competitionRepository,
                          GradingGroupRepository gradingGroupRepository, ApplicationUserRepository applicationUserRepository,
                          RegisterToRepository registerToRepository, GradingSystemRepository gradingSystemRepository,
-                         SecurityUserRepository securityUserRepository, ManagedByRepository managedByRepository, UserBuilder userBuilder) {
+                         SecurityUserRepository securityUserRepository, ManagedByRepository managedByRepository, UserBuilder userBuilder,
+                         GradeRepository gradeRepository) {
         this.customUserDetailService = customUserDetailService;
         this.competitionRepository = competitionRepository;
         this.gradingGroupRepository = gradingGroupRepository;
@@ -48,6 +51,7 @@ public class UserGenerator {
         this.securityUserRepository = securityUserRepository;
         this.managedByRepository = managedByRepository;
         this.userBuilder = userBuilder;
+        this.gradeRepository = gradeRepository;
     }
 
     @PostConstruct
@@ -92,7 +96,9 @@ public class UserGenerator {
             applicationUserRepository,
             competitionRepository,
             gradingGroupRepository,
-            registerToRepository, gradingSystemRepository)
+            registerToRepository,
+            gradingSystemRepository,
+            gradeRepository)
             .withParticipantsPerGroup(5)
             .withName("Judge Test")
             .setPublic(true)

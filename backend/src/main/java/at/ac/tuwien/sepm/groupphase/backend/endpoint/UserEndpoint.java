@@ -28,6 +28,7 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleFlagDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.CompetitionMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.service.CompetitionRegistrationService;
+import at.ac.tuwien.sepm.groupphase.backend.service.GradeService;
 import at.ac.tuwien.sepm.groupphase.backend.service.PictureService;
 import at.ac.tuwien.sepm.groupphase.backend.service.ReportService;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
@@ -76,6 +77,8 @@ public class UserEndpoint {
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final UserService userService;
     private final ReportService reportService;
+
+    private final GradeService gradeService;
     private final UserMapper userMapper;
     static final String BASE_PATH = "/api/v1/user";
     private final CompetitionMapper competitionMapper;
@@ -92,6 +95,7 @@ public class UserEndpoint {
         UserMapper userMapper,
         SessionUtils sessionUtils,
         ReportService reportService,
+        GradeService gradeService,
         CompetitionRegistrationService competitionRegistrationService,
         CompetitionMapper competitionMapper, PictureService pictureService) {
         this.userService = userService;
@@ -99,12 +103,14 @@ public class UserEndpoint {
         this.userMapper = userMapper;
         this.sessionUtils = sessionUtils;
         this.reportService = reportService;
+        this.gradeService = gradeService;
         this.competitionRegistrationService = competitionRegistrationService;
         this.pictureService = pictureService;
     }
 
     @Secured({"ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER", "ROLE_PARTICIPANT"})
     @GetMapping("/calendar")
+    @Operation(summary = "Gets the competitions gor a calender week")
     public Set<CalenderViewCompetitionDto> getCompetitionsForCalender(@RequestParam int year, @RequestParam int weekNumber) {
         logger.info("GET {}/calender?year={}&month={}", BASE_URI, year, weekNumber);
 
@@ -123,6 +129,7 @@ public class UserEndpoint {
     @Secured({"ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER"})
     @PostMapping("/import-team")
     @ResponseStatus(code = HttpStatus.OK)
+    @Operation(summary = "Imports the members into the application or adds them to the team if they already exist")
     public ClubManagerTeamImportResults importTeam(@RequestBody ClubManagerTeamImportDto clubManagerTeamImportDto) {
         logger.info("POST {}", BASE_URI + "/import-team");
         return userService.importTeam(clubManagerTeamImportDto);
@@ -131,6 +138,7 @@ public class UserEndpoint {
     @Secured({"ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER"})
     @PostMapping("/flags")
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Imports flags for team members")
     public ImportFlagsResultDto importFlags(@RequestBody List<ImportFlag> flags) {
         logger.info("POST {}\n{}", BASE_URI + "/flags", flags);
         return userService.importFlags(flags);
@@ -138,6 +146,7 @@ public class UserEndpoint {
 
     @Secured({"ROLE_PARTICIPANT", "ROLE_TOURNAMENT_MANAGER", "ROLE_CLUB_MANAGER"})
     @GetMapping
+    @Operation(summary = "Gets the current user.")
     public UserInfoDto getUser() {
         logger.info("GET {}", BASE_PATH);
         return userService.getUser();
@@ -145,6 +154,7 @@ public class UserEndpoint {
 
     @Secured({"ROLE_PARTICIPANT", "ROLE_TOURNAMENT_MANAGER", "ROLE_CLUB_MANAGER"})
     @GetMapping("/detail")
+    @Operation(summary = "Gets a detailed description of the current user.")
     public UserDetailDto getUserDetail() {
         logger.info("GET {}/detail", BASE_PATH);
         return userService.getUser(sessionUtils.getSessionUser().getId());
@@ -152,6 +162,7 @@ public class UserEndpoint {
 
     @Secured({"ROLE_PARTICIPANT", "ROLE_TOURNAMENT_MANAGER", "ROLE_CLUB_MANAGER"})
     @GetMapping("/{id}")
+    @Operation(summary = "Gets current user by id.")
     public UserDetailDto getUserDetail(@PathVariable Long id) {
         logger.info("GET {}/{}", BASE_PATH, id);
         return userService.getUser(id);
@@ -170,13 +181,14 @@ public class UserEndpoint {
     @Secured({"ROLE_PARTICIPANT", "ROLE_TOURNAMENT_MANAGER", "ROLE_CLUB_MANAGER"})
     @GetMapping(value = "/competitions/{id}")
     @Operation(summary = "Checks if the authenticated user is registered to the competition.", security = @SecurityRequirement(name = "apiKey"))
-    public ResponseEntity<Void> authenticatedUserIsRegisteredToCompetition(@PathVariable Long id) {
+    public Boolean authenticatedUserIsRegisteredToCompetition(@PathVariable Long id) {
         logger.info("GET {}/competitions/{}", BASE_PATH, id);
-        return competitionRegistrationService.isRegisteredTo(id) ? new ResponseEntity<>(HttpStatus.NO_CONTENT) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return competitionRegistrationService.isRegisteredTo(id);
     }
 
     @Secured({"ROLE_TOURNAMENT_MANAGER"})
     @GetMapping("search")
+    @Operation(summary = "Gets a user by name.")
     public Set<UserDetailDto> getUserByName(UserSearchDto searchDto) {
         logger.info("GET {}/search", BASE_PATH);
         return userService.findByUserName(searchDto);
@@ -184,6 +196,7 @@ public class UserEndpoint {
 
     @Secured({"ROLE_TOURNAMENT_MANAGER", "ROLE_CLUB_MANAGER"})
     @GetMapping("my-flags")
+    @Operation(summary = "Gets all flags managed by the club manager.")
     public List<SimpleFlagDto> getManagedFlags() {
         logger.info("GET {}/my-flags", BASE_PATH);
         return userService.getManagedFlags();
@@ -191,6 +204,7 @@ public class UserEndpoint {
 
     @Secured({"ROLE_TOURNAMENT_MANAGER", "ROLE_CLUB_MANAGER"})
     @PostMapping("members/flags")
+    @Operation(summary = "Add flags for team members.")
     public ResponseEntity<Void> addMemberFlags(@RequestBody UserDetailSetFlagDto members) {
         logger.info("GET {}/members/flags", BASE_PATH);
         userService.addFlagsForUsers(members);
@@ -199,6 +213,7 @@ public class UserEndpoint {
 
     @Secured({"ROLE_TOURNAMENT_MANAGER", "ROLE_CLUB_MANAGER"})
     @PatchMapping("members/flags")
+    @Operation(summary = "Remove flags for team members.")
     public ResponseEntity<Void> removeMemberFlags(@RequestBody UserDetailSetFlagDto members) {
         logger.info("GET {}/members/flags", BASE_PATH);
         userService.removeFlagsForUsers(members);
@@ -219,5 +234,13 @@ public class UserEndpoint {
     public List<ParticipantCompetitionResultDto> getMyResults() {
         logger.info("GET {}/my-results", BASE_PATH);
         return reportService.getParticipantResults();
+    }
+
+    @Secured({"ROLE_PARTICIPANT", "ROLE_CLUB_MANAGER", "ROLE_TOURNAMENT_MANAGER"})
+    @GetMapping(value = "/judges/{competitionId}")
+    @Operation(summary = "Get users results across tournaments", security = @SecurityRequirement(name = "apiKey"))
+    public boolean userIsJudge(@PathVariable Long competitionId) {
+        logger.info("GET {}/judges/{}", BASE_PATH, competitionId);
+        return this.gradeService.userJudges(competitionId);
     }
 }

@@ -1,3 +1,3 @@
-# Stationary
+# ECGS
 
-This project focuses on managing single athlete competition for sports relying on stations. Test test2
+This software project is a efficient competition grading system.
